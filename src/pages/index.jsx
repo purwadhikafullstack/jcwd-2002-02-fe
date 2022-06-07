@@ -1,4 +1,4 @@
-import { Box, Button, Container, Typography } from "@mui/material";
+import { Box, Container } from "@mui/material";
 import Nav from "components/nav";
 import UnggahResep from "components/unggahResep";
 import Footer from "components/Footer";
@@ -10,8 +10,6 @@ const Home = () => {
     <Box>
       <Nav />
       <Container>
-        <Button variant="contain">hello world</Button>
-        <Typography variant="h2">hello world</Typography>
         <ProductCard />
         <UnggahResep />
         <MetodePembayaran />
