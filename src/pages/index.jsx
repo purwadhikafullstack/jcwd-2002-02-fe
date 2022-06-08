@@ -4,6 +4,7 @@ import UnggahResep from "components/unggahResep";
 import Footer from "components/Footer";
 import MetodePembayaran from "components/MetodePembayaran";
 import ProductCard from "components/ProductCard";
+import BannerJaminan from "components/BannerJaminan";
 
 const Home = () => {
   return (
@@ -12,6 +13,7 @@ const Home = () => {
       <Container>
         <ProductCard />
         <UnggahResep />
+        <BannerJaminan />
         <MetodePembayaran />
       </Container>
       <Footer />
