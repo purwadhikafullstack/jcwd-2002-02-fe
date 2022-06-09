@@ -3,7 +3,10 @@ import {
   Button,
   Checkbox,
   FormControlLabel,
+  InputAdornment,
+  MenuItem,
   OutlinedInput,
+  Select,
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -61,6 +64,9 @@ const Alamat = () => {
               </Typography>
               {/* input no tlpon diganti pke library */}
               <RoundedInput
+                startAdornment={
+                  <InputAdornment position="start">+62</InputAdornment>
+                }
                 sx={{
                   width: "510px",
                 }}
@@ -72,21 +78,33 @@ const Alamat = () => {
                   Provinsi
                 </Typography>
                 {/* ganti jadi select, tembak ke api */}
-                <RoundedInput fullWidth />
+                <Select fullWidth sx={{ borderRadius: "8px" }}>
+                  <MenuItem>test1</MenuItem>
+                  <MenuItem>test2</MenuItem>
+                  <MenuItem>test3</MenuItem>
+                </Select>
               </Box>
               <Box mt="36px" width="50%">
                 <Typography fontSize="14px" color="#737A8D" mb="16px">
                   Kota/Kabupaten
                 </Typography>
                 {/* ganti jadi select, tembak ke api */}
-                <RoundedInput fullWidth />
+                <Select fullWidth sx={{ borderRadius: "8px" }}>
+                  <MenuItem>test1</MenuItem>
+                  <MenuItem>test2</MenuItem>
+                  <MenuItem>test3</MenuItem>
+                </Select>
               </Box>
             </Box>
             <Box mt="36px" width="50%" paddingRight="15px">
               <Typography fontSize="14px" color="#737A8D" mb="16px">
                 Kecamatan
               </Typography>
-              <RoundedInput fullWidth />
+              <Select fullWidth sx={{ borderRadius: "8px" }}>
+                <MenuItem>test1</MenuItem>
+                <MenuItem>test2</MenuItem>
+                <MenuItem>test3</MenuItem>
+              </Select>
             </Box>
             <Box mt="36px">
               <Typography fontSize="14px" color="#737A8D" mb="16px">
