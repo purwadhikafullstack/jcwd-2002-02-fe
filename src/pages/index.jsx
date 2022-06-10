@@ -6,10 +6,12 @@ import MetodePembayaran from "components/MetodePembayaran";
 import ProductCard from "components/ProductCard";
 import BannerJaminan from "components/BannerJaminan";
 import Kategori from "components/Kategori";
+import AdminSidebar from "components/AdminSidebar";
 
 const Home = () => {
   return (
     <Box>
+      <AdminSidebar />
       <Nav />
       <Container>
         <ProductCard />
