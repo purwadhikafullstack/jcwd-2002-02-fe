@@ -18,6 +18,9 @@ import { useRouter } from "next/router";
 import "react-date-range/dist/styles.css"; // main style file
 import "react-date-range/dist/theme/default.css"; // theme css file
 import { DateRange } from "react-date-range";
+import { Box } from "@mui/material";
+import DataTable from "components/admin_components/table";
+import moment from "moment";
 
 const columns = [
   { field: "id", headerName: "No", width: 70 },
