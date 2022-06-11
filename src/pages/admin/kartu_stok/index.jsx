@@ -4,15 +4,16 @@ import {
   Button,
   Divider,
   IconButton,
-  // InputAdornment,
-  // OutlinedInput,
   TextField,
   Typography,
 } from "@mui/material";
 import DataTable from "components/admin_components/table";
+import _ from "lodash";
 import moment from "moment";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
 const columns = [
   { field: "id", headerName: "No", width: 70 },
@@ -44,39 +45,51 @@ const columns = [
 const autoCompleteSelectionMonth = [
   {
     label: "January",
+    value: "January",
   },
   {
     label: "February",
+    value: "February",
   },
   {
     label: "March",
+    value: "March",
   },
   {
     label: "April",
+    value: "April",
   },
   {
     label: "Mei",
+    value: "Mei",
   },
   {
     label: "June",
+    value: "June",
   },
   {
     label: "July",
+    value: "July",
   },
   {
     label: "August",
+    value: "August",
   },
   {
     label: "September",
+    value: "September",
   },
   {
     label: "October",
+    value: "October",
   },
   {
     label: "November",
+    value: "November",
   },
   {
     label: "December",
+    value: "December",
   },
 ];
 
@@ -94,13 +107,66 @@ const rows = [
 ];
 
 const KartuStok = () => {
+  const [month, setMonth] = useState("");
+  const [year, setYear] = useState("");
+
+  const router = useRouter();
+
+  // use for onChange on the input
+  const debounceSelectionfilter = useCallback(
+    _.debounce((values, category) => {
+      if (category === "month") {
+        if (values) {
+          setMonth(values);
+        } else {
+          setMonth("");
+        }
+      } else if (category === "year") {
+        setYear(values);
+      }
+    }, 2000),
+    []
+  );
+
+  useEffect(() => {
+    if (month) {
+      router.push({
+        query: {
+          month,
+        },
+      });
+    } else if (!month) {
+      router.replace(
+        {
+          query: {
+            month,
+          },
+        },
+        undefined,
+        { shallow: true }
+      );
+    }
+
+    if (year) {
+      router.push({
+        query: {
+          year,
+        },
+      });
+    } else if (!year) {
+      router.replace(
+        {
+          query: {
+            month,
+          },
+        },
+        undefined,
+        { shallow: true }
+      );
+    }
+  }, [month, year]);
+
   return (
-    // <Box width="1186px" boxShadow={2}>
-    //   <Box width="100%" paddingLeft="30px">
-
-    //   </Box>
-    // </Box>
-
     <Box
       height="100vh"
       sx={{
@@ -154,6 +220,9 @@ const KartuStok = () => {
           >
             <Typography sx={{ mb: "5px" }}>Bulan</Typography>
             <Autocomplete
+              onChange={(e) => {
+                debounceSelectionfilter(e.target.innerText, "month");
+              }}
               disablePortal
               options={autoCompleteSelectionMonth}
               renderInput={(params) => (
@@ -164,6 +233,12 @@ const KartuStok = () => {
           <Box display="flex" flexDirection="column" mt="30px" mr="24px">
             <Typography sx={{ mb: "5px" }}>Tahun</Typography>
             <Autocomplete
+              onChange={(e) => {
+                debounceSelectionfilter(e.target.value, "year");
+              }}
+              isOptionEqualToValue={(option, value) =>
+                option.value === value.value
+              }
               disablePortal
               options={autoCompleteSelectionYear}
               renderInput={(params) => (

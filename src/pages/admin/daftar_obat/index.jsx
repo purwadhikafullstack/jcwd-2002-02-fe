@@ -7,10 +7,13 @@ import {
   Typography,
 } from "@mui/material";
 import DataTable from "components/admin_components/table";
+import _ from "lodash";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import DownloadIcon from "@mui/icons-material/Download";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
 const columns = [
   { field: "id", headerName: "No", width: 70 },
@@ -79,6 +82,29 @@ const rows = [
 ];
 
 const DaftarObat = () => {
+  const [namaObatFilter, setNamaObatFilter] = useState("");
+
+  const router = useRouter();
+
+  const debounceNamaObatFilter = useCallback(
+    _.debounce((values) => {
+      setNamaObatFilter(values);
+    }, 2000),
+    []
+  );
+
+  useEffect(() => {
+    if (namaObatFilter) {
+      router.push({
+        query: {
+          nama_obat: namaObatFilter,
+        },
+      });
+    } else if (!namaObatFilter) {
+      router.replace({ query: "nama_obat" }, undefined, { shallow: true });
+    }
+  }, [namaObatFilter]);
+
   return (
     <Box paddingTop="38px" width="1186px" height="100%" paddingX="48px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -119,6 +145,7 @@ const DaftarObat = () => {
           marginRight="32px"
         >
           <OutlinedInput
+            onChange={(e) => debounceNamaObatFilter(e.target.value)}
             placeholder="Cari nama obat"
             sx={{ width: "328px", height: "42px" }}
             endAdornment={
