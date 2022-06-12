@@ -100,10 +100,16 @@ const DaftarObat = () => {
           nama_obat: namaObatFilter,
         },
       });
-    } else if (!namaObatFilter) {
-      router.replace({ query: "nama_obat" }, undefined, { shallow: true });
     }
   }, [namaObatFilter]);
+
+  useEffect(() => {
+    if (router.isReady) {
+      if (router.query.nama_obat) {
+        setNamaObatFilter(router.query.nama_obat);
+      }
+    }
+  }, [router.isReady]);
 
   return (
     <Box paddingTop="38px" width="1186px" height="100%" paddingX="48px">

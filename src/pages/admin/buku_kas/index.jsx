@@ -7,10 +7,13 @@ import {
   Typography,
 } from "@mui/material";
 import moment from "moment";
+import _ from "lodash";
 import SearchIcon from "@mui/icons-material/Search";
 import DownloadIcon from "@mui/icons-material/Download";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import DataTable from "components/admin_components/table";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
 const columns = [
   { field: "id", headerName: "No", width: 70 },
@@ -77,6 +80,37 @@ const rows = [
 ];
 
 const KartuStok = () => {
+  const [namaObatFilter, setNamaObatFilter] = useState("");
+
+  const router = useRouter();
+
+  const debounceNamaObatFilter = useCallback(
+    _.debounce((values) => {
+      setNamaObatFilter(values);
+    }, 2000),
+    []
+  );
+
+  useEffect(() => {
+    if (namaObatFilter) {
+      router.push({
+        query: {
+          nama_obat: namaObatFilter,
+        },
+      });
+    }
+
+    console.log(namaObatFilter);
+  }, [namaObatFilter]);
+
+  useEffect(() => {
+    if (router.isReady) {
+      if (router.query.nama_obat) {
+        setNamaObatFilter(router.query.nama_obat);
+      }
+    }
+  }, [router.isReady]);
+
   return (
     <Box paddingTop="38px" width="1186px" height="100%" paddingX="48px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -136,6 +170,7 @@ const KartuStok = () => {
             {/* belum tau caranya */}
           </Box>
           <OutlinedInput
+            onChange={(e) => debounceNamaObatFilter(e.target.value)}
             placeholder="Cari nama obat"
             sx={{ width: "328px", height: "42px" }}
             endAdornment={

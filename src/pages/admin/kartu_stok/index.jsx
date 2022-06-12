@@ -135,17 +135,18 @@ const KartuStok = () => {
           month,
         },
       });
-    } else if (!month) {
-      router.replace(
-        {
-          query: {
-            month,
-          },
-        },
-        undefined,
-        { shallow: true }
-      );
     }
+    // else if (!month) {
+    //   router.replace(
+    //     {
+    //       query: {
+    //         month,
+    //       },
+    //     },
+    //     undefined,
+    //     { shallow: true }
+    //   );
+    // }
 
     if (year) {
       router.push({
@@ -153,17 +154,18 @@ const KartuStok = () => {
           year,
         },
       });
-    } else if (!year) {
-      router.replace(
-        {
-          query: {
-            month,
-          },
-        },
-        undefined,
-        { shallow: true }
-      );
     }
+    // else if (!year) {
+    //   router.replace(
+    //     {
+    //       query: {
+    //         month,
+    //       },
+    //     },
+    //     undefined,
+    //     { shallow: true }
+    //   );
+    // }
   }, [month, year]);
 
   return (
