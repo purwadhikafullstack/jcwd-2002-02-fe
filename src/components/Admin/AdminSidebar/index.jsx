@@ -22,13 +22,8 @@ const AdminSidebar = () => {
       anchor="left"
     >
       <Box sx={{ paddingX: "20px", paddingY: "30px" }}>
-        <Box
-          paddingX="56px"
-          alignContent="center"
-          height="64px"
-          marginBottom="30px"
-        >
-          <Image src={Healthymed} />
+        <Box display="flex" justifyContent="center" marginBottom="20px">
+          <Image src={Healthymed} width="135px" height="29px" />
         </Box>
 
         {/* Dashboard */}
@@ -43,12 +38,14 @@ const AdminSidebar = () => {
               flexDirection: "row",
               justifyContent: "space-between",
               marginBottom: "14px",
-              paddingX: "20px",
               paddingY: 1,
-              color: router.pathname === "/" ? "Brand.500" : "Sidebar.500",
+              color:
+                router.pathname === "/admin/dashboard"
+                  ? "Brand.500"
+                  : "Sidebar.500",
             }}
           >
-            <Link href="/">
+            <Link href="/admin/dashboard">
               <Box display="flex" flexDirection="row">
                 <MdHomeFilled fontSize="27px" />
                 <Typography fontWeight="bold" marginLeft="12px">
