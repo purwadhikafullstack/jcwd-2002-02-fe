@@ -6,7 +6,7 @@ import {
   OutlinedInput,
   Typography,
 } from "@mui/material";
-import DataTable from "components/admin_components/table";
+import DataTable from "components/Admin/table";
 import _ from "lodash";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
@@ -110,71 +110,73 @@ const DaftarObat = () => {
   }, [router.isReady]);
 
   return (
-    <Box paddingTop="38px" width="1186px" height="100%" paddingX="48px">
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Typography variant="h6" fontWeight="bold">
-          Daftar Obat
-        </Typography>
-        <Box display="flex">
-          <Button
-            sx={{ marginRight: "15px" }}
-            variant="outlined"
-            startIcon={<DownloadIcon />}
-          >
-            Unduh PDF
-          </Button>
-          <Button variant="outlined" startIcon={<InsertDriveFileIcon />}>
-            Excel
-          </Button>
+    <Box display="flex" justifyContent="flex-end">
+      <Box paddingTop="38px" width="1186px" height="100%" paddingX="48px">
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Typography variant="h6" fontWeight="bold">
+            Daftar Obat
+          </Typography>
+          <Box display="flex">
+            <Button
+              sx={{ marginRight: "15px" }}
+              variant="outlined"
+              startIcon={<DownloadIcon />}
+            >
+              Unduh PDF
+            </Button>
+            <Button variant="outlined" startIcon={<InsertDriveFileIcon />}>
+              Excel
+            </Button>
+          </Box>
         </Box>
-      </Box>
-      <Box
-        paddingLeft="32px"
-        paddingY="32px"
-        width="100%"
-        height="772px"
-        marginTop="38px"
-        marginBottom="94px"
-        borderRadius="8px"
-        boxShadow="2"
-        sx={{
-          backgroundColor: "white",
-        }}
-      >
         <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          marginBottom="35px"
-          marginRight="32px"
-        >
-          <OutlinedInput
-            onChange={(e) => debounceNamaObatFilter(e.target.value)}
-            placeholder="Cari nama obat"
-            sx={{ width: "328px", height: "42px" }}
-            endAdornment={
-              <InputAdornment>
-                <SearchIcon />
-              </InputAdornment>
-            }
-          />
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            sx={{ width: "160px" }}
-          >
-            Tambah Obat
-          </Button>
-        </Box>
-        <Divider />
-        <Box
+          paddingLeft="32px"
+          paddingY="32px"
+          width="100%"
+          height="772px"
+          marginTop="38px"
+          marginBottom="94px"
+          borderRadius="8px"
+          boxShadow="2"
           sx={{
-            height: 400,
-            width: "100%",
-            marginTop: "32px",
+            backgroundColor: "white",
           }}
         >
-          <DataTable columns={columns} rows={rows} />
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            marginBottom="35px"
+            marginRight="32px"
+          >
+            <OutlinedInput
+              onChange={(e) => debounceNamaObatFilter(e.target.value)}
+              placeholder="Cari nama obat"
+              sx={{ width: "328px", height: "42px" }}
+              endAdornment={
+                <InputAdornment>
+                  <SearchIcon />
+                </InputAdornment>
+              }
+            />
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              sx={{ width: "160px" }}
+            >
+              Tambah Obat
+            </Button>
+          </Box>
+          <Divider />
+          <Box
+            sx={{
+              height: 400,
+              width: "100%",
+              marginTop: "32px",
+            }}
+          >
+            <DataTable columns={columns} rows={rows} />
+          </Box>
         </Box>
       </Box>
     </Box>

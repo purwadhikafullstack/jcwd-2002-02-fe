@@ -11,7 +11,7 @@ import _ from "lodash";
 import SearchIcon from "@mui/icons-material/Search";
 import DownloadIcon from "@mui/icons-material/Download";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
-import DataTable from "components/admin_components/table";
+import DataTable from "components/Admin/table";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import "react-date-range/dist/styles.css"; // main style file
