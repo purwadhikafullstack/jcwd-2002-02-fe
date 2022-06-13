@@ -1,5 +1,4 @@
 import {
-  Autocomplete,
   Box,
   Button,
   Divider,
@@ -8,12 +7,16 @@ import {
   Typography,
 } from "@mui/material";
 import DataTable from "components/admin_components/table";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import _ from "lodash";
 import moment from "moment";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 const columns = [
   { field: "id", headerName: "No", width: 70 },
@@ -42,59 +45,6 @@ const columns = [
   },
 ];
 
-const autoCompleteSelectionMonth = [
-  {
-    label: "January",
-    value: "January",
-  },
-  {
-    label: "February",
-    value: "February",
-  },
-  {
-    label: "March",
-    value: "March",
-  },
-  {
-    label: "April",
-    value: "April",
-  },
-  {
-    label: "Mei",
-    value: "Mei",
-  },
-  {
-    label: "June",
-    value: "June",
-  },
-  {
-    label: "July",
-    value: "July",
-  },
-  {
-    label: "August",
-    value: "August",
-  },
-  {
-    label: "September",
-    value: "September",
-  },
-  {
-    label: "October",
-    value: "October",
-  },
-  {
-    label: "November",
-    value: "November",
-  },
-  {
-    label: "December",
-    value: "December",
-  },
-];
-
-const autoCompleteSelectionYear = [];
-
 const rows = [
   {
     id: 1,
@@ -117,55 +67,29 @@ const KartuStok = () => {
     _.debounce((values, category) => {
       if (category === "month") {
         if (values) {
-          setMonth(values);
+          setMonth(moment(values).format("MMMM"));
         } else {
           setMonth("");
         }
       } else if (category === "year") {
-        setYear(values);
+        setYear(moment(values).format("YYYY"));
       }
     }, 2000),
     []
   );
 
   useEffect(() => {
-    if (month) {
-      router.push({
-        query: {
-          month,
-        },
-      });
-    }
-    // else if (!month) {
-    //   router.replace(
-    //     {
-    //       query: {
-    //         month,
-    //       },
-    //     },
-    //     undefined,
-    //     { shallow: true }
-    //   );
-    // }
-
-    if (year) {
-      router.push({
-        query: {
-          year,
-        },
-      });
-    }
-    // else if (!year) {
-    //   router.replace(
-    //     {
-    //       query: {
-    //         month,
-    //       },
-    //     },
-    //     undefined,
-    //     { shallow: true }
-    //   );
-    // }
+    router.push({
+      query: {
+        month: month ? month.toString() : undefined,
+        year: year.toString(),
+      },
+    });
+    // router.push({
+    //   query: {
+    //     year: year.toString(),
+    //   },
+    // });
   }, [month, year]);
 
   return (
@@ -187,9 +111,11 @@ const KartuStok = () => {
         sx={{ backgroundColor: "#FFFFFF" }}
       >
         <Box display="flex" alignItems="center">
-          <IconButton>
-            <ArrowBackIosNewIcon />
-          </IconButton>
+          <Link href="/admin/daftar_obat">
+            <IconButton>
+              <ArrowBackIosNewIcon />
+            </IconButton>
+          </Link>
           <Typography marginLeft="25px" fontWeight="bold" variant="h6">
             Detail Obat: Actived
           </Typography>
@@ -221,32 +147,33 @@ const KartuStok = () => {
             mr="24px"
           >
             <Typography sx={{ mb: "5px" }}>Bulan</Typography>
-            <Autocomplete
-              onChange={(e) => {
-                debounceSelectionfilter(e.target.innerText, "month");
-              }}
-              disablePortal
-              options={autoCompleteSelectionMonth}
-              renderInput={(params) => (
-                <TextField {...params} sx={{ width: "200px" }} />
-              )}
-            />
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <DatePicker
+                views={["month"]}
+                inputFormat="mm"
+                renderInput={(params) => (
+                  <TextField {...params} helperText={null} />
+                )}
+                onChange={(date) => {
+                  debounceSelectionfilter(date, "month");
+                }}
+              />
+            </LocalizationProvider>
           </Box>
           <Box display="flex" flexDirection="column" mt="30px" mr="24px">
             <Typography sx={{ mb: "5px" }}>Tahun</Typography>
-            <Autocomplete
-              onChange={(e) => {
-                debounceSelectionfilter(e.target.value, "year");
-              }}
-              isOptionEqualToValue={(option, value) =>
-                option.value === value.value
-              }
-              disablePortal
-              options={autoCompleteSelectionYear}
-              renderInput={(params) => (
-                <TextField {...params} sx={{ width: "200px" }} />
-              )}
-            />
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <DatePicker
+                views={["year"]}
+                // value={year}
+                onChange={(date) => {
+                  debounceSelectionfilter(date, "year");
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} helperText={null} />
+                )}
+              />
+            </LocalizationProvider>
           </Box>
         </Box>
         <Divider

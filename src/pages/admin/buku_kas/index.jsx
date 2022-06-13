@@ -14,6 +14,9 @@ import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import DataTable from "components/admin_components/table";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import "react-date-range/dist/styles.css"; // main style file
+import "react-date-range/dist/theme/default.css"; // theme css file
+import { DateRangePicker } from "react-date-range";
 
 const columns = [
   { field: "id", headerName: "No", width: 70 },
@@ -81,12 +84,20 @@ const rows = [
 
 const KartuStok = () => {
   const [namaObatFilter, setNamaObatFilter] = useState("");
+  const [dateRange, setDateRange] = useState();
 
   const router = useRouter();
 
   const debounceNamaObatFilter = useCallback(
     _.debounce((values) => {
       setNamaObatFilter(values);
+    }, 2000),
+    []
+  );
+
+  const debounceDateRangeInput = useCallback(
+    _.debounce((date) => {
+      setDateRange(date.selection);
     }, 2000),
     []
   );
@@ -99,8 +110,6 @@ const KartuStok = () => {
         },
       });
     }
-
-    console.log(namaObatFilter);
   }, [namaObatFilter]);
 
   useEffect(() => {
@@ -110,6 +119,12 @@ const KartuStok = () => {
       }
     }
   }, [router.isReady]);
+
+  const selectionRange = {
+    startDate: new Date(),
+    endDate: new Date(),
+    key: "selection",
+  };
 
   return (
     <Box paddingTop="38px" width="1186px" height="100%" paddingX="48px">
@@ -167,7 +182,11 @@ const KartuStok = () => {
             mr="24px"
           >
             <Typography sx={{ mb: "5px" }}>Tanggal</Typography>
-            {/* belum tau caranya */}
+            <DateRangePicker
+              ranges={[selectionRange]}
+              showMonthAndYearPickers={false}
+              onChange={(date) => debounceDateRangeInput(date)}
+            />
           </Box>
           <OutlinedInput
             onChange={(e) => debounceNamaObatFilter(e.target.value)}

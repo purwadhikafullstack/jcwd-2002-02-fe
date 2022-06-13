@@ -94,13 +94,11 @@ const DaftarObat = () => {
   );
 
   useEffect(() => {
-    if (namaObatFilter) {
-      router.push({
-        query: {
-          nama_obat: namaObatFilter,
-        },
-      });
-    }
+    router.push({
+      query: {
+        nama_obat: namaObatFilter,
+      },
+    });
   }, [namaObatFilter]);
 
   useEffect(() => {
