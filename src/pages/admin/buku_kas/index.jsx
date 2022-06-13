@@ -28,6 +28,9 @@ import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import DataTable from "components/admin_components/table";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import "react-date-range/dist/styles.css"; // main style file
+import "react-date-range/dist/theme/default.css"; // theme css file
+import { DateRangePicker } from "react-date-range";
 
 const columns = [
   { field: "id", headerName: "No", width: 70 },
@@ -139,6 +142,12 @@ const KartuStok = () => {
       }
     }
   }, [router.isReady]);
+
+  const selectionRange = {
+    startDate: new Date(),
+    endDate: new Date(),
+    key: "selection",
+  };
 
   return (
     <Box paddingTop="38px" width="1186px" height="100%" paddingX="48px">
