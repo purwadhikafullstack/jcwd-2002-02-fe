@@ -9,14 +9,19 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import MainMenu from "./MainMenu";
 
+const drawerWidth = 256;
+
 const AdminSidebar = () => {
   const router = useRouter();
 
   return (
     <Drawer
       sx={{
-        maxWidth: "256px",
-        boxSizing: "border-box",
+        width: drawerWidth,
+        "& .MuiDrawer-paper": {
+          width: drawerWidth,
+          boxSizing: "border-box",
+        },
       }}
       variant="permanent"
       anchor="left"
