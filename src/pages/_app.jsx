@@ -8,11 +8,11 @@ const MyApp = ({ Component, pageProps }) => {
   const router = useRouter();
   return (
     <ThemeProvider theme={theme}>
-      {router.pathname.startsWith("/admin") ? (
+      {/* {router.pathname.startsWith("/admin") ? (
         <AdminPageContainer children={<Component {...pageProps} />} />
-      ) : (
-        <Component {...pageProps} />
-      )}
+      ) : ( */}
+      <Component {...pageProps} />
+      {/* )} */}
     </ThemeProvider>
   );
 };

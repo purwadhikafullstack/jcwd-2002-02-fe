@@ -1,22 +1,23 @@
 import {
   Box,
   Button,
+  Dialog,
+  DialogContent,
   Divider,
   InputAdornment,
   OutlinedInput,
   Typography,
 } from "@mui/material";
 import moment from "moment";
-import _ from "lodash";
 import SearchIcon from "@mui/icons-material/Search";
 import DownloadIcon from "@mui/icons-material/Download";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import DataTable from "components/Admin/table";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import "react-date-range/dist/styles.css"; // main style file
 import "react-date-range/dist/theme/default.css"; // theme css file
-import { DateRangePicker } from "react-date-range";
+import { DateRange } from "react-date-range";
 
 const columns = [
   { field: "id", headerName: "No", width: 70 },
@@ -84,33 +85,42 @@ const rows = [
 
 const KartuStok = () => {
   const [namaObatFilter, setNamaObatFilter] = useState("");
-  const [dateRange, setDateRange] = useState();
+  const [dateRange, setDateRange] = useState([
+    {
+      startDate: null,
+      endDate: null,
+      key: "selection",
+    },
+  ]);
+  const [open, setOpen] = useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const router = useRouter();
 
-  const debounceNamaObatFilter = useCallback(
-    _.debounce((values) => {
-      setNamaObatFilter(values);
-    }, 2000),
-    []
-  );
+  // const debounceNamaObatFilter = useCallback(
+  //   _.debounce((values) => {
+  //     setNamaObatFilter(values);
+  //   }, 2000),
+  //   []
+  // );
 
-  const debounceDateRangeInput = useCallback(
-    _.debounce((date) => {
-      setDateRange(date.selection);
-    }, 2000),
-    []
-  );
-
-  useEffect(() => {
-    if (namaObatFilter) {
-      router.push({
-        query: {
-          nama_obat: namaObatFilter,
-        },
-      });
-    }
-  }, [namaObatFilter]);
+  const handleFilter = () => {
+    // didalam sini juga ada fetching API dan dimskin ke dalam state
+    router.push({
+      query: {
+        nama_obat: namaObatFilter,
+        start_date: moment(dateRange[0]?.startDate).format("DD-MM-YYYY"),
+        end_date: moment(dateRange[0]?.endDate).format("DD-MM-YYYY"),
+      },
+    });
+  };
 
   useEffect(() => {
     if (router.isReady) {
@@ -119,12 +129,6 @@ const KartuStok = () => {
       }
     }
   }, [router.isReady]);
-
-  const selectionRange = {
-    startDate: new Date(),
-    endDate: new Date(),
-    key: "selection",
-  };
 
   return (
     <Box paddingTop="38px" width="1186px" height="100%" paddingX="48px">
@@ -182,22 +186,56 @@ const KartuStok = () => {
             mr="24px"
           >
             <Typography sx={{ mb: "5px" }}>Tanggal</Typography>
-            <DateRangePicker
-              ranges={[selectionRange]}
-              showMonthAndYearPickers={false}
-              onChange={(date) => debounceDateRangeInput(date)}
+            <OutlinedInput
+              onClick={handleClickOpen}
+              sx={{ width: "328px", height: "42px" }}
+              value={
+                dateRange[0].startDate
+                  ? `${moment(dateRange[0].startDate).format("l")} - ${moment(
+                      dateRange[0].endDate
+                    ).format("l")}`
+                  : undefined
+              }
+            />
+            <Dialog open={open} onClose={handleClose}>
+              <DialogContent>
+                <DateRange
+                  ranges={dateRange}
+                  editableDateInputs
+                  moveRangeOnFirstSelection={false}
+                  onChange={(date) => setDateRange([date.selection])}
+                />
+              </DialogContent>
+            </Dialog>
+          </Box>
+          <Box display="flex" flexDirection="column" justifyContent="end">
+            <Typography sx={{ mb: "5px" }}>&nbsp;</Typography>
+            <OutlinedInput
+              onChange={(e) => setNamaObatFilter(e.target.value)}
+              placeholder="Cari nama obat"
+              sx={{ width: "328px", height: "42px" }}
+              endAdornment={
+                <InputAdornment>
+                  <SearchIcon />
+                </InputAdornment>
+              }
             />
           </Box>
-          <OutlinedInput
-            onChange={(e) => debounceNamaObatFilter(e.target.value)}
-            placeholder="Cari nama obat"
-            sx={{ width: "328px", height: "42px" }}
-            endAdornment={
-              <InputAdornment>
-                <SearchIcon />
-              </InputAdornment>
-            }
-          />
+          <Box
+            display="flex"
+            flexDirection="column"
+            justifyContent="end"
+            marginLeft="18px"
+          >
+            <Typography sx={{ mb: "5px" }}>&nbsp;</Typography>
+            <Button
+              variant="contained"
+              sx={{ width: "70px" }}
+              onClick={handleFilter}
+            >
+              Filter
+            </Button>
+          </Box>
         </Box>
         <Divider />
         <Box

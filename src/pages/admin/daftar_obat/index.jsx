@@ -96,7 +96,7 @@ const DaftarObat = () => {
   useEffect(() => {
     router.push({
       query: {
-        nama_obat: namaObatFilter,
+        nama_obat: namaObatFilter === "" ? undefined : namaObatFilter,
       },
     });
   }, [namaObatFilter]);
