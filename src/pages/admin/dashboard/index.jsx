@@ -6,7 +6,6 @@ import { useState } from "react";
 import CardStatistik from "components/Admin/CardStatistik";
 import requiresAdmin from "config/requireAdmin";
 
-const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 const DashboardPage = () => {
   const penjualanObatOption = {
     stroke: { width: 2, curve: "smooth" },
