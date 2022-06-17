@@ -30,10 +30,13 @@ import Link from "next/link";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import InfoIcon from "@mui/icons-material/Info";
+import { useRouter } from "next/router";
 
 const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [term, setTerm] = useState(false);
+
+  const router = useRouter();
 
   const termHandle = () => {
     setTerm(!term);
@@ -66,7 +69,15 @@ const RegisterPage = () => {
           "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
         ),
     }),
-    onSubmit: (values) => {},
+    onSubmit: async (values) => {
+      try {
+        console.log(values);
+
+        router.push("/login");
+      } catch (err) {
+        console.log(err);
+      }
+    },
     validateOnChange: false,
   });
 
