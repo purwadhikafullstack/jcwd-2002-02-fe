@@ -6,8 +6,6 @@ import {
   Typography,
   InputAdornment,
   FormControl,
-  InputLabel,
-  OutlinedInput,
 } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
