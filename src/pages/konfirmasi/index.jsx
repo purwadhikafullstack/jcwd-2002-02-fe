@@ -8,7 +8,6 @@ import {
 } from "@mui/material";
 import CheckOutCard from "components/CheckOut";
 import Image from "next/image";
-import { CgFormatSlash } from "react-icons/cg";
 import { RiFileCopyFill } from "react-icons/ri";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
