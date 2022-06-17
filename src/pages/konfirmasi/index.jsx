@@ -1,4 +1,11 @@
-import { Box, Button, Container, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Collapse,
+  Container,
+  Stack,
+  Typography,
+} from "@mui/material";
 import CheckOutCard from "components/CheckOut";
 import Image from "next/image";
 import { CgFormatSlash } from "react-icons/cg";
@@ -8,6 +15,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import BCA from "../../public/Images/BCA.png";
 import { useState } from "react";
 import Link from "next/link";
+import Timer from "components/Timer";
 
 const Konfirmasi = () => {
   const [bca, setBca] = useState(false);
@@ -58,60 +66,7 @@ const Konfirmasi = () => {
               alignItems: "center",
             }}
           >
-            <Box
-              sx={{
-                background: "#FF6B6B",
-                // mr: 2,
-                color: "white",
-                width: "32px",
-                height: "32px",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: 1,
-                fontWeight: 700,
-                fontSize: "14px",
-              }}
-            >
-              24
-            </Box>
-            <CgFormatSlash fontSize="30px" color="#FF6B6B" />
-            <Box
-              sx={{
-                background: "#FF6B6B",
-                // mr: 2,
-                color: "white",
-                width: "32px",
-                height: "32px",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: 1,
-                fontWeight: 700,
-                fontSize: "14px",
-              }}
-            >
-              45
-            </Box>
-            <CgFormatSlash fontSize="30px" color="#FF6B6B" />
-
-            <Box
-              sx={{
-                background: "#FF6B6B",
-                // mr: 2,
-                color: "white",
-                width: "32px",
-                height: "32px",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: 1,
-                fontWeight: 700,
-                fontSize: "14px",
-              }}
-            >
-              28
-            </Box>
+            <Timer />
           </Box>
         </Box>
         <Box sx={{ mt: "41px" }}>
@@ -249,18 +204,20 @@ const Konfirmasi = () => {
                 Kembali Ke Beranda
               </Button>
             </Link>
-            <Button
-              variant="contained"
-              sx={{
-                height: "50px",
-                width: "100%",
-                fontWeight: 700,
-                fontSize: "14px",
-                "&:hover": { border: 0 },
-              }}
-            >
-              Check Status Pembayaran
-            </Button>
+            <Link href="/proses-pemesanan">
+              <Button
+                variant="contained"
+                sx={{
+                  height: "50px",
+                  width: "100%",
+                  fontWeight: 700,
+                  fontSize: "14px",
+                  "&:hover": { border: 0 },
+                }}
+              >
+                Check Status Pembayaran
+              </Button>
+            </Link>
           </Box>
         </Box>
         <Typography
@@ -304,7 +261,7 @@ const Konfirmasi = () => {
             <KeyboardArrowDownIcon />
           </Box>
         )}
-        {bca ? (
+        <Collapse in={bca}>
           <Stack
             sx={{
               mt: "28px",
@@ -334,7 +291,7 @@ const Konfirmasi = () => {
               pembayaran.
             </Typography>
           </Stack>
-        ) : null}
+        </Collapse>
       </Stack>
     </Container>
   );
