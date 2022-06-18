@@ -82,7 +82,7 @@ const rows = [
   },
 ];
 
-const DaftarObat = () => {
+const DaftarProduk = () => {
   const [namaObatFilter, setNamaObatFilter] = useState("");
   const [tambahObat, setTambahObat] = useState(false);
 
@@ -113,7 +113,7 @@ const DaftarObat = () => {
 
   return (
     <Box display="flex" justifyContent="flex-end">
-      <Box paddingTop="38px" width="1186px" height="100%" paddingX="48px">
+      <Box width="1186px" height="100%">
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="h6" fontWeight="bold">
             Daftar Obat
@@ -190,4 +190,4 @@ const DaftarObat = () => {
   );
 };
 
-export default DaftarObat;
+export default DaftarProduk;

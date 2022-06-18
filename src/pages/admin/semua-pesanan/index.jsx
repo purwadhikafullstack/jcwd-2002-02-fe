@@ -102,8 +102,8 @@ const SemuaPesananPage = () => {
                   <MenuItem disabled value="">
                     Filter
                   </MenuItem>
-                  <MenuItem value="Obat Resep">Obat Resep</MenuItem>
                   <MenuItem value="Obat Bebas">Obat Bebas</MenuItem>
+                  <MenuItem value="Obat Resep">Obat Resep</MenuItem>
                 </Select>
               </FormControl>
 
