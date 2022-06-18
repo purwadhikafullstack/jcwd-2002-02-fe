@@ -14,6 +14,7 @@ import DownloadIcon from "@mui/icons-material/Download";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import ModalTambahObat from "components/Admin/ModalTambahObat";
 
 const columns = [
   { field: "id", headerName: "No", width: 70 },
@@ -83,6 +84,7 @@ const rows = [
 
 const DaftarObat = () => {
   const [namaObatFilter, setNamaObatFilter] = useState("");
+  const [tambahObat, setTambahObat] = useState(false);
 
   const router = useRouter();
 
@@ -160,12 +162,17 @@ const DaftarObat = () => {
               }
             />
             <Button
+              onClick={() => setTambahObat(true)}
               variant="contained"
               startIcon={<AddIcon />}
               sx={{ width: "160px" }}
             >
               Tambah Obat
             </Button>
+            <ModalTambahObat
+              open={tambahObat}
+              handleClose={() => setTambahObat(false)}
+            />
           </Box>
           <Divider />
           <Box
