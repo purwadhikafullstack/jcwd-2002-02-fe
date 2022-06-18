@@ -17,7 +17,7 @@ import {
   Typography,
 } from "@mui/material";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import InfoIcon from "@mui/icons-material/Info";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -26,7 +26,8 @@ import imagePlaceholder from "../../public/Images/imagePlaceholder.png";
 const ProfilePage = () => {
   const [openModalEdit, setOpenModalEdit] = useState(false);
   const [openModalPassword, setOpenModalPassword] = useState(false);
-  const [editPhotoProfile, setEditPhotoProfile] = useState("test");
+  const [editPhotoProfile, setEditPhotoProfile] = useState(null);
+  const [showPhotoProfilePreview, setShowPhotoProfilePreview] = useState();
 
   const userInfo = {
     nama: "Mychael Son",
@@ -117,6 +118,26 @@ const ProfilePage = () => {
       children: `${name.split(" ")[0][0]}${name.split(" ")[1][0]}`,
     };
   }
+
+  const handleFile = (e) => {
+    setEditPhotoProfile(e.target.files[0]);
+  };
+
+  useEffect(() => {
+    if (editPhotoProfile === null) {
+      setShowPhotoProfilePreview(undefined);
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(editPhotoProfile);
+    setShowPhotoProfilePreview(objectUrl);
+
+    // function to unset the url
+    // free memory when ever this component is unmounted
+    // eslint-disable-next-line consistent-return
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [editPhotoProfile]);
+
   return (
     <Container>
       <Box display="flex" alignItems="center" height="100vh" padding="20px">
@@ -139,12 +160,17 @@ const ProfilePage = () => {
                 height="300px"
               >
                 <Image
-                  src={userInfo.profilePicture || imagePlaceholder}
+                  src={
+                    showPhotoProfilePreview ||
+                    userInfo.profilePicture ||
+                    imagePlaceholder
+                  }
                   width="300px"
                   height="300px"
                 />
               </Box>
               <input
+                onChange={handleFile}
                 type="file"
                 ref={inputProfilePictureRef}
                 style={{ display: "none" }}
