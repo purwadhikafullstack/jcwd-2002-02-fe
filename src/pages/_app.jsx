@@ -18,7 +18,8 @@ const MyApp = ({ Component, pageProps }) => {
         <SnackbarProvider maxSnack={3}>
           {router.pathname === "/admin/login" ||
           router.pathname === "/admin/kartu_stok" ||
-          router.pathname === "/register" ? (
+          router.pathname === "/register" ||
+          router.pathname === "/login" ? (
             <Component {...pageProps} />
           ) : (
             <>
