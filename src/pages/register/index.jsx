@@ -30,13 +30,16 @@ import Link from "next/link";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import InfoIcon from "@mui/icons-material/Info";
-// import { useRouter } from "next/router";
+import axiosInstance from "config/api";
+import { useRouter } from "next/router";
+import { useSnackbar } from "notistack";
 
 const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [term, setTerm] = useState(false);
 
-  // const router = useRouter();
+  const router = useRouter();
+  const { enqueueSnackbar } = useSnackbar();
 
   const termHandle = () => {
     setTerm(!term);
@@ -69,11 +72,27 @@ const RegisterPage = () => {
           "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
         ),
     }),
-    // onSubmit: async (values) => {
-    //   try {
-    //     router.push("/login");
-    //   } catch (err) {}
-    // },
+    onSubmit: async (values) => {
+      try {
+        const userInfo = {
+          name: values.name,
+          username: values.username,
+          email: values.email,
+          password: values.password,
+        };
+
+        const registerUser = await axiosInstance.post(
+          "/auth/register",
+          userInfo
+        );
+
+        enqueueSnackbar(registerUser.data.message, { variant: "success" });
+
+        router.push("/login");
+      } catch (err) {
+        enqueueSnackbar(err.response.data.message, { variant: "error" });
+      }
+    },
     validateOnChange: false,
   });
 
