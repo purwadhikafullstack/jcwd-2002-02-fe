@@ -15,7 +15,8 @@ const MyApp = ({ Component, pageProps }) => {
     <Provider store={store}>
       <ThemeProvider theme={theme}>
         {router.pathname === "/admin/login" ||
-        router.pathname === "/admin/kartu_stok" ? (
+        router.pathname === "/admin/kartu_stok" ||
+        router.pathname === "/register" ? (
           <Component {...pageProps} />
         ) : (
           <>
