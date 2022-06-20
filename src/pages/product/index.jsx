@@ -13,8 +13,40 @@ import ShareIcon from "@mui/icons-material/Share";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import ProductCard from "components/ProductCard";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { useRouter } from "next/router";
 
 const ProductPage = () => {
+  const router = useRouter();
+  const formik = useFormik({
+    initialValues: {
+      quantity: 1,
+    },
+    onSubmit: () => {
+      // eslint-disable-next-line no-console
+      console.log("berhasil!");
+    },
+    validationSchema: Yup.object().shape({
+      quantity: Yup.number().required().min(1),
+    }),
+  });
+
+  const qtyHandler = (status) => {
+    if (status === "increment") {
+      if (formik.values.quantity === "") {
+        formik.setFieldValue("quantity", 1);
+        return;
+      }
+      if (formik.values.quantity >= 10) return;
+      // eslint-disable-next-line radix
+      formik.setFieldValue("quantity", parseInt(formik.values.quantity) + 1);
+    } else if (status === "decrement") {
+      if (formik.values.quantity < 1) return;
+
+      formik.setFieldValue("quantity", formik.values.quantity - 1);
+    }
+  };
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
       <Container
@@ -28,15 +60,37 @@ const ProductPage = () => {
         {/* LEFT SIDE */}
         <Box sx={{ display: "flex", flexDirection: "column", mt: 2, mr: 10 }}>
           <Box sx={{ mb: 5 }}>
-            <Breadcrumbs sx={{ fontSize: "18px" }}>
-              <Link underline="hover" color="Brand.500" href="/">
-                Beranda
+            <Breadcrumbs sx={{ "&:hover": { cursor: "pointer" } }}>
+              <Link underline="none" href="/">
+                <Typography
+                  sx={{
+                    color: router.pathname === "/" ? "Brand.500" : "#213360",
+                    fontWeight: router.pathname === "/" ? 700 : 400,
+                  }}
+                >
+                  Beranda
+                </Typography>
               </Link>
-              <Link underline="hover" color="Brand.500" href="/">
-                Kategori
+              <Link underline="none" href="/">
+                <Typography
+                  sx={{
+                    color: router.pathname === "/" ? "Brand.500" : "#213360",
+                    fontWeight: router.pathname === "/" ? 700 : 400,
+                  }}
+                >
+                  Kategori
+                </Typography>
               </Link>
-              <Link underline="hover" color="Brand.500" href="/">
-                Obat
+              <Link underline="none" href="/product">
+                <Typography
+                  sx={{
+                    color:
+                      router.pathname === "/product" ? "Brand.500" : "#213360",
+                    fontWeight: router.pathname === "/product" ? 700 : 400,
+                  }}
+                >
+                  Obat
+                </Typography>
               </Link>
             </Breadcrumbs>
           </Box>
@@ -174,6 +228,7 @@ const ProductPage = () => {
               }}
             >
               <Button
+                onClick={() => qtyHandler("decrement")}
                 variant="outlined"
                 sx={{
                   border: 0,
@@ -193,9 +248,10 @@ const ProductPage = () => {
                   textAlign: "center",
                 }}
               >
-                1
+                {formik.values.quantity}
               </Typography>
               <Button
+                onClick={() => qtyHandler("increment")}
                 variant="outlined"
                 sx={{
                   border: 0,
