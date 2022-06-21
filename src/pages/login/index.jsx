@@ -23,18 +23,20 @@ import {
 import MailIcon from "@mui/icons-material/Mail";
 import LockIcon from "@mui/icons-material/Lock";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import Link from "next/link";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { login } from "redux/reducer/auth";
 import { useRouter } from "next/router";
+import loginDispatch from "redux/actions/user";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState("false");
   const [openModal, setOpenModal] = useState(false);
+
+  const userSelector = useSelector((state) => state.auth);
 
   const router = useRouter();
 
@@ -59,18 +61,9 @@ const LoginPage = () => {
     }),
     onSubmit: (values) => {
       // ini nanti bedasarkan fetchingan dari API, hrus ada alamat and no tlpon
-      const userInfo = {
-        id: 1,
-        email: values.email,
-        name: "john doe",
-        password: values.password,
-      };
-      // console.log(userInfo);
-      dispatch(login(userInfo));
-
       setTimeout(() => {
-        router.push("/");
-      }, 5000);
+        dispatch(loginDispatch(values, formik.setSubmitting));
+      }, 3000);
     },
     validateOnChange: false,
   });
@@ -87,6 +80,12 @@ const LoginPage = () => {
     onSubmit: () => {},
     validateOnChange: false,
   });
+
+  useEffect(() => {
+    if (userSelector.id) {
+      router.push("/");
+    }
+  }, [userSelector.id]);
 
   return (
     <>
