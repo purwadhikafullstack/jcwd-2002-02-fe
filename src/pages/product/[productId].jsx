@@ -50,8 +50,8 @@ const ProductPage = ({ productDetail }) => {
   };
 
   const hargaJual =
-    parseInt(productDetail?.harga) -
-    parseInt(productDetail?.harga) * (parseInt(productDetail?.diskon) / 100);
+    // eslint-disable-next-line no-unsafe-optional-chaining
+    productDetail?.harga - productDetail?.harga * (productDetail?.diskon / 100);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
