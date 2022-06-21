@@ -37,9 +37,11 @@ import { useSnackbar } from "notistack";
 import ModalTambahAlamat from "components/ModalTambahAlamat";
 import CardAlamat from "components/CardAlamat";
 import Group from "public/Images/Group.png";
+import { useSelector } from "react-redux";
 import imagePlaceholder from "../../public/Images/imagePlaceholder.png";
 
 const ProfilePage = () => {
+  const userSelector = useSelector((state) => state.auth);
   const [openModalEdit, setOpenModalEdit] = useState(false);
   const [openModalPassword, setOpenModalPassword] = useState(false);
   const [editPhotoProfile, setEditPhotoProfile] = useState(null);
@@ -48,6 +50,7 @@ const ProfilePage = () => {
     useState(false);
   const [tab, setTab] = useState(1);
   const [tambahAlamat, setTambahAlamat] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [listAlamat, setListAlamat] = useState(1);
   const { enqueueSnackbar } = useSnackbar();
 
@@ -65,6 +68,19 @@ const ProfilePage = () => {
   };
 
   const inputProfilePictureRef = useRef(null);
+
+  const uploadAvatarHandler = async () => {
+    const formData = new FormData();
+
+    formData.append("avatar_image_file", editPhotoProfile);
+
+    try {
+      await axiosInstance.patch(`/auth/${userSelector.id}`, formData);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
+    }
+  };
 
   const userProfileFormik = useFormik({
     initialValues: {
@@ -536,8 +552,12 @@ const ProfilePage = () => {
                   <Button
                     autoFocus
                     variant="contained"
-                    sx={{ width: "90px", height: "42px" }}
-                    onClick={() => userProfileFormik.handleSubmit()}
+                    sx={{ width: "140px", borderRadius: "8px", mt: "20px" }}
+                    onClick={() => {
+                      uploadAvatarHandler();
+                    }}
+                    // onClick={() => inputProfilePictureRef.current.click()}
+                    // onclick ini bakal ngehandle file upload ke API
                   >
                     Simpan
                   </Button>
