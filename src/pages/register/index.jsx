@@ -75,12 +75,15 @@ const RegisterPage = () => {
     }),
     onSubmit: async (values) => {
       try {
+        console.log("test1");
         const userInfo = {
           name: values.name,
           username: values.username,
           email: values.email,
           password: values.password,
         };
+
+        console.log(userInfo, "test2");
 
         const registerUser = await axiosInstance.post(
           "/auth/register",
@@ -91,7 +94,8 @@ const RegisterPage = () => {
 
         router.push("/login");
       } catch (err) {
-        enqueueSnackbar(err.response.data.message, { variant: "error" });
+        console.log(err);
+        enqueueSnackbar(err?.response?.data?.message, { variant: "error" });
       }
     },
     validateOnChange: false,
@@ -254,7 +258,7 @@ const RegisterPage = () => {
                 onChange={(e) => {
                   formik.setFieldValue("password", e.target.value);
                 }}
-                type={showPassword ? "password" : "text"}
+                type={showPassword ? "text" : "password"}
                 placeholder="Password123@"
                 startAdornment={
                   <LockIcon sx={{ marginRight: "17px" }} htmlColor="#02114f" />
