@@ -105,13 +105,13 @@ const RegisterPage = () => {
     <>
       {/* <AdminSidebar /> */}
       {/* <Stack direction="row"> */}
-      <Grid container columns={{ xs: 4, sm: 8, md: 12 }}>
-        <Grid item xs={0} sm={4} md={6}>
+      <Grid container columns={{ xs: 4, md: 12 }}>
+        <Grid item display={{ xs: "none", md: "block" }} xs={0} md={6}>
           <Box>
             <Image src={Frame} layout="fixed" />
           </Box>
         </Grid>
-        <Grid item xs={4} sm={4} md={6}>
+        <Grid item xs={4} md={6}>
           <Box px="96px" py="50px" height="100vh" overflow="scroll">
             <Typography fontWeight="bold" variant="h4" component="h4">
               Mari Kita Mulai
@@ -137,7 +137,7 @@ const RegisterPage = () => {
                   backgroundColor: "white",
                   color: "black",
                   fontWeight: "bold",
-                  height: "48px",
+                  minHeight: "48px",
                   border: "2px solid #c7bfaf",
                   boxShadow: "none",
                   ":hover": {
