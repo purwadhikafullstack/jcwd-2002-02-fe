@@ -221,6 +221,7 @@ const ProfilePage = () => {
         height="100vh"
         padding="20px"
       >
+        {/* Box Tab */}
         <Box display="flex" justifyContent="flex-end">
           <Grid Container>
             <Tabs onChange={tabHandle} value={tab} indicatorColor="primary">
@@ -229,9 +230,13 @@ const ProfilePage = () => {
             </Tabs>
           </Grid>
         </Box>
+
+        {/* Body untuk Tab */}
         {tab === 1 ? (
+          // Tab = 1
           <Grid container spacing={8}>
             <Grid item xs={5}>
+              {/* Box pada Profile Picture */}
               <Box
                 py="16px"
                 px="40px"
@@ -316,6 +321,7 @@ const ProfilePage = () => {
                     Status Akun
                   </Typography>
                   {userSelectors.is_verified ? (
+                    // Box tanda terverifikasi
                     <Box
                       sx={{
                         border: "2px solid #2db31e",
@@ -332,6 +338,7 @@ const ProfilePage = () => {
                       <Typography>Terverifikasi</Typography>
                     </Box>
                   ) : (
+                    // Box ketika belum verifikasi
                     <Box
                       sx={{
                         border: "2px solid #575959",
@@ -584,6 +591,8 @@ const ProfilePage = () => {
                   </Button>
                 </DialogActions>
               </Dialog>
+
+              {/* Box untuk Ganti Password */}
               <Dialog open={openModalPassword} onClose={closeModal}>
                 <Box
                   width="500px"
@@ -704,6 +713,7 @@ const ProfilePage = () => {
             </Grid>
           </Grid>
         ) : (
+          // Tab = 2
           <Box
             sx={{
               overflow: "auto",
