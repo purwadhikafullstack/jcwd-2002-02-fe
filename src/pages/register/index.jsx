@@ -112,7 +112,12 @@ const RegisterPage = () => {
           </Box>
         </Grid>
         <Grid item xs={4} md={6}>
-          <Box px="96px" py="50px" height="100vh" overflow="scroll">
+          <Box
+            px={{ xs: "35px", sm: "96px" }}
+            py="50px"
+            height="100vh"
+            overflow="scroll"
+          >
             <Typography fontWeight="bold" variant="h4" component="h4">
               Mari Kita Mulai
             </Typography>

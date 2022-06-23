@@ -97,7 +97,12 @@ const LoginPage = () => {
           </Box>
         </Grid>
         <Grid item xs={4} md={6}>
-          <Box px="96px" py="30px" height="100vh" overflow="scroll">
+          <Box
+            px={{ xs: "35px", sm: "96px" }}
+            py="30px"
+            height="100vh"
+            overflow="scroll"
+          >
             <Box display="flex" justifyContent="flex-end">
               <ButtonGroup
                 sx={{ marginBottom: "50px" }}
