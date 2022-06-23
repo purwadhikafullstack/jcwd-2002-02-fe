@@ -34,6 +34,9 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import axiosInstance from "config/api";
 import { useSnackbar } from "notistack";
+import ModalTambahAlamat from "components/ModalTambahAlamat";
+import CardAlamat from "components/CardAlamat";
+import Group from "public/Images/Group.png";
 import imagePlaceholder from "../../public/Images/imagePlaceholder.png";
 
 const ProfilePage = () => {
@@ -43,9 +46,14 @@ const ProfilePage = () => {
   const [showPhotoProfilePreview, setShowPhotoProfilePreview] = useState();
   const [verificationButtonLoading, setVerificationButtonLoading] =
     useState(false);
-
+  const [tab, setTab] = useState(1);
+  const [tambahAlamat, setTambahAlamat] = useState(false);
+  const [listAlamat, setListAlamat] = useState(1);
   const { enqueueSnackbar } = useSnackbar();
 
+  const tabHandle = (event, newValue) => {
+    setTab(newValue);
+  };
   const userInfo = {
     nama: "Mychael Son",
     username: "mychael",
