@@ -75,15 +75,12 @@ const RegisterPage = () => {
     }),
     onSubmit: async (values) => {
       try {
-        console.log("test1");
         const userInfo = {
           name: values.name,
           username: values.username,
           email: values.email,
           password: values.password,
         };
-
-        console.log(userInfo, "test2");
 
         const registerUser = await axiosInstance.post(
           "/auth/register",
@@ -94,7 +91,6 @@ const RegisterPage = () => {
 
         router.push("/login");
       } catch (err) {
-        console.log(err);
         enqueueSnackbar(err?.response?.data?.message, { variant: "error" });
       }
     },
