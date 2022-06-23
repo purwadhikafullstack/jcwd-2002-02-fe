@@ -285,7 +285,6 @@ const ProfilePage = () => {
                       sx={{ width: "140px", borderRadius: "8px", mt: "20px" }}
                       onClick={() => {
                         uploadAvatarHandler();
-                        // setShowPhotoProfilePreview("");
                       }}
                     >
                       Simpan
