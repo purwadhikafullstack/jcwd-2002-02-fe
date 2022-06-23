@@ -39,7 +39,6 @@ import Group from "public/Images/Group.png";
 import { useDispatch, useSelector } from "react-redux";
 import Image from "next/image";
 import { login } from "redux/reducer/auth";
-import imagePlaceholder from "../../public/Images/imagePlaceholder.png";
 
 const ProfilePage = () => {
   const userSelector = {
