@@ -36,8 +36,9 @@ import { useSnackbar } from "notistack";
 import ModalTambahAlamat from "components/ModalTambahAlamat";
 import CardAlamat from "components/CardAlamat";
 import Group from "public/Images/Group.png";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Image from "next/image";
+import { login } from "redux/reducer/auth";
 import imagePlaceholder from "../../public/Images/imagePlaceholder.png";
 
 const ProfilePage = () => {
@@ -65,6 +66,7 @@ const ProfilePage = () => {
   // eslint-disable-next-line no-unused-vars
   const [listAlamat, setListAlamat] = useState(1);
   const { enqueueSnackbar } = useSnackbar();
+  const dispatch = useDispatch();
 
   const tabHandle = (event, newValue) => {
     setTab(newValue);
@@ -78,7 +80,15 @@ const ProfilePage = () => {
     formData.append("avatar_image_file", editPhotoProfile);
 
     try {
-      await axiosInstance.patch(`/auth/${userSelector.id}`, formData);
+      const userUpdatePhotoProfile = await axiosInstance.patch(
+        `/auth/${userSelectors.id}`,
+        formData
+      );
+      setEditPhotoProfile(null);
+
+      dispatch(login(userUpdatePhotoProfile.data.result));
+
+      enqueueSnackbar("Profile Picture Updated!", { variant: "success" });
     } catch (err) {
       // eslint-disable-next-line no-console
       console.log(err);
@@ -239,10 +249,15 @@ const ProfilePage = () => {
                   width="300px"
                   height="300px"
                 >
-                  <Box
-                    component="img"
-                    sx={{ width: "300px", height: "300px", objectFit: "cover" }}
-                    src={userSelector.photo_profile || imagePlaceholder}
+                  <img
+                    src={showPhotoProfilePreview || userSelectors.photo_profile}
+                    alt="photo_profile"
+                    // eslint-disable-next-line react/style-prop-object
+                    style={{
+                      objectFit: "cover",
+                      width: "100%",
+                      height: "100%",
+                    }}
                   />
                 </Box>
                 <input
@@ -271,9 +286,8 @@ const ProfilePage = () => {
                       sx={{ width: "140px", borderRadius: "8px", mt: "20px" }}
                       onClick={() => {
                         uploadAvatarHandler();
+                        // setShowPhotoProfilePreview("");
                       }}
-                      // onClick={() => inputProfilePictureRef.current.click()}
-                      // onclick ini bakal ngehandle file upload ke API
                     >
                       Simpan
                     </Button>
