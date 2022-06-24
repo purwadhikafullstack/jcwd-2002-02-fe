@@ -41,16 +41,6 @@ import Image from "next/image";
 import { login } from "redux/reducer/auth";
 
 const ProfilePage = () => {
-  const userSelector = {
-    nama: "Mychael Son",
-    username: "mychael",
-    email: "sonmychael@gmail.com",
-    profilePicture: null,
-    isVerified: false,
-    gender: "Pria",
-    DOB: "2001-03-31 07:20:31",
-  };
-
   // eslint-disable-next-line no-unused-vars
   const userSelectors = useSelector((state) => state.auth);
   const [openModalEdit, setOpenModalEdit] = useState(false);
@@ -95,12 +85,13 @@ const ProfilePage = () => {
   };
 
   const userProfileFormik = useFormik({
+    enableReinitialize: true,
     initialValues: {
-      nama: userSelector.nama || "",
-      username: userSelector.username || "",
-      gender: userSelector.gender || "",
-      DOB: userSelector.DOB || "",
-      email: userSelector.email || "",
+      nama: userSelectors.nama ? userSelectors.nama : "",
+      username: userSelectors.username ? userSelectors.username : "",
+      gender: userSelectors.gender ? userSelectors.gender : "",
+      DOB: userSelectors.DOB ? userSelectors.DOB : "",
+      email: userSelectors.email ? userSelectors.email : "",
     },
     validationSchema: Yup.object().shape({
       nama: Yup.string()
@@ -115,6 +106,39 @@ const ProfilePage = () => {
       DOB: Yup.date(),
     }),
     validateOnChange: false,
+    onSubmit: (values) => {
+      try {
+        const editedData = {
+          nama: values.nama,
+          username:
+            values.username === userSelectors.username
+              ? undefined
+              : values.username,
+          gender: values.gender,
+          DOB: values.DOB,
+        };
+
+        axiosInstance.patch("/user/edit-profile", editedData);
+        dispatch(
+          login({
+            nama: values.nama,
+            username:
+              values.username === userSelectors.username
+                ? userSelectors.username
+                : values.username,
+            gender: values.gender,
+            DOB: values.DOB,
+            photo_profile: userSelectors.photo_profile,
+            email: userSelectors.email,
+          })
+        );
+
+        enqueueSnackbar("Edit Profile Success!", { variant: "success" });
+        setOpenModalEdit(false);
+      } catch (err) {
+        enqueueSnackbar(err?.response?.data?.message, { variant: "error" });
+      }
+    },
   });
 
   const passwordFormik = useFormik({
@@ -171,11 +195,16 @@ const ProfilePage = () => {
   }
 
   function stringAvatar(name) {
+    if (!name) return;
+    const splitName = name.split(" ");
+    // eslint-disable-next-line consistent-return
     return {
       sx: {
         bgcolor: stringToColor(name),
       },
-      children: `${name.split(" ")[0][0]}${name.split(" ")[1][0]}`,
+      children: splitName[1]
+        ? `${splitName[0][0]}${splitName[1][0]}`
+        : `${splitName[0][0]}${splitName[0][1]}`,
     };
   }
 
@@ -361,7 +390,7 @@ const ProfilePage = () => {
                     Nama
                   </Typography>
                   <Typography fontWeight="bold">
-                    {userProfileFormik.values.nama || "-"}
+                    {userSelectors.nama || "-"}
                   </Typography>
                 </Box>
                 <Box display="flex" alignItems="center" mb="25px">
@@ -369,7 +398,7 @@ const ProfilePage = () => {
                     Username
                   </Typography>
                   <Typography fontWeight="bold">
-                    {userProfileFormik.values.username || "-"}
+                    {userSelectors.username || "-"}
                   </Typography>
                 </Box>
                 <Box display="flex" alignItems="center" mb="25px">
@@ -377,7 +406,7 @@ const ProfilePage = () => {
                     Email
                   </Typography>
                   <Typography fontWeight="bold">
-                    {userProfileFormik.values.email || "-"}
+                    {userSelectors.email || "-"}
                   </Typography>
                 </Box>
                 <Box display="flex" alignItems="center" mb="25px">
@@ -385,10 +414,8 @@ const ProfilePage = () => {
                     Tanggal Lahir
                   </Typography>
                   <Typography fontWeight="bold">
-                    {userProfileFormik.values.DOB
-                      ? moment(userProfileFormik.values.DOB).format(
-                          "DD MMMM YYYY"
-                        )
+                    {userSelectors.DOB
+                      ? moment(userSelectors.DOB).format("DD MMMM YYYY")
                       : "-"}
                   </Typography>
                 </Box>
@@ -397,7 +424,7 @@ const ProfilePage = () => {
                     Jenis Kelamin
                   </Typography>
                   <Typography fontWeight="bold">
-                    {userProfileFormik.values.gender || "-"}
+                    {userSelectors.gender || "-"}
                   </Typography>
                 </Box>
                 <Stack direction="row" spacing={1}>
@@ -444,9 +471,9 @@ const ProfilePage = () => {
                   pb={0}
                   overflow="scroll"
                 >
-                  {userSelector.profilePicture ? (
+                  {userSelectors.photo_profile ? (
                     <Avatar
-                      src={userSelector.profilePicture}
+                      src={userSelectors.photo_profile}
                       alt={userProfileFormik.values.nama}
                       sx={{ width: 56, height: 56 }}
                     />
@@ -466,7 +493,6 @@ const ProfilePage = () => {
                         Nama
                       </FormLabel>
                       <OutlinedInput
-                        placeholder="John Doe"
                         value={userProfileFormik.values.nama}
                         onChange={(e) =>
                           userProfileFormik.setFieldValue(
@@ -489,7 +515,6 @@ const ProfilePage = () => {
                         Username
                       </FormLabel>
                       <OutlinedInput
-                        placeholder="john"
                         value={userProfileFormik.values.username}
                         onChange={(e) =>
                           userProfileFormik.setFieldValue(
@@ -566,29 +591,27 @@ const ProfilePage = () => {
                       closeModal();
                       userProfileFormik.setFieldValue(
                         "nama",
-                        userSelector.nama
+                        userSelectors.nama
                       );
                       userProfileFormik.setFieldValue(
                         "username",
-                        userSelector.username
+                        userSelectors.username
                       );
                       userProfileFormik.setFieldValue(
                         "gender",
-                        userSelector.gender
+                        userSelectors.gender
                       );
-                      userProfileFormik.setFieldValue("DOB", userSelector.DOB);
+                      userProfileFormik.setFieldValue("DOB", userSelectors.DOB);
                     }}
-                    sx={{ width: "90px", height: "42px", mr: "8px" }}
+                    sx={{ width: "120px", height: "42px", mr: "8px" }}
                   >
                     Batal
                   </Button>
                   <Button
                     autoFocus
                     variant="contained"
-                    sx={{ width: "140px", borderRadius: "8px", mt: "20px" }}
-                    onClick={() => {
-                      uploadAvatarHandler();
-                    }}
+                    sx={{ width: "120px", height: "42px", borderRadius: "8px" }}
+                    onClick={userProfileFormik.handleSubmit}
                     // onClick={() => inputProfilePictureRef.current.click()}
                     // onclick ini bakal ngehandle file upload ke API
                   >
@@ -607,15 +630,15 @@ const ProfilePage = () => {
                   alignItems="center"
                   pb={0}
                 >
-                  {userSelector.profilePicture ? (
+                  {userSelectors.photo_profile ? (
                     <Avatar
-                      src={userSelector.profilePicture}
-                      alt={userSelector.nama}
+                      src={userSelectors.photo_profile}
+                      alt={userSelectors.nama}
                       sx={{ width: 56, height: 56 }}
                     />
                   ) : (
                     <Avatar
-                      {...stringAvatar(userSelector.nama)}
+                      {...stringAvatar(userSelectors.nama)}
                       sx={{ width: 56, height: 56 }}
                     />
                   )}
@@ -700,15 +723,16 @@ const ProfilePage = () => {
                   sx={{ marginX: 6, marginBottom: 4, marginTop: 2 }}
                 >
                   <Button
-                    variant="contained"
-                    sx={{ height: "45px", width: "180px" }}
+                    variant="outlined"
+                    sx={{ height: "42px", width: "120px" }}
+                    onClick={closeModal}
                   >
                     Batal
                   </Button>
                   <Button
                     autoFocus
                     variant="contained"
-                    sx={{ width: "90px", height: "42px" }}
+                    sx={{ width: "120px", height: "42px" }}
                     onClick={() => passwordFormik.handleSubmit()}
                   >
                     Simpan
