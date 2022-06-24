@@ -19,9 +19,9 @@ import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import { logout } from "redux/reducer/auth";
-import shopee from "../../public/Images/shopee.png";
 import jsCookie from "js-cookie";
 import Router from "next/router";
+import shopee from "../../public/Images/shopee.png";
 
 const Nav = () => {
   const userSelector = useSelector((state) => state.auth);
@@ -58,9 +58,11 @@ const Nav = () => {
         background: "rgb(255, 255, 255, 0.9)",
       }}
     >
-      <Link href="/">
-        <Image src={shopee} height="80px" width="210px" />
-      </Link>
+      <Box display={{ xs: "none", md: "block" }}>
+        <Link href="/">
+          <Image src={shopee} height="80px" width="210px" />
+        </Link>
+      </Box>
       <FormControl
         sx={{
           m: 1,
