@@ -402,6 +402,7 @@ const ProfilePage = () => {
                 </Box>
                 <Stack direction="row" spacing={1}>
                   {userSelectors.is_verified ? undefined : (
+                    // Button Verifikasi
                     <Button
                       onClick={verifiactionButtonHandler}
                       disabled={verificationButtonLoading}
@@ -412,6 +413,7 @@ const ProfilePage = () => {
                     </Button>
                   )}
                   <br />
+                  {/* Button Edit Profile */}
                   <Button
                     variant="outlined"
                     sx={{ height: "45px", width: "180px" }}
@@ -420,6 +422,7 @@ const ProfilePage = () => {
                     Edit Profile
                   </Button>
                   <br />
+                  {/* Button Ganti Password */}
                   <Button
                     variant="outlined"
                     sx={{ height: "45px", width: "180px" }}
@@ -429,6 +432,8 @@ const ProfilePage = () => {
                   </Button>
                 </Stack>
               </Box>
+
+              {/* Box Edit Profile */}
               <Dialog open={openModalEdit} onClose={closeModal}>
                 <Box
                   width="500px"
