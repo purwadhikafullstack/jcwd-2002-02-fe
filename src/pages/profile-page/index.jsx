@@ -171,7 +171,6 @@ const ProfilePage = () => {
     }),
     validateOnChange: false,
     onSubmit: async (values) => {
-      console.log("test");
       try {
         const userChangePassword = {
           oldPassword: values.oldPassword,
