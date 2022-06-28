@@ -20,6 +20,8 @@ import TableData from "components/Admin/NewTable";
 const DaftarProduk = () => {
   const [namaObatFilter, setNamaObatFilter] = useState("");
   const [tambahObat, setTambahObat] = useState(false);
+  const [page, setPage] = useState(0);
+  const [rowPerPage, setRowPerPage] = useState(10);
 
   const router = useRouter();
 
@@ -95,6 +97,15 @@ const DaftarProduk = () => {
     "Atur",
   ];
 
+  const handleChangeRowsPerPage = (event) => {
+    setRowPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
   return (
     <Box display="flex" justifyContent="flex-end">
       <Box width="1186px" height="100%">
@@ -167,7 +178,14 @@ const DaftarProduk = () => {
               marginTop: "32px",
             }}
           >
-            <TableData columns={columns} rows={rows} />
+            <TableData
+              columns={columns}
+              rows={rows}
+              page={page}
+              rowPerPage={rowPerPage}
+              handleChangePage={handleChangePage}
+              handleChangeRowsPerPage={handleChangeRowsPerPage}
+            />
           </Box>
         </Box>
       </Box>

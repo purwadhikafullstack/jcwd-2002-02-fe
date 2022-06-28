@@ -9,12 +9,19 @@ import {
   Button,
   IconButton,
   styled,
-  // TableFooter,
-  // TablePagination,
+  TableFooter,
+  TablePagination,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
-const TableData = ({ columns, rows }) => {
+const TableData = ({
+  columns,
+  rows,
+  rowPerPage,
+  page,
+  handleChangeRowsPerPage,
+  handleChangePage,
+}) => {
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
       backgroundColor: theme.palette.common.black,
@@ -42,7 +49,11 @@ const TableData = ({ columns, rows }) => {
   };
 
   const renderTableBody = () => {
-    return rows.map((val) => {
+    return (
+      rowPerPage > 0
+        ? rows.slice(page * rowPerPage, page * rowPerPage + rowPerPage)
+        : rows
+    ).map((val) => {
       return (
         <StyledTableRow>
           <StyledTableCell component="th" scope="row">
@@ -78,16 +89,18 @@ const TableData = ({ columns, rows }) => {
           <TableRow>{renderTableHead()}</TableRow>
         </TableHead>
         <TableBody>{renderTableBody()}</TableBody>
-        {/* <TableFooter>
+        <TableFooter>
           <TableRow>
             <TablePagination
-              rowsPerPageOptions={[10, 20]}
+              rowsPerPageOptions={[1, 10, 20]}
               count={rows.length}
-              rowsPerPage={10}
-              page={0}
+              rowsPerPage={rowPerPage}
+              page={page}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              onPageChange={handleChangePage}
             />
           </TableRow>
-        </TableFooter> */}
+        </TableFooter>
       </Table>
     </TableContainer>
   );
