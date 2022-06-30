@@ -40,16 +40,13 @@ const DaftarProduk = () => {
 
   const fetchProductCategory = async () => {
     try {
-      setIsLoading(true);
       const findAllProductCategory = await axiosInstance.get(
         "/admin/product-category"
       );
 
       setProductCategory(findAllProductCategory?.data?.result);
-      setIsLoading(false);
     } catch (err) {
       // eslint-disable-next-line no-console
-      setIsLoading(false);
       console.log(err);
     }
   };
@@ -73,42 +70,6 @@ const DaftarProduk = () => {
   useEffect(() => {
     fetchProductCategory();
   }, []);
-
-  const rows = [
-    {
-      id: 1,
-      namaObat: "Adem Sari",
-      noObat: "A000321",
-      noBpom: "B000521",
-      kategori: "Obat Bebas",
-      stok: 20,
-      satuan: "Box",
-      nilaiBarang: 15000,
-      nilaiJual: 44000,
-    },
-    {
-      id: 2,
-      namaObat: "Adem Sari",
-      noObat: "A000321",
-      noBpom: "B000521",
-      kategori: "Obat Bebas",
-      stok: 10,
-      satuan: "Box",
-      nilaiBarang: 15000,
-      nilaiJual: 44000,
-    },
-    {
-      id: 3,
-      namaObat: "Adem Sari",
-      noObat: "A000321",
-      noBpom: "B000521",
-      kategori: "Obat Bebas",
-      stok: 15,
-      satuan: "Box",
-      nilaiBarang: 15000,
-      nilaiJual: 44000,
-    },
-  ];
 
   const columns = [
     { props: "No", width: 10 },
@@ -238,7 +199,6 @@ const DaftarProduk = () => {
               open={tambahObat}
               handleClose={() => setTambahObat(false)}
               categories={productCategory}
-              loading={isLoading}
             />
           </Box>
           <Divider />

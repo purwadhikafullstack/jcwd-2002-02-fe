@@ -11,7 +11,6 @@ import {
   Grid,
   Select,
   MenuItem,
-  Input,
 } from "@mui/material";
 import Image from "next/image";
 import { useState, useRef } from "react";
@@ -19,11 +18,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import Group8729 from "public/Images/Group8729.png";
 import axiosInstance from "config/api";
 import * as Yup from "yup";
-import LooksOneIcon from "@mui/icons-material/LooksOne";
-import LooksTwoIcon from "@mui/icons-material/LooksTwo";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
 import { useSnackbar } from "notistack";
 import { useFormik } from "formik";
 
@@ -83,6 +77,7 @@ const ModalTambahObat = ({ open, handleClose, categories = [] }) => {
     } = formik.values;
 
     if (!diskon) {
+      // eslint-disable-next-line no-unused-expressions
       diskon === 0;
     }
 
@@ -93,7 +88,7 @@ const ModalTambahObat = ({ open, handleClose, categories = [] }) => {
     formData.append("satuan", satuan);
     formData.append("harga_jual", harga_jual);
     formData.append("diskon", diskon);
-    Object.values(files).forEach((file, idx) => {
+    Object.values(files).forEach((file) => {
       formData.append("product_image_file", file);
     });
 
