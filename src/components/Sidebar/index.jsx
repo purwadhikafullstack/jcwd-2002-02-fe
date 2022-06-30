@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import {
   Box,
   Collapse,
@@ -12,7 +13,12 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { useState } from "react";
 
-const Sidebar = ({ setHargaMinimum, setHargaMaksimum, setPage }) => {
+const Sidebar = ({
+  setHargaMinimum,
+  setHargaMaksimum,
+  setPage,
+  setKategoriTerpilih,
+}) => {
   const [kategori, setKategori] = useState(false);
   const openKategori = () => setKategori(true);
   const closeKategori = () => setKategori(false);
@@ -21,6 +27,13 @@ const Sidebar = ({ setHargaMinimum, setHargaMaksimum, setPage }) => {
   const closeHarga = () => setHarga(false);
   const [hargaMin, setHargaMin] = useState(null);
   const [hargaMaks, setHargaMaks] = useState(null);
+  const [pilihKategori, setPilihKategori] = useState(null);
+
+  const kategoriHandler = (value) => {
+    setPilihKategori(value);
+    setKategoriTerpilih(value);
+    setPage(1);
+  };
 
   const setHandler = () => {
     setHargaMinimum(hargaMin);
@@ -79,6 +92,7 @@ const Sidebar = ({ setHargaMinimum, setHargaMaksimum, setPage }) => {
         <Collapse in={kategori}>
           <Stack sx={{ mt: "16px" }}>
             <Typography
+              onClick={() => kategoriHandler(1)}
               sx={{
                 fontSize: "14px",
                 mb: "12px",
@@ -92,6 +106,7 @@ const Sidebar = ({ setHargaMinimum, setHargaMaksimum, setPage }) => {
               Obat-Obatan
             </Typography>
             <Typography
+              onClick={() => kategoriHandler(2)}
               sx={{
                 fontSize: "14px",
                 mb: "12px",
@@ -105,6 +120,8 @@ const Sidebar = ({ setHargaMinimum, setHargaMaksimum, setPage }) => {
               Nutrisi
             </Typography>
             <Typography
+              value={3}
+              onClick={kategoriHandler}
               sx={{
                 fontSize: "14px",
                 mb: "12px",
@@ -118,6 +135,8 @@ const Sidebar = ({ setHargaMinimum, setHargaMaksimum, setPage }) => {
               Herbal
             </Typography>
             <Typography
+              value={4}
+              onClick={kategoriHandler}
               sx={{
                 fontSize: "14px",
                 mb: "12px",
@@ -131,6 +150,8 @@ const Sidebar = ({ setHargaMinimum, setHargaMaksimum, setPage }) => {
               Vitamin & Suplemen
             </Typography>
             <Typography
+              value={5}
+              onClick={kategoriHandler}
               sx={{
                 fontSize: "14px",
                 mb: "12px",
@@ -144,6 +165,8 @@ const Sidebar = ({ setHargaMinimum, setHargaMaksimum, setPage }) => {
               Alat Kesehatan
             </Typography>
             <Typography
+              value={6}
+              onClick={kategoriHandler}
               sx={{
                 fontSize: "14px",
                 mb: "12px",
@@ -157,6 +180,8 @@ const Sidebar = ({ setHargaMinimum, setHargaMaksimum, setPage }) => {
               Perawatan Tubuh
             </Typography>
             <Typography
+              value={7}
+              onClick={kategoriHandler}
               sx={{
                 fontSize: "14px",
                 mb: "12px",
