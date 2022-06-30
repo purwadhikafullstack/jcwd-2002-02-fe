@@ -26,6 +26,7 @@ const DaftarProduk = () => {
   const [rowPerPage, setRowPerPage] = useState(10);
   const [rows, setRows] = useState([]);
   const [totalData, setTotalData] = useState(0);
+  const [productCategory, setProductCategory] = useState([]);
 
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
@@ -36,6 +37,22 @@ const DaftarProduk = () => {
     }, 2000),
     []
   );
+
+  const fetchProductCategory = async () => {
+    try {
+      setIsLoading(true);
+      const findAllProductCategory = await axiosInstance.get(
+        "/admin/product-category"
+      );
+
+      setProductCategory(findAllProductCategory?.data?.result);
+      setIsLoading(false);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      setIsLoading(false);
+      console.log(err);
+    }
+  };
 
   useEffect(() => {
     router.push({
@@ -52,6 +69,46 @@ const DaftarProduk = () => {
       }
     }
   }, [router.isReady]);
+
+  useEffect(() => {
+    fetchProductCategory();
+  }, []);
+
+  const rows = [
+    {
+      id: 1,
+      namaObat: "Adem Sari",
+      noObat: "A000321",
+      noBpom: "B000521",
+      kategori: "Obat Bebas",
+      stok: 20,
+      satuan: "Box",
+      nilaiBarang: 15000,
+      nilaiJual: 44000,
+    },
+    {
+      id: 2,
+      namaObat: "Adem Sari",
+      noObat: "A000321",
+      noBpom: "B000521",
+      kategori: "Obat Bebas",
+      stok: 10,
+      satuan: "Box",
+      nilaiBarang: 15000,
+      nilaiJual: 44000,
+    },
+    {
+      id: 3,
+      namaObat: "Adem Sari",
+      noObat: "A000321",
+      noBpom: "B000521",
+      kategori: "Obat Bebas",
+      stok: 15,
+      satuan: "Box",
+      nilaiBarang: 15000,
+      nilaiJual: 44000,
+    },
+  ];
 
   const columns = [
     { props: "No", width: 10 },
@@ -180,6 +237,8 @@ const DaftarProduk = () => {
             <ModalTambahObat
               open={tambahObat}
               handleClose={() => setTambahObat(false)}
+              categories={productCategory}
+              loading={isLoading}
             />
           </Box>
           <Divider />
