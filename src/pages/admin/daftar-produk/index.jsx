@@ -91,16 +91,15 @@ const DaftarProduk = () => {
           return {
             id: idx + rowPerPage * page + 1,
             namaObat: val.nama_produk,
-            noObat: val?.no_obat,
-            noBpom: val?.noBpom,
+            noObat: val?.nomor_obat,
+            noBpom: val?.nomor_bpom,
             kategori: val.product_category.kategori,
             stok: val.stocks.reduce((init, object) => {
               return init + object.jumlah_stok;
             }, 0),
             stokTypes: val.stocks,
             satuan: val?.satuan,
-            nilaiBarang: val.harga_modal,
-            nilaiJual: val.harga,
+            nilaiJual: val.harga_jual,
             productId: val.id,
           };
         })
@@ -112,16 +111,6 @@ const DaftarProduk = () => {
 
   useEffect(() => {
     fetchProduct();
-
-    // if (router.isReady) {
-    //   router.push({
-    //     query: {
-    //       nama_obat: namaObatFilter === "" ? undefined : namaObatFilter,
-    //       sort_dir: sortDir === "" ? undefined : sortDir,
-    //       sort_by: sortBy === "" ? undefined : sortBy,
-    //     },
-    //   });
-    // }
 
     if (typeof namaObatFilter === "string" || typeof sortDir === "string") {
       router.push({
@@ -150,10 +139,10 @@ const DaftarProduk = () => {
 
   const sortButton = (val) => {
     if (val === "Highest Price") {
-      setSortBy("harga");
+      setSortBy("harga_jual");
       setSortDir("DESC");
     } else if (val === "Lowest Price") {
-      setSortBy("harga");
+      setSortBy("harga_jual");
       setSortDir("ASC");
     } else if (val === "name_ASC") {
       setSortBy("nama_produk");
@@ -172,11 +161,14 @@ const DaftarProduk = () => {
     if (router.isReady && router.query.sort_dir && router.query.sort_by) {
       if (
         router.query.sort_dir === "DESC" &&
-        router.query.sort_by === "harga"
+        router.query.sort_by === "harga_jual"
       ) {
         return "Highest Price";
       }
-      if (router.query.sort_dir === "ASC" && router.query.sort_by === "harga") {
+      if (
+        router.query.sort_dir === "ASC" &&
+        router.query.sort_by === "harga_jual"
+      ) {
         return "Lowest Price";
       }
       if (
