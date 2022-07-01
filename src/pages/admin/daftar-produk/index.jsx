@@ -52,22 +52,6 @@ const DaftarProduk = () => {
   };
 
   useEffect(() => {
-    router.push({
-      query: {
-        nama_obat: namaObatFilter === "" ? undefined : namaObatFilter,
-      },
-    });
-  }, [namaObatFilter]);
-
-  useEffect(() => {
-    if (router.isReady) {
-      if (router.query.nama_obat) {
-        setNamaObatFilter(router.query.nama_obat);
-      }
-    }
-  }, [router.isReady]);
-
-  useEffect(() => {
     fetchProductCategory();
   }, []);
 
