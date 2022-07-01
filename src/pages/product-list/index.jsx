@@ -104,7 +104,7 @@ const ProductList = () => {
         <Grid item xs={6} sm={4} md={3}>
           <ProductCard
             nama_produk={val?.nama_produk}
-            harga={val?.harga}
+            harga={val?.harga_jual}
             diskon={val?.diskon}
             produk_image={val?.produk_image_url[0]}
             id={val?.id}
