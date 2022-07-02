@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useState } from "react";
+import ModalEditObat from "../ModalEditObat";
 
 const TableData = ({
   columns,
@@ -24,6 +25,7 @@ const TableData = ({
   handleChangeRowsPerPage,
   handleChangePage,
   totalData,
+  categoriesData,
 }) => {
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -41,14 +43,15 @@ const TableData = ({
     });
   };
 
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
+  const [editProduk, setEditProduk] = useState(false);
+  const [produkData, setProdukData] = useState({});
+  const [selectedId, setSelectedId] = useState(0);
+  const [produkImages, setProdukImages] = useState([]);
+  const open = (id) => {
+    // Boolean(anchorEl);
+    setSelectedId(id);
   };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+
   const renderTableBody = () => {
     return rows.map((val) => {
       return (
@@ -96,12 +99,26 @@ const TableData = ({
             Rp. {val.nilaiJual.toLocaleString() || "-"}
           </TableCell>
           <TableCell align="center">
-            <IconButton onClick={handleClick}>
+            <IconButton onClick={() => setSelectedId(val.id)}>
               <MoreVertIcon />
             </IconButton>
-            <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-              <MenuItem>test</MenuItem>
-              <MenuItem>test</MenuItem>
+            <Menu
+              // anchorEl={anchorEl}
+              open={val.id === selectedId}
+              onClose={() => open(0)}
+            >
+              <MenuItem>Lihat Detail</MenuItem>
+              <MenuItem>Tambah Stok</MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setEditProduk(true);
+                  setProdukData(val);
+                  setProdukImages(val?.obatImages);
+                }}
+              >
+                Ubah Produk
+              </MenuItem>
+              <MenuItem>Hapus Produk</MenuItem>
             </Menu>
           </TableCell>
         </TableRow>
@@ -111,6 +128,16 @@ const TableData = ({
 
   return (
     <>
+      <ModalEditObat
+        open={editProduk}
+        data={produkData}
+        handleClose={() => {
+          setEditProduk(false);
+          setSelectedId(0);
+        }}
+        categories={categoriesData}
+        produkImages={produkImages}
+      />
       <Box sx={{ overflow: "scroll" }} paddingRight="32px">
         <TableContainer
           component={Paper}
