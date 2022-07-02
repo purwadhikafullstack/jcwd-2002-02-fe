@@ -19,7 +19,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import ModalTambahObat from "components/Admin/ModalTambahObat";
 import requiresAdmin from "config/requireAdmin";
-import TableData from "components/Admin/NewTable";
+import TableData from "components/Admin/DaftarObatTable";
 import { useSnackbar } from "notistack";
 import axiosInstance from "config/api";
 
@@ -188,15 +188,25 @@ const DaftarProduk = () => {
     }
   };
 
-  const debounce = useCallback(
-    _.debounce((values, field) => {
-      if (field === "namaObat") {
-        setNamaObatFilter(values);
-      } else if (field === "sort") {
-        sortButton(values);
-      } else if (field === "filter") {
-        filtersetState(values);
-      }
+  const namaObatDebounce = useCallback(
+    _.debounce((values) => {
+      setNamaObatFilter(values);
+      setPage(0);
+    }, 2000),
+    []
+  );
+
+  const filterDebounce = useCallback(
+    _.debounce((values) => {
+      filtersetState(values);
+      setPage(0);
+    }, 2000),
+    []
+  );
+
+  const sortDebounce = useCallback(
+    _.debounce((values) => {
+      sortButton(values);
       setPage(0);
     }, 2000),
     []
@@ -274,7 +284,7 @@ const DaftarProduk = () => {
           >
             <Box display="flex" alignItems="center">
               <OutlinedInput
-                onChange={(e) => debounce(e.target.value, "namaObat")}
+                onChange={(e) => namaObatDebounce(e.target.value)}
                 placeholder="Cari nama obat"
                 sx={{ width: "300px", height: "55px", mr: 1 }}
                 defaultValue={router.query.nama_obat}
@@ -288,7 +298,7 @@ const DaftarProduk = () => {
                 <InputLabel>Filter</InputLabel>
                 <Select
                   label="Filter"
-                  onChange={(e) => debounce(e.target.value, "filter")}
+                  onChange={(e) => filterDebounce(e.target.value)}
                   defaultValue={router.query.filter_by_category}
                 >
                   <MenuItem value="">None</MenuItem>
@@ -299,7 +309,7 @@ const DaftarProduk = () => {
                 <InputLabel>Sort</InputLabel>
                 <Select
                   label="Sort"
-                  onChange={(e) => debounce(e.target.value, "sort")}
+                  onChange={(e) => sortDebounce(e.target.value)}
                   defaultValue={sortDefaultValue()}
                 >
                   <MenuItem value="">None</MenuItem>
