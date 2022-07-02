@@ -27,6 +27,7 @@ const ModalEditObat = ({
   handleClose,
   categories = [],
   data,
+  // eslint-disable-next-line no-unused-vars
   produkImages = [],
 }) => {
   const [activeStep, setActiveStep] = useState(1);
