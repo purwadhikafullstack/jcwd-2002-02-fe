@@ -46,9 +46,10 @@ const TableData = ({
   const [editProduk, setEditProduk] = useState(false);
   const [produkData, setProdukData] = useState({});
   const [selectedId, setSelectedId] = useState(0);
+  const [anchorEl, setAnchorEl] = useState(null);
   const [produkImages, setProdukImages] = useState([]);
+
   const open = (id) => {
-    // Boolean(anchorEl);
     setSelectedId(id);
   };
 
@@ -103,17 +104,19 @@ const TableData = ({
               <MoreVertIcon />
             </IconButton>
             <Menu
-              // anchorEl={anchorEl}
+              anchorEl={anchorEl}
               open={val.id === selectedId}
               onClose={() => open(0)}
             >
               <MenuItem>Lihat Detail</MenuItem>
               <MenuItem>Tambah Stok</MenuItem>
               <MenuItem
-                onClick={() => {
+                onClick={(event) => {
                   setEditProduk(true);
                   setProdukData(val);
                   setProdukImages(val?.obatImages);
+                  setAnchorEl(event.currentTarget);
+                  setSelectedId(0);
                 }}
               >
                 Ubah Produk

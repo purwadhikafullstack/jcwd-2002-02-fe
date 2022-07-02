@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable camelcase */
 import {
   Modal,
@@ -29,19 +30,11 @@ const ModalEditObat = ({
   produkImages = [],
 }) => {
   const [activeStep, setActiveStep] = useState(1);
-
+  const [imageReview, setImageReview] = useState([]);
   const { enqueueSnackbar } = useSnackbar();
+  const [files, setFiles] = useState([]);
 
   const inputFile = useRef(null);
-
-  const handleFile = (event) => {
-    if (event.target.files[0]) {
-      setFiles([...files, event.target.files[0]]);
-      enqueueSnackbar(event.target.files[0].name, {
-        variant: "info",
-      });
-    }
-  };
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -51,6 +44,7 @@ const ModalEditObat = ({
       nomor_bpom: data.noBpom,
       kategori: data.kategoriId,
       satuan: data.satuan,
+      harga_jual: data.nilaiJual,
       diskon: data.diskon,
     },
     validationSchema: Yup.object().shape({
@@ -66,7 +60,7 @@ const ModalEditObat = ({
   });
 
   const submitHandler = async () => {
-    if (!files) {
+    if (!imageReview) {
       enqueueSnackbar("Select your Image First!", { variant: "warning" });
       return;
     }
@@ -100,7 +94,7 @@ const ModalEditObat = ({
 
     try {
       const res = await axiosInstance.patch(
-        `/admin/product/${data.id}`,
+        `/admin/product/${data.productId}`,
         formData,
         {
           headers: {
@@ -109,6 +103,7 @@ const ModalEditObat = ({
         }
       );
       setFiles(null);
+      setImageReview(null);
       enqueueSnackbar(res?.data?.message, { variant: "success" });
       setActiveStep(3);
 
@@ -126,30 +121,34 @@ const ModalEditObat = ({
     }
   };
 
-  const [files, setFiles] = useState([]);
   const onChange = (e) => {
+    if (e.target.files[0]) {
+      setFiles([...files, e.target.files[0]]);
+      enqueueSnackbar(e.target.files[0].name, {
+        variant: "info",
+      });
+    }
+    // eslint-disable-next-line no-restricted-syntax
     for (const file of e.target.files) {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => {
-        setFiles((imgs) => [...imgs, reader.result]);
+        setImageReview((imgs) => [...imgs, reader.result]);
       };
       reader.onerror = () => {
+        // eslint-disable-next-line no-console
         console.log(reader.error);
       };
     }
   };
 
   useEffect(() => {
-    if (!files) {
-      setFiles(produkImages);
+    if (!open) {
+      setFiles([]);
+      setImageReview([]);
     }
-  }, [files]);
+  }, [open]);
 
-  console.log(produkImages);
-  console.log(files);
-  const totalImages = [...produkImages, ...files];
-  console.log(totalImages);
   return (
     <Modal open={open} onClose={handleClose}>
       {activeStep === 3 ? (
@@ -477,7 +476,33 @@ const ModalEditObat = ({
                       Add Image
                     </Button>
                   </Grid>
-                  {files?.length ? (
+                  {/* <Box display="flex">
+                    {produkImages.map((file, idx) => {
+                      return (
+                        <Box
+                          sx={{
+                            marginTop: "10px",
+                            display: "flex",
+                            borderRadius: "10px",
+                            padding: "5px",
+                            border: "2px solid",
+                          }}
+                        >
+                          <img src={file} width="100" />
+                          <CloseIcon
+                            sx={{
+                              position: "fixed",
+                              ":hover": {
+                                color: "red",
+                                cursor: "pointer",
+                              },
+                            }}
+                          />
+                        </Box>
+                      );
+                    })}
+                  </Box> */}
+                  {imageReview?.length ? (
                     <Box
                       display="flex"
                       marginTop="10px"
@@ -486,20 +511,21 @@ const ModalEditObat = ({
                         overflowX: "auto",
                       }}
                     >
-                      {files.map((file, idx) => {
+                      {imageReview.map((file, idx) => {
                         return (
                           <Box
                             sx={{
                               display: "flex",
                               borderRadius: "10px",
                               padding: "5px",
+                              border: "2px solid gray",
                             }}
                           >
                             <img src={file} width="100" />
                             <CloseIcon
                               sx={{
-                                position: "absolute",
-                                right: 0,
+                                color: "Sidebar.500",
+                                position: "fixed",
                                 alignContent: "flex-end",
                                 ":hover": {
                                   color: "red",
@@ -507,6 +533,11 @@ const ModalEditObat = ({
                                 },
                               }}
                               onClick={() => {
+                                setImageReview((prevValue) => {
+                                  return prevValue.filter(
+                                    (val, prevIdx) => idx !== prevIdx
+                                  );
+                                });
                                 setFiles((prevValue) => {
                                   return prevValue.filter(
                                     (val, prevIdx) => idx !== prevIdx
