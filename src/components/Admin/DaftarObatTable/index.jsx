@@ -46,7 +46,6 @@ const TableData = ({
   const [editProduk, setEditProduk] = useState(false);
   const [produkData, setProdukData] = useState({});
   const [selectedId, setSelectedId] = useState(0);
-  const [anchorEl, setAnchorEl] = useState(null);
   const [produkImages, setProdukImages] = useState([]);
 
   const open = (id) => {
@@ -103,19 +102,14 @@ const TableData = ({
             <IconButton onClick={() => setSelectedId(val.id)}>
               <MoreVertIcon />
             </IconButton>
-            <Menu
-              anchorEl={anchorEl}
-              open={val.id === selectedId}
-              onClose={() => open(0)}
-            >
+            <Menu open={val.id === selectedId} onClose={() => open(0)}>
               <MenuItem>Lihat Detail</MenuItem>
               <MenuItem>Tambah Stok</MenuItem>
               <MenuItem
-                onClick={(event) => {
+                onClick={() => {
                   setEditProduk(true);
                   setProdukData(val);
                   setProdukImages(val?.obatImages);
-                  setAnchorEl(event.currentTarget);
                   setSelectedId(0);
                 }}
               >
