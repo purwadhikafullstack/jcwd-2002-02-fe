@@ -153,12 +153,9 @@ const ModalEditObat = ({
 
   async function createFile() {
     produkImages.map(async (image) => {
-      let response = await fetch(`${image}`);
-      let data = await response.blob();
-      let metadata = {
-        type: "image/jpeg",
-      };
-      let file = new File([data], `${image}`, { type: data.type });
+      const response = await fetch(`${image}`);
+      const blob = await response.blob();
+      const file = new File([blob], `${image}`, { type: blob.type });
       if (!files) {
         setFiles([file]);
       } else {
