@@ -21,10 +21,12 @@ const DeleteDialog = ({ open, handleClose, data }) => {
 
       enqueueSnackbar(res?.data?.message, { variant: "success" });
       handleClose();
+      window.location.reload();
     } catch (err) {
       // eslint-disable-next-line no-console
       console.log(err);
       enqueueSnackbar(err?.response?.data?.message, { variant: "error" });
+      handleClose();
     }
   };
   return (

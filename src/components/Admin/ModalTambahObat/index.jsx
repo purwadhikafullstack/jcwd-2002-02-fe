@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable camelcase */
 import {
   Modal,
@@ -11,6 +12,7 @@ import {
   Grid,
   Select,
   MenuItem,
+  Tooltip,
 } from "@mui/material";
 import Image from "next/image";
 import { useState, useRef } from "react";
@@ -24,17 +26,42 @@ import { useFormik } from "formik";
 const ModalTambahObat = ({ open, handleClose, categories = [] }) => {
   const [activeStep, setActiveStep] = useState(1);
   const [files, setFiles] = useState([]);
+  const [imageReview, setImageReview] = useState([]);
 
   const { enqueueSnackbar } = useSnackbar();
 
   const inputFile = useRef(null);
 
-  const handleFile = (event) => {
-    if (event.target.files[0]) {
-      setFiles([...files, event.target.files[0]]);
-      enqueueSnackbar(event.target.files[0].name, {
+  const handleFile = (e) => {
+    if (!files) {
+      setFiles([e.target.files[0]]);
+      enqueueSnackbar(e.target.files[0].name, {
         variant: "info",
       });
+    } else {
+      setFiles([...files, e.target.files[0]]);
+      enqueueSnackbar(e.target.files[0].name, {
+        variant: "info",
+      });
+    }
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const file of e.target.files) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      if (!imageReview) {
+        reader.onload = () => {
+          setImageReview([reader.result]);
+        };
+      } else {
+        reader.onload = () => {
+          setImageReview((imgs) => [...imgs, reader.result]);
+        };
+      }
+      reader.onerror = () => {
+        // eslint-disable-next-line no-console
+        console.log(reader.error);
+      };
     }
   };
 
@@ -428,65 +455,93 @@ const ModalTambahObat = ({ open, handleClose, categories = [] }) => {
                     </FormLabel>
                   </Grid>
                   <Grid item xs={9}>
-                    <input
-                      accept="image/png, image/jpeg, image/jpg"
-                      onChange={handleFile}
-                      ref={inputFile}
-                      type="file"
-                      inputProps={{ multiple: true }}
-                      style={{ display: "none" }}
-                    />
-                    <Button
-                      variant="outlined"
-                      onClick={() => inputFile.current.click()}
-                    >
-                      Add Image
-                    </Button>
-                  </Grid>
-                  {files?.length ? (
-                    <Box
-                      display="flex"
-                      marginTop="10px"
-                      maxWidth="100%"
-                      sx={{
-                        overflowX: "auto",
-                      }}
-                    >
-                      {files.map((file, idx) => {
-                        return (
-                          <Box
-                            sx={{
-                              backgroundColor: "Sidebar.500",
-                              display: "flex",
-                              borderRadius: "10px",
-                              padding: "5px",
-                            }}
+                    {files?.length === 5 ? (
+                      <Tooltip title="Maksimal 5 Gambar" placement="right">
+                        <span>
+                          <input
+                            accept="image/png, image/jpeg, image/jpg"
+                            onChange={handleFile}
+                            ref={inputFile}
+                            type="file"
+                            inputProps={{ multiple: true }}
+                            style={{ display: "none" }}
+                          />
+                          <Button
+                            variant="outlined"
+                            onClick={() => inputFile.current.click()}
+                            disabled={files.length === 5}
                           >
-                            <Typography>
-                              {file?.name?.length > 15
-                                ? `${file?.name?.slice(0, 9)}...`
-                                : file?.name}
-                            </Typography>
-                            <CloseIcon
-                              sx={{
-                                ":hover": {
-                                  color: "red",
-                                  cursor: "pointer",
-                                },
-                              }}
-                              onClick={() => {
-                                setFiles((prevValue) => {
-                                  return prevValue.filter(
-                                    (val, prevIdx) => idx !== prevIdx
-                                  );
-                                });
-                              }}
-                            />
-                          </Box>
-                        );
-                      })}
-                    </Box>
-                  ) : null}
+                            Add Image
+                          </Button>
+                        </span>
+                      </Tooltip>
+                    ) : (
+                      <>
+                        <input
+                          accept="image/png, image/jpeg, image/jpg"
+                          onChange={handleFile}
+                          ref={inputFile}
+                          type="file"
+                          inputProps={{ multiple: true }}
+                          style={{ display: "none" }}
+                        />
+                        <Button
+                          variant="outlined"
+                          onClick={() => inputFile.current.click()}
+                          disabled={files?.length === 5}
+                        >
+                          Add Image
+                        </Button>
+                      </>
+                    )}
+                  </Grid>
+
+                  <Box
+                    display="flex"
+                    marginTop="10px"
+                    maxWidth="100%"
+                    sx={{
+                      overflowX: "auto",
+                    }}
+                  >
+                    {imageReview?.map((file, idx) => {
+                      return (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            borderRadius: "10px",
+                            padding: "5px",
+                          }}
+                        >
+                          <img src={file} height="200px" />
+                          <CloseIcon
+                            sx={{
+                              color: "Sidebar.600",
+                              position: "relative",
+                              right: 30,
+                              alignContent: "flex-end",
+                              ":hover": {
+                                color: "red",
+                                cursor: "pointer",
+                              },
+                            }}
+                            onClick={() => {
+                              setImageReview((prevValue) => {
+                                return prevValue.filter(
+                                  (val, prevIdx) => idx !== prevIdx
+                                );
+                              });
+                              setFiles((prevValue) => {
+                                return prevValue.filter(
+                                  (val, prevIdx) => idx !== prevIdx
+                                );
+                              });
+                            }}
+                          />
+                        </Box>
+                      );
+                    })}
+                  </Box>
                 </Grid>
               </FormControl>
             </Box>

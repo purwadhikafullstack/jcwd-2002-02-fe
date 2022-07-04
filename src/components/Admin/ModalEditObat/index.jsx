@@ -12,6 +12,7 @@ import {
   Grid,
   Select,
   MenuItem,
+  IconButton,
 } from "@mui/material";
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
@@ -21,6 +22,7 @@ import axiosInstance from "config/api";
 import * as Yup from "yup";
 import { useSnackbar } from "notistack";
 import { useFormik } from "formik";
+import AddIcon from "@mui/icons-material/Add";
 
 const ModalEditObat = ({
   open,
@@ -34,12 +36,12 @@ const ModalEditObat = ({
   const [imageReview, setImageReview] = useState([]);
   const { enqueueSnackbar } = useSnackbar();
   const [files, setFiles] = useState([]);
+  const [editImage, setEditImage] = useState(false);
 
   const inputFile = useRef(null);
 
   const formik = useFormik({
     enableReinitialize: true,
-    validateOnMount: true,
     initialValues: {
       nama_produk: data.namaObat,
       nomor_obat: data.noObat,
@@ -59,47 +61,45 @@ const ModalEditObat = ({
       diskon: Yup.number(),
     }),
     validateOnChange: true,
+    onSubmit: async (values) => {
+      try {
+        const productInfo = {
+          nama_produk: values.nama_produk,
+          nomor_obat: values.nomor_obat,
+          nomor_bpom: values.nomor_bpom,
+          kategori: values.kategori,
+          satuan: values.satuan,
+          harga_jual: values.harga_jual,
+          diskon: values.diskon,
+        };
+        const res = await axiosInstance.patch(
+          `/admin/product/${data.productId}`,
+          productInfo
+        );
+        enqueueSnackbar(res?.data?.message, { variant: "success" });
+        setActiveStep(3);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.log(err);
+        enqueueSnackbar(err?.response?.data?.message, { variant: "error" });
+      }
+    },
   });
 
-  const submitHandler = async () => {
+  const imagesSubmitHandler = async () => {
     if (!imageReview) {
       enqueueSnackbar("Select your Image First!", { variant: "warning" });
       return;
     }
 
-    const formData = new FormData();
-    const {
-      nama_produk,
-      nomor_obat,
-      nomor_bpom,
-      kategori,
-      satuan,
-      harga_jual,
-      diskon,
-    } = formik.values;
-
-    if (!diskon) {
-      // eslint-disable-next-line no-unused-expressions
-      diskon === 0;
-    }
-
-    formData.append("nama_produk", nama_produk);
-    formData.append("nomor_obat", nomor_obat);
-    formData.append("nomor_bpom", nomor_bpom);
-    formData.append("productCategoryId", kategori);
-    formData.append("satuan", satuan);
-    formData.append("harga_jual", harga_jual);
-    formData.append("diskon", diskon);
-    Object.values(files).forEach((file) => {
-      formData.append("product_image_file", file);
-    });
-
-    if (!files) {
-      formData.append("product_image_file", produkImages);
-    }
     try {
-      const res = await axiosInstance.patch(
-        `/admin/product/${data.productId}`,
+      const formData = new FormData();
+
+      Object.values(files).forEach((file) => {
+        formData.append("product_image_file", file);
+      });
+      const res = await axiosInstance.put(
+        `/admin/product-images/${data.productId}`,
         formData,
         {
           headers: {
@@ -107,18 +107,10 @@ const ModalEditObat = ({
           },
         }
       );
-      setFiles(null);
-      setImageReview(null);
+      // setFiles(null);
+      // setImageReview(null);
       enqueueSnackbar(res?.data?.message, { variant: "success" });
-      setActiveStep(3);
-
-      formik.setFieldValue("nama_produk", formik.initialValues.nama_produk);
-      formik.setFieldValue("nomor_obat", formik.initialValues.nomor_obat);
-      formik.setFieldValue("nomor_bpom", formik.initialValues.nomor_bpom);
-      formik.setFieldValue("productCategoryId", "");
-      formik.setFieldValue("satuan", "Box");
-      formik.setFieldValue("harga_jual", formik.initialValues.harga_jual);
-      formik.setFieldValue("diskon", formik.initialValues.diskon);
+      setEditImage(false);
     } catch (err) {
       // eslint-disable-next-line no-console
       console.log(err);
@@ -127,19 +119,31 @@ const ModalEditObat = ({
   };
 
   const onChange = (e) => {
-    if (e.target.files[0]) {
+    if (!files) {
+      setFiles([e.target.files[0]]);
+      enqueueSnackbar(e.target.files[0].name, {
+        variant: "info",
+      });
+    } else {
       setFiles([...files, e.target.files[0]]);
       enqueueSnackbar(e.target.files[0].name, {
         variant: "info",
       });
     }
+
     // eslint-disable-next-line no-restricted-syntax
     for (const file of e.target.files) {
       const reader = new FileReader();
       reader.readAsDataURL(file);
-      reader.onload = () => {
-        setImageReview((imgs) => [...imgs, reader.result]);
-      };
+      if (!imageReview) {
+        reader.onload = () => {
+          setImageReview([reader.result]);
+        };
+      } else {
+        reader.onload = () => {
+          setImageReview((imgs) => [...imgs, reader.result]);
+        };
+      }
       reader.onerror = () => {
         // eslint-disable-next-line no-console
         console.log(reader.error);
@@ -147,12 +151,50 @@ const ModalEditObat = ({
     }
   };
 
+  const closeEditImage = () => {
+    setEditImage(false);
+    setFiles([]);
+    setImageReview([]);
+  };
+
+  async function createFile() {
+    produkImages.map(async (image) => {
+      const response = await fetch(`${image}`);
+      const blob = await response.blob();
+      const file = new File([blob], `${image}`, { type: blob.type });
+      // if (!files) {
+      //   setFiles([file]);
+      // } else {
+      //   setFiles([...files, file]);
+      // }
+
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      if (!imageReview || !files) {
+        reader.onload = () => {
+          setFiles([file]);
+          setImageReview([reader.result]);
+        };
+      } else {
+        reader.onload = () => {
+          setImageReview((imgs) => [...imgs, reader.result]);
+          setFiles((imgs) => [...imgs, file]);
+        };
+      }
+      reader.onerror = () => {
+        // eslint-disable-next-line no-console
+        console.log(reader.error);
+      };
+    });
+  }
   useEffect(() => {
-    if (!open) {
-      setFiles([]);
+    if (produkImages) {
+      createFile();
+    } else {
       setImageReview([]);
+      setFiles([]);
     }
-  }, [open]);
+  }, [produkImages]);
 
   return (
     <Modal open={open} onClose={handleClose}>
@@ -204,7 +246,7 @@ const ModalEditObat = ({
                 fontWeight: "bold",
               }}
             >
-              Obat Berhasil Ditambahkan!
+              Produk Berhasil Diubah!
             </Typography>
             <Typography sx={{ color: "Brand.300", fontSize: "12px" }}>
               Jumlah stok diperbarui secara otomatis
@@ -239,7 +281,11 @@ const ModalEditObat = ({
                 Ubah Data Obat
               </Typography>
               <CloseIcon
-                onClick={handleClose}
+                onClick={() => {
+                  handleClose();
+                  setFiles([]);
+                  setImageReview([]);
+                }}
                 sx={{
                   "&:hover": {
                     cursor: "pointer",
@@ -359,8 +405,6 @@ const ModalEditObat = ({
                           <MenuItem value={val.id}>{val.kategori}</MenuItem>
                         );
                       })}
-                      {/* <MenuItem value="Obat Bebas">Obat Bebas</MenuItem>
-                          <MenuItem value="Obat Resep">Obat Resep</MenuItem> */}
                     </Select>
                   </Grid>
                 </Grid>
@@ -466,69 +510,142 @@ const ModalEditObat = ({
                     </FormLabel>
                   </Grid>
                   <Grid item xs={9}>
-                    <input
-                      accept="image/png, image/jpeg, image/jpg"
-                      onChange={onChange}
-                      ref={inputFile}
-                      type="file"
-                      inputProps={{ multiple: true }}
-                      style={{ display: "none" }}
-                    />
                     <Button
                       variant="outlined"
-                      onClick={() => inputFile.current.click()}
+                      onClick={() => setEditImage(true)}
                     >
-                      Add Image
+                      Edit Image
                     </Button>
                   </Grid>
-                  {imageReview?.length ? (
+                  <Modal open={editImage} onClose={closeEditImage}>
                     <Box
-                      display="flex"
-                      marginTop="10px"
-                      maxWidth="100%"
                       sx={{
-                        overflowX: "auto",
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        minWidth: "300px",
+                        maxWidth: "1000px",
+                        height: "auto",
+                        bgcolor: "white",
+                        borderRadius: 2,
+                        boxShadow: 24,
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                        padding: 3,
                       }}
                     >
-                      {imageReview.map((file, idx) => {
-                        return (
+                      <Box
+                        display="flex"
+                        justifyContent="space-between"
+                        marginBottom="30px"
+                      >
+                        <Typography fontSize="20px" fontWeight="bold">
+                          Ubah Gambar Produk
+                        </Typography>
+                        <CloseIcon
+                          onClick={closeEditImage}
+                          sx={{
+                            "&:hover": {
+                              cursor: "pointer",
+                            },
+                          }}
+                        />
+                      </Box>
+                      <Box
+                        display="flex"
+                        alignContent="center"
+                        alignItems="center"
+                        maxWidth="100%"
+                        overflow="auto"
+                      >
+                        {imageReview?.map((file, idx) => {
+                          return (
+                            <Box
+                              sx={{
+                                display: "flex",
+                                borderRadius: "10px",
+                                padding: "5px",
+                              }}
+                            >
+                              <img src={file} height="200px" />
+                              <CloseIcon
+                                sx={{
+                                  color: "Sidebar.600",
+                                  position: "relative",
+                                  right: 30,
+                                  alignContent: "flex-end",
+                                  ":hover": {
+                                    color: "red",
+                                    cursor: "pointer",
+                                  },
+                                }}
+                                onClick={() => {
+                                  setImageReview((prevValue) => {
+                                    return prevValue.filter(
+                                      (val, prevIdx) => idx !== prevIdx
+                                    );
+                                  });
+                                  setFiles((prevValue) => {
+                                    return prevValue.filter(
+                                      (val, prevIdx) => idx !== prevIdx
+                                    );
+                                  });
+                                }}
+                              />
+                            </Box>
+                          );
+                        })}
+                        {imageReview?.length > 4 ? null : (
                           <Box
                             sx={{
                               display: "flex",
-                              borderRadius: "10px",
-                              padding: "5px",
-                              border: "2px solid gray",
                             }}
                           >
-                            <img src={file} width="100" />
-                            <CloseIcon
-                              sx={{
-                                color: "Sidebar.500",
-                                position: "fixed",
-                                alignContent: "flex-end",
-                                ":hover": {
-                                  color: "red",
-                                  cursor: "pointer",
-                                },
-                              }}
-                              onClick={() => {
-                                setImageReview((prevValue) => {
-                                  return prevValue.filter(
-                                    (val, prevIdx) => idx !== prevIdx
-                                  );
-                                });
-                                setFiles((prevValue) => {
-                                  return prevValue.filter(
-                                    (val, prevIdx) => idx !== prevIdx
-                                  );
-                                });
-                              }}
-                            />
+                            <IconButton
+                              onClick={() => inputFile.current.click()}
+                            >
+                              <input
+                                accept="image/png, image/jpeg, image/jpg"
+                                onChange={onChange}
+                                ref={inputFile}
+                                type="file"
+                                inputProps={{ multiple: true }}
+                                style={{ display: "none" }}
+                              />
+                              <AddIcon />
+                              Add
+                            </IconButton>
                           </Box>
-                        );
-                      })}
+                        )}
+                      </Box>
+                      <Box>
+                        <Divider orientation="horizontal" />
+                        <Box
+                          display="flex"
+                          justifyContent="flex-end"
+                          marginTop="20px"
+                        >
+                          <Button
+                            variant="outlined"
+                            onClick={() => {
+                              setEditImage(false);
+                            }}
+                            sx={{ marginRight: 1 }}
+                          >
+                            Batal
+                          </Button>
+                          <Button
+                            variant="contained"
+                            onClick={imagesSubmitHandler}
+                          >
+                            Simpan
+                          </Button>
+                        </Box>
+                      </Box>
                     </Box>
-                  ) : null}
+                  </Modal>
                 </Grid>
               </FormControl>
             </Box>
@@ -538,7 +655,7 @@ const ModalEditObat = ({
             <Divider orientation="horizontal" />
             <Box display="flex" justifyContent="flex-end" padding="16px">
               <Button
-                onClick={submitHandler}
+                onClick={formik.handleSubmit}
                 disabled={!formik.isValid}
                 variant="contained"
               >
