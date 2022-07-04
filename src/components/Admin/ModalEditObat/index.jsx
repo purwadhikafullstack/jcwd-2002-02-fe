@@ -196,8 +196,6 @@ const ModalEditObat = ({
     }
   }, [produkImages]);
 
-  console.log(files);
-  console.log(imageReview);
   return (
     <Modal open={open} onClose={handleClose}>
       {activeStep === 3 ? (
