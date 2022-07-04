@@ -47,6 +47,7 @@ const TableData = ({
   const [produkData, setProdukData] = useState({});
   const [selectedId, setSelectedId] = useState(0);
   const [produkImages, setProdukImages] = useState([]);
+  const [anchorEl, setAnchorEl] = useState(null);
 
   const open = (id) => {
     setSelectedId(id);
@@ -99,10 +100,19 @@ const TableData = ({
             Rp. {val.nilaiJual.toLocaleString() || "-"}
           </TableCell>
           <TableCell align="center">
-            <IconButton onClick={() => setSelectedId(val.id)}>
+            <IconButton
+              onClick={(event) => {
+                setSelectedId(val.id);
+                setAnchorEl(event.currentTarget);
+              }}
+            >
               <MoreVertIcon />
             </IconButton>
-            <Menu open={val.id === selectedId} onClose={() => open(0)}>
+            <Menu
+              anchorEl={anchorEl}
+              open={val.id === selectedId}
+              onClose={() => open(0)}
+            >
               <MenuItem>Lihat Detail</MenuItem>
               <MenuItem>Tambah Stok</MenuItem>
               <MenuItem
