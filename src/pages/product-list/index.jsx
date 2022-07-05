@@ -247,7 +247,6 @@ const ProductList = () => {
           <InfiniteScroll
             dataLength={contentList.length}
             next={fetchNextPage}
-            // eslint-disable-next-line react/jsx-boolean-value
             hasMore={page < maxPage}
             loader={<Typography>Loading...</Typography>}
           >

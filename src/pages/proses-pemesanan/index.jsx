@@ -1,3 +1,7 @@
+/* eslint-disable no-unneeded-ternary */
+/* eslint-disable no-unused-vars */
+/* eslint-disable eqeqeq */
+/* eslint-disable no-console */
 import {
   Avatar,
   Box,
@@ -16,8 +20,12 @@ import PaymentsIcon from "@mui/icons-material/Payments";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import EmailIcon from "@mui/icons-material/Email";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DaftarPemesanan from "components/DaftarPemesanan";
+import axiosInstance from "config/api";
+import InfiniteScroll from "react-infinite-scroll-component";
+import IsiTab from "components/IsiTab";
+import { useRouter } from "next/router";
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -30,14 +38,89 @@ const TabPanel = (props) => {
 };
 
 const ProsesPemesanan = () => {
-  const [filter, setFilter] = useState("");
-  const handleFilter = (event) => {
-    setFilter(event.target.value);
-  };
+  const router = useRouter();
   const [value, setValue] = useState(0);
+  const [filter, setFilter] = useState("");
+  const [contentList, setContentList] = useState([]);
+  const [page, setPage] = useState(1);
+  const [maxPage, setMaxPage] = useState(1);
+  const [jumlahTransaksi, setJumlahTransaksi] = useState(null);
+  const [status, setStatus] = useState(null);
+  const [sortInput, setSortInput] = useState("");
+  const [sortBy, setSortBy] = useState("");
+  const [sortDir, setSortDir] = useState("");
+
+  const fetchTransactions = async () => {
+    try {
+      const limit = 4;
+
+      const transactionList = await axiosInstance.get("/transaction", {
+        params: {
+          _limit: limit,
+          _page: page,
+          statusTerpilih: status || undefined,
+          _sortBy: sortBy ? sortBy : undefined,
+          _sortDir: sortDir ? sortDir : undefined,
+        },
+      });
+      setJumlahTransaksi(transactionList.data.result.count);
+      if (page == 1) {
+        setContentList(transactionList.data.result.rows);
+      } else {
+        setContentList((prevList) => [
+          ...prevList,
+          ...transactionList.data.result.rows,
+        ]);
+      }
+      setMaxPage(Math.ceil(transactionList.data.result.count / limit));
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const fetchNextPage = () => {
+    setPage(page + 1);
+  };
+
+  const sortInputHandler = (event) => {
+    const { fill } = event.target;
+    setSortInput(fill);
+  };
+
+  const statusHandler = (stat) => {
+    setStatus(stat);
+    setPage(1);
+  };
+
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  const renderTransactionList = () => {
+    return contentList?.map((val) => {
+      return (
+        <DaftarPemesanan
+          status={val?.payment_status?.status}
+          total_harga={val?.total_price}
+          produk={val?.transaction_details}
+        />
+      );
+    });
+  };
+
+  useEffect(() => {
+    fetchTransactions();
+
+    if (sortInput) {
+      router.push({
+        query: {
+          _sortBy: sortBy ? sortBy : undefined,
+          _sortDir: sortDir ? sortDir : undefined,
+          statusTerpilih: status || undefined,
+        },
+      });
+    }
+  }, [status, sortBy, sortDir, page]);
   return (
     <Grid container sx={{ mt: "56px", ml: "96px" }}>
       <Grid item xs={3}>
@@ -135,84 +218,139 @@ const ProsesPemesanan = () => {
                 },
               }}
             >
-              <Tab label="Semua" value={0} sx={{ textTransform: "none" }} />
-              <Tab label="Menunggu" value={1} sx={{ textTransform: "none" }} />
-              <Tab label="Diproses" value={2} sx={{ textTransform: "none" }} />
-              <Tab label="Dikirim" value={3} sx={{ textTransform: "none" }} />
-              <Tab label="Selesai" value={4} sx={{ textTransform: "none" }} />
+              <Tab
+                label="Semua"
+                value={0}
+                sx={{ textTransform: "none" }}
+                onClick={() => statusHandler(0)}
+              />
+              <Tab
+                label="Menunggu"
+                value={1}
+                sx={{ textTransform: "none" }}
+                onClick={() => statusHandler(1)}
+              />
+              <Tab
+                label="Diproses"
+                value={2}
+                sx={{ textTransform: "none" }}
+                onClick={() => statusHandler(2)}
+              />
+              <Tab
+                label="Dikirim"
+                value={3}
+                sx={{ textTransform: "none" }}
+                onClick={() => statusHandler(3)}
+              />
+              <Tab
+                label="Selesai"
+                value={4}
+                sx={{ textTransform: "none" }}
+                onClick={() => statusHandler(4)}
+              />
               <Tab
                 label="Dibatalkan"
                 value={5}
                 sx={{ textTransform: "none" }}
+                onClick={() => statusHandler(5)}
               />
             </Tabs>
           </Box>
           <TabPanel value={value} index={0}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                mt: "46px",
-              }}
+            <InfiniteScroll
+              dataLength={contentList.length}
+              next={fetchNextPage}
+              hasMore={page < maxPage}
+              loader={<Typography>Loading...</Typography>}
             >
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <Typography
-                  sx={{ fontWeight: 700, fontSize: "14px", mr: "10px" }}
-                >
-                  Jenis Obat
-                </Typography>
-                <Button
-                  variant="outlined"
-                  sx={{ mr: "10px", borderRadius: "17px" }}
-                >
-                  Semua Obat
-                </Button>
-                <Button
-                  variant="outlined"
-                  sx={{ mr: "10px", borderRadius: "17px" }}
-                >
-                  Obat Resep
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{
-                    "&:hover": { border: 0 },
-                    mr: "10px",
-                    borderRadius: "17px",
-                  }}
-                >
-                  Obat Bebas
-                </Button>
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Typography
-                  sx={{ color: "#737A8D", fontSize: "14px", fontWeight: 400 }}
-                >
-                  Urutkan
-                </Typography>
-                <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-                  <Select value={filter} onChange={handleFilter}>
-                    <MenuItem value="Terbaru">Terbaru</MenuItem>
-                    <MenuItem value="Termahal">Termahal</MenuItem>
-                    <MenuItem value="Termurah">Termurah</MenuItem>
-                  </Select>
-                </FormControl>
-              </Box>
-            </Box>
-            <DaftarPemesanan status="Dikirim" />
-            <DaftarPemesanan status="Sedang Dikirim" />
-            <DaftarPemesanan status="Diproses" />
+              <IsiTab
+                renderTransactionList={renderTransactionList}
+                sortInputHandler={sortInputHandler}
+                setSortBy={setSortBy}
+                setSortDir={setSortDir}
+                setPage={setPage}
+              />
+            </InfiniteScroll>
+          </TabPanel>
+          <TabPanel value={value} index={1}>
+            <InfiniteScroll
+              dataLength={contentList.length}
+              next={fetchNextPage}
+              hasMore={page < maxPage}
+              loader={<Typography>Loading...</Typography>}
+            >
+              <IsiTab
+                renderTransactionList={renderTransactionList}
+                sortInputHandler={sortInputHandler}
+                setSortBy={setSortBy}
+                setSortDir={setSortDir}
+                setPage={setPage}
+              />
+            </InfiniteScroll>
+          </TabPanel>
+          <TabPanel value={value} index={2}>
+            <InfiniteScroll
+              dataLength={contentList.length}
+              next={fetchNextPage}
+              hasMore={page < maxPage}
+              loader={<Typography>Loading...</Typography>}
+            >
+              <IsiTab
+                renderTransactionList={renderTransactionList}
+                sortInputHandler={sortInputHandler}
+                setSortBy={setSortBy}
+                setSortDir={setSortDir}
+                setPage={setPage}
+              />
+            </InfiniteScroll>
+          </TabPanel>
+          <TabPanel value={value} index={3}>
+            <InfiniteScroll
+              dataLength={contentList.length}
+              next={fetchNextPage}
+              hasMore={page < maxPage}
+              loader={<Typography>Loading...</Typography>}
+            >
+              <IsiTab
+                renderTransactionList={renderTransactionList}
+                sortInputHandler={sortInputHandler}
+                setSortBy={setSortBy}
+                setSortDir={setSortDir}
+                setPage={setPage}
+              />
+            </InfiniteScroll>
+          </TabPanel>
+          <TabPanel value={value} index={4}>
+            <InfiniteScroll
+              dataLength={contentList.length}
+              next={fetchNextPage}
+              hasMore={page < maxPage}
+              loader={<Typography>Loading...</Typography>}
+            >
+              <IsiTab
+                renderTransactionList={renderTransactionList}
+                sortInputHandler={sortInputHandler}
+                setSortBy={setSortBy}
+                setSortDir={setSortDir}
+                setPage={setPage}
+              />
+            </InfiniteScroll>
+          </TabPanel>
+          <TabPanel value={value} index={5}>
+            <InfiniteScroll
+              dataLength={contentList.length}
+              next={fetchNextPage}
+              hasMore={page < maxPage}
+              loader={<Typography>Loading...</Typography>}
+            >
+              <IsiTab
+                renderTransactionList={renderTransactionList}
+                sortInputHandler={sortInputHandler}
+                setSortBy={setSortBy}
+                setSortDir={setSortDir}
+                setPage={setPage}
+              />
+            </InfiniteScroll>
           </TabPanel>
         </Stack>
       </Grid>

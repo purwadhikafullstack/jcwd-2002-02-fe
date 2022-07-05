@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable eqeqeq */
 /* eslint-disable no-unused-vars */
 import {
@@ -37,7 +38,6 @@ const Sidebar = ({
       const categoryList = await axiosInstance.get("/admin/product-category");
 
       setCategory(categoryList.data.result);
-      console.log(categoryList.data.result);
     } catch (err) {
       console.log(err);
     }
