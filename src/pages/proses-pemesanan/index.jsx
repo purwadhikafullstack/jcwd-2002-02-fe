@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable no-unneeded-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable eqeqeq */
@@ -40,15 +41,13 @@ const TabPanel = (props) => {
 const ProsesPemesanan = () => {
   const router = useRouter();
   const [value, setValue] = useState(0);
-  const [filter, setFilter] = useState("");
   const [contentList, setContentList] = useState([]);
   const [page, setPage] = useState(1);
   const [maxPage, setMaxPage] = useState(1);
   const [jumlahTransaksi, setJumlahTransaksi] = useState(null);
   const [status, setStatus] = useState(null);
-  const [sortInput, setSortInput] = useState("");
-  const [sortBy, setSortBy] = useState("");
-  const [sortDir, setSortDir] = useState("");
+  const [sortBy, setSortBy] = useState(router.query._sortyBy);
+  const [sortDir, setSortDir] = useState(router.query._sortyDir);
 
   const fetchTransactions = async () => {
     try {
@@ -82,11 +81,6 @@ const ProsesPemesanan = () => {
     setPage(page + 1);
   };
 
-  const sortInputHandler = (event) => {
-    const { fill } = event.target;
-    setSortInput(fill);
-  };
-
   const statusHandler = (stat) => {
     setStatus(stat);
     setPage(1);
@@ -111,16 +105,26 @@ const ProsesPemesanan = () => {
   useEffect(() => {
     fetchTransactions();
 
-    if (sortInput) {
+    if (typeof sortDir === "string") {
       router.push({
         query: {
-          _sortBy: sortBy ? sortBy : undefined,
-          _sortDir: sortDir ? sortDir : undefined,
-          statusTerpilih: status || undefined,
+          _sortBy: sortBy,
+          _sortDir: sortDir,
         },
       });
     }
   }, [status, sortBy, sortDir, page]);
+
+  useEffect(() => {
+    if (router.isReady) {
+      if (router.query._sortBy) {
+        setSortBy(router.query._sortBy);
+      }
+      if (router.query._sortDir) {
+        setSortDir(router.query._sortDir);
+      }
+    }
+  }, [router.isReady]);
   return (
     <Grid container sx={{ mt: "56px", ml: "96px" }}>
       <Grid item xs={3}>
@@ -265,7 +269,6 @@ const ProsesPemesanan = () => {
             >
               <IsiTab
                 renderTransactionList={renderTransactionList}
-                sortInputHandler={sortInputHandler}
                 setSortBy={setSortBy}
                 setSortDir={setSortDir}
                 setPage={setPage}
@@ -281,7 +284,6 @@ const ProsesPemesanan = () => {
             >
               <IsiTab
                 renderTransactionList={renderTransactionList}
-                sortInputHandler={sortInputHandler}
                 setSortBy={setSortBy}
                 setSortDir={setSortDir}
                 setPage={setPage}
@@ -297,7 +299,6 @@ const ProsesPemesanan = () => {
             >
               <IsiTab
                 renderTransactionList={renderTransactionList}
-                sortInputHandler={sortInputHandler}
                 setSortBy={setSortBy}
                 setSortDir={setSortDir}
                 setPage={setPage}
@@ -313,7 +314,6 @@ const ProsesPemesanan = () => {
             >
               <IsiTab
                 renderTransactionList={renderTransactionList}
-                sortInputHandler={sortInputHandler}
                 setSortBy={setSortBy}
                 setSortDir={setSortDir}
                 setPage={setPage}
@@ -329,7 +329,6 @@ const ProsesPemesanan = () => {
             >
               <IsiTab
                 renderTransactionList={renderTransactionList}
-                sortInputHandler={sortInputHandler}
                 setSortBy={setSortBy}
                 setSortDir={setSortDir}
                 setPage={setPage}
@@ -345,7 +344,6 @@ const ProsesPemesanan = () => {
             >
               <IsiTab
                 renderTransactionList={renderTransactionList}
-                sortInputHandler={sortInputHandler}
                 setSortBy={setSortBy}
                 setSortDir={setSortDir}
                 setPage={setPage}
