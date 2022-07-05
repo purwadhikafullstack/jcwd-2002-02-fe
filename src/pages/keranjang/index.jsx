@@ -39,7 +39,6 @@ const KeranjangPage = () => {
       );
     }, 0);
   };
-  console.log(totalPrice());
 
   return (
     <Container sx={{ mt: "56px" }}>
