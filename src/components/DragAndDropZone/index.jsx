@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import InsertPhotoOutlinedIcon from "@mui/icons-material/InsertPhotoOutlined";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import axiosInstance from "config/api";
 
 const DragAndDrop = () => {
   const [resepImgFile, setResepImgFile] = useState(null);
@@ -38,6 +39,19 @@ const DragAndDrop = () => {
     noKeyboard: true,
     maxSize: 10485786,
   });
+
+  const uploadAvatarHandler = async () => {
+    const formData = new FormData();
+
+    formData.append("resep_image_file", resepImgFile);
+
+    try {
+      const uploadedResep = await axiosInstance.patch("/transaction", formData);
+      setResepImgFile(null);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <Box
