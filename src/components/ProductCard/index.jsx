@@ -3,6 +3,10 @@
 import { Box, Button, Paper, Typography } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import { styled } from "@mui/material/styles";
+import { useSnackbar } from "notistack";
+import axiosInstance from "config/api";
+import { useDispatch } from "react-redux";
+import { addToCart } from "redux/reducer/cart";
 
 const Image = styled("img")({
   maxWidth: "100%",
@@ -11,7 +15,27 @@ const Image = styled("img")({
 });
 
 const ProductCard = ({ nama_produk, harga, diskon, produk_image, id }) => {
-  // const productName = "ALLOPURINOL OGB DEXA MEDICA 100...";
+  const { enqueueSnackbar } = useSnackbar();
+  const dispatch = useDispatch();
+  const addToCartButtonHandler = async () => {
+    try {
+      const addProductToCart = await axiosInstance.post("/cart/add-to-cart", {
+        productId: id,
+        quantity: 1,
+      });
+
+      const cartInfo = addProductToCart.data;
+
+      dispatch(addToCart(cartInfo.data));
+
+      enqueueSnackbar(cartInfo.message, {
+        variant: "success",
+      });
+    } catch (err) {
+      enqueueSnackbar(err?.response?.data?.message, { variant: "error" });
+    }
+  };
+
   return (
     <Paper
       elevation={2}
@@ -28,16 +52,11 @@ const ProductCard = ({ nama_produk, harga, diskon, produk_image, id }) => {
     >
       <Box paddingTop="20px" paddingX="40px" position="relative">
         <Box>
-          <Image
-            src={produk_image}
-            // width={"139px"}
-            // height={"142px"}
-          />
+          <Image src={produk_image} />
         </Box>
         <Paper
           sx={{
             borderRadius: "50%",
-            // maxWidth: "50px",
             minWidth: "45px",
             height: "44px",
             top: "20px",
@@ -103,7 +122,12 @@ const ProductCard = ({ nama_produk, harga, diskon, produk_image, id }) => {
           <Typography>/ Pack</Typography>
         </Box>
         <Box mt="10px">
-          <Button fullWidth variant="outlined" color="success">
+          <Button
+            fullWidth
+            variant="outlined"
+            color="success"
+            onClick={addToCartButtonHandler}
+          >
             Keranjang
           </Button>
         </Box>
