@@ -6,7 +6,6 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import DataTable from "components/Admin/table";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -14,52 +13,21 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import moment from "moment";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import requiresAdmin from "config/requireAdmin";
-
-const columns = [
-  { field: "id", headerName: "No", width: 70 },
-  { field: "tanggal", headerName: "Tanggal", width: 130 },
-  { field: "aktifitas", headerName: "Aktifitas", width: 350, sortable: false },
-  {
-    field: "masuk",
-    headerName: "Masuk (Rp.)",
-    width: 120,
-    type: "number",
-  },
-  {
-    field: "keluar",
-    headerName: "Keluar (Rp.)",
-    width: 120,
-    type: "number",
-  },
-  { field: "saldo", headerName: "Saldo", width: 120, type: "number" },
-  {
-    field: "atur",
-    headerName: "Atur",
-    width: 130,
-    renderCell: () => {
-      return <Button variant="outlined">Batalkan</Button>;
-    },
-  },
-];
-
-const rows = [
-  {
-    id: 1,
-    tanggal: moment("2022-04-05 07:25:48").format("DD/MM/YYYY"),
-    aktifitas: "Penjualan dengan nomer faktur:  220103412531",
-    masuk: 8000000,
-    keluar: 8000000,
-    saldo: 68000000,
-  },
-];
+import StockHistoryTable from "components/Admin/StockHistoryTable";
+import axiosInstance from "config/api";
+import { useSnackbar } from "notistack";
 
 const KartuStok = () => {
   const [month, setMonth] = useState("");
+  const [rowPerPage, setRowPerPage] = useState(10);
+  const [page, setPage] = useState(1);
+  const [dataCount, setDataCount] = useState([]);
   const [year, setYear] = useState("");
+  const [dataTable, setDataTable] = useState([]);
+  const { enqueueSnackbar } = useSnackbar();
 
   const router = useRouter();
 
@@ -74,7 +42,52 @@ const KartuStok = () => {
     // tinggal mskin function untuk fetch ke API dan set state
   };
 
-  // Debounce untuk fetch API dan push ke Query
+  const fetchProductStock = async () => {
+    try {
+      const { productId } = router.query;
+      const res = await axiosInstance.get(
+        `/admin/stock-history/product/${productId}`,
+        {
+          params: {
+            _limit: rowPerPage,
+            _page: page,
+          },
+        }
+      );
+
+      const data = res.data.result.rows;
+      setDataCount(res.data.result.count);
+
+      setDataTable(
+        data.map((val, idx) => {
+          return {
+            nomor: idx + rowPerPage * (page - 1) + 1,
+            createdAt: val?.stock?.createdAt,
+            aktivitas: val?.aktivitas,
+            expDate: val?.stock?.exp_date,
+            jumlahStok: val?.jumlah,
+          };
+        })
+      );
+    } catch (err) {
+      enqueueSnackbar(err?.response?.data?.message, { variant: "error" });
+    }
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowPerPage(event.target.value);
+    setPage(1);
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  useEffect(() => {
+    if (router.query.productId) {
+      fetchProductStock();
+    }
+  }, [router.query.productId, rowPerPage, page]);
 
   return (
     <Box
@@ -176,27 +189,19 @@ const KartuStok = () => {
             marginY: "30px",
           }}
         />
-        <Box
-          marginTop="32px"
-          // marginBottom="39px"
-          marginX="86px"
-          sx={{
-            height: 400,
-            // width: "100%",
-          }}
-        >
-          <DataTable columns={columns} rows={rows} />
+        <Box padding={5}>
+          <StockHistoryTable
+            rows={dataTable}
+            count={dataCount}
+            handleChangeRowsPerPage={handleChangeRowsPerPage}
+            handleChangePage={handleChangePage}
+            page={page}
+            rowPerPage={rowPerPage}
+          />
         </Box>
       </Box>
     </Box>
   );
 };
-
-// eslint-disable-next-line no-unused-vars
-export const getServerSideProps = requiresAdmin((context) => {
-  return {
-    props: {},
-  };
-});
 
 export default KartuStok;
