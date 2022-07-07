@@ -5,8 +5,9 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import { styled } from "@mui/material/styles";
 import { useSnackbar } from "notistack";
 import axiosInstance from "config/api";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "redux/reducer/cart";
+import { useRouter } from "next/router";
 
 const Image = styled("img")({
   maxWidth: "100%",
@@ -17,8 +18,16 @@ const Image = styled("img")({
 const ProductCard = ({ nama_produk, harga, diskon, produk_image, id }) => {
   const { enqueueSnackbar } = useSnackbar();
   const dispatch = useDispatch();
+  const authSelector = useSelector((state) => state.auth);
+  const router = useRouter();
+
   const addToCartButtonHandler = async () => {
     try {
+      if (!authSelector.id) {
+        router.push("/login");
+        return;
+      }
+
       const addProductToCart = await axiosInstance.post("/cart/add-to-cart", {
         productId: id,
         quantity: 1,

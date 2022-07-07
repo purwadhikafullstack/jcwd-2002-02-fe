@@ -17,8 +17,14 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useRouter } from "next/router";
 import axiosInstance from "config/api";
+import { useSnackbar } from "notistack";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "redux/reducer/cart";
 
 const ProductPage = ({ productDetail }) => {
+  const { enqueueSnackbar } = useSnackbar();
+  const dispatch = useDispatch();
+  const authSelector = useSelector((state) => state.auth);
   const router = useRouter();
   const formik = useFormik({
     initialValues: {
@@ -34,18 +40,43 @@ const ProductPage = ({ productDetail }) => {
   });
 
   const qtyHandler = (status) => {
+    let { quantity } = formik.values;
     if (status === "increment") {
-      if (formik.values.quantity === "") {
-        formik.setFieldValue("quantity", 1);
+      if (quantity === "") {
+        quantity = 1;
         return;
       }
-      if (formik.values.quantity >= 10) return;
+      if (quantity >= 10) return;
       // eslint-disable-next-line radix
-      formik.setFieldValue("quantity", parseInt(formik.values.quantity) + 1);
+      quantity = parseInt(quantity) + 1;
     } else if (status === "decrement") {
-      if (formik.values.quantity < 1) return;
+      if (quantity <= 1) return;
+      quantity = parseInt(quantity) - 1;
+    }
+    formik.setFieldValue("quantity", quantity);
+  };
 
-      formik.setFieldValue("quantity", formik.values.quantity - 1);
+  const addToCartButtonHandler = async () => {
+    try {
+      if (!authSelector.id) {
+        router.push("/login");
+        return;
+      }
+
+      const addProductToCart = await axiosInstance.post("/cart/add-to-cart", {
+        productId: router.query.productId,
+        quantity: formik.values.quantity,
+      });
+
+      const cartInfo = addProductToCart.data;
+
+      dispatch(addToCart(cartInfo.data));
+
+      enqueueSnackbar(cartInfo.message, {
+        variant: "success",
+      });
+    } catch (err) {
+      enqueueSnackbar(err?.response?.data?.message, { variant: "error" });
     }
   };
 
@@ -209,7 +240,7 @@ const ProductPage = ({ productDetail }) => {
               <Typography
                 sx={{ textDecoration: "line-through", color: "#737A8D", mr: 2 }}
               >
-                Rp {productDetail.harga.toLocaleString()},-
+                Rp {parseInt(productDetail.harga)},-
               </Typography>
               <Box
                 sx={{
@@ -287,7 +318,11 @@ const ProductPage = ({ productDetail }) => {
             </Typography>
           </Box>
           <Box sx={{ display: "flex", flexDirection: "row", mt: 3 }}>
-            <Button variant="outlined" startIcon={<ShoppingCartOutlinedIcon />}>
+            <Button
+              variant="outlined"
+              startIcon={<ShoppingCartOutlinedIcon />}
+              onClick={addToCartButtonHandler}
+            >
               Keranjang
             </Button>
             <Button
