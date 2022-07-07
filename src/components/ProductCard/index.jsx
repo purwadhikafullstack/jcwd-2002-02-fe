@@ -8,6 +8,7 @@ import axiosInstance from "config/api";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "redux/reducer/cart";
 import { useRouter } from "next/router";
+import { useState } from "react";
 
 const Image = styled("img")({
   maxWidth: "100%",
@@ -20,8 +21,10 @@ const ProductCard = ({ nama_produk, harga, diskon, produk_image, id }) => {
   const dispatch = useDispatch();
   const authSelector = useSelector((state) => state.auth);
   const router = useRouter();
+  const [likedStatus, setLikedStatus] = useState(false);
 
-  const addToCartButtonHandler = async () => {
+  const addToCartButtonHandler = async (event) => {
+    event.stopPropagation();
     try {
       if (!authSelector.id) {
         router.push("/login");
@@ -45,6 +48,16 @@ const ProductCard = ({ nama_produk, harga, diskon, produk_image, id }) => {
     }
   };
 
+  const redirectToProductDetail = (event) => {
+    event.stopPropagation();
+    router.push(`/product/${id}`);
+  };
+
+  const likedButtonHandler = (event) => {
+    event.stopPropagation();
+    setLikedStatus(!likedStatus);
+  };
+
   return (
     <Paper
       elevation={2}
@@ -58,6 +71,7 @@ const ProductCard = ({ nama_produk, harga, diskon, produk_image, id }) => {
         pb: "20px",
         "&:hover": { background: "#EFEFEF", cursor: "pointer" },
       }}
+      onClick={redirectToProductDetail}
     >
       <Box paddingTop="20px" paddingX="40px" position="relative">
         <Box>
@@ -77,10 +91,11 @@ const ProductCard = ({ nama_produk, harga, diskon, produk_image, id }) => {
           }}
           elevation={2}
           bgcolor="gray"
+          onClick={(event) => likedButtonHandler(event)}
         >
           <FavoriteIcon
             sx={{
-              color: "#D5D7DD",
+              color: likedStatus ? "#ff0000" : "#D5D7DD",
             }}
           />
         </Paper>
