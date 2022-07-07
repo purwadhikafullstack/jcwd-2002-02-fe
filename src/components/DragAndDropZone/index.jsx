@@ -1,33 +1,16 @@
 import { Box, Button, Divider, IconButton, Typography } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import InsertPhotoOutlinedIcon from "@mui/icons-material/InsertPhotoOutlined";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
-import axiosInstance from "config/api";
 
-const DragAndDrop = () => {
-  const [resepImgFile, setResepImgFile] = useState(null);
-  const [resepImgUrl, setResepImgUrl] = useState(undefined);
-  const [preview, setPreview] = useState();
-
-  const onDrop = useCallback((acceptedFiles) => {
-    setResepImgFile(acceptedFiles[0]);
-    setResepImgUrl(acceptedFiles[0]?.name);
-  }, []);
-
-  useEffect(() => {
-    if (!resepImgFile) {
-      setPreview(undefined);
-      return;
-    }
-
-    const objectUrl = URL.createObjectURL(resepImgFile);
-    setPreview(objectUrl);
-
-    // eslint-disable-next-line consistent-return
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [resepImgFile]);
-
+const DragAndDrop = ({
+  onDrop,
+  preview,
+  resepImgFile,
+  resepImgUrl,
+  setResepImgFile,
+  setResepImgUrl,
+}) => {
   const { getRootProps, getInputProps, open } = useDropzone({
     onDrop,
     maxFiles: 1,
@@ -39,20 +22,6 @@ const DragAndDrop = () => {
     noKeyboard: true,
     maxSize: 10485786,
   });
-
-  const uploadAvatarHandler = async () => {
-    const formData = new FormData();
-
-    formData.append("resep_image_file", resepImgFile);
-
-    try {
-      const uploadedResep = await axiosInstance.patch("/transaction", formData);
-      setResepImgFile(null);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
   return (
     <Box
       {...getRootProps()}

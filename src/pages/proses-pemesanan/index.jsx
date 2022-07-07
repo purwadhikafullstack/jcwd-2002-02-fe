@@ -92,11 +92,16 @@ const ProsesPemesanan = () => {
 
   const renderTransactionList = () => {
     return contentList?.map((val) => {
+      console.log(val);
       return (
         <DaftarPemesanan
           status={val?.payment_status?.status}
           total_harga={val?.total_price}
           produk={val?.transaction_details}
+          detail={val}
+          image_url={
+            val.is_resep ? val.resep_image_url : val.transaction_details
+          }
         />
       );
     });
@@ -137,6 +142,8 @@ const ProsesPemesanan = () => {
             paddingY: "28px",
             height: "484px",
             width: "300px",
+            position: "sticky",
+            top: "120px",
           }}
         >
           <Box
