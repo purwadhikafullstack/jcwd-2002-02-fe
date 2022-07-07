@@ -30,10 +30,6 @@ const ProductPage = ({ productDetail }) => {
     initialValues: {
       quantity: 1,
     },
-    onSubmit: () => {
-      // eslint-disable-next-line no-console
-      console.log("berhasil!");
-    },
     validationSchema: Yup.object().shape({
       quantity: Yup.number().required().min(1),
     }),
