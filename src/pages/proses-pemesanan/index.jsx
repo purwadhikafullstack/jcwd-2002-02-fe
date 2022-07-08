@@ -92,7 +92,6 @@ const ProsesPemesanan = () => {
 
   const renderTransactionList = () => {
     return contentList?.map((val) => {
-      console.log(val);
       return (
         <DaftarPemesanan
           status={val?.payment_status?.status}
