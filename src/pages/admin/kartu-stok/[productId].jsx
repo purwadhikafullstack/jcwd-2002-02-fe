@@ -3,6 +3,8 @@ import {
   Button,
   Divider,
   IconButton,
+  MenuItem,
+  Select,
   TextField,
   Typography,
 } from "@mui/material";
@@ -22,25 +24,26 @@ import { useSnackbar } from "notistack";
 
 const KartuStok = () => {
   const [month, setMonth] = useState("");
-  const [rowPerPage, setRowPerPage] = useState(10);
+  const [rowPerPage, setRowPerPage] = useState(5);
   const [page, setPage] = useState(1);
   const [dataCount, setDataCount] = useState([]);
   const [year, setYear] = useState("");
+  const [activity, setActivity] = useState("");
   const [dataTable, setDataTable] = useState([]);
   const { enqueueSnackbar } = useSnackbar();
 
   const router = useRouter();
 
-  const handleButtonFilter = () => {
-    router.push({
-      query: {
-        month: moment(month).format("MMMM") || undefined,
-        year: year || undefined,
-      },
-    });
+  // const handleButtonFilter = () => {
+  //   router.push({
+  //     query: {
+  //       month: moment(month).format("MMMM") || undefined,
+  //       year: year || undefined,
+  //     },
+  //   });
 
-    // tinggal mskin function untuk fetch ke API dan set state
-  };
+  //   // tinggal mskin function untuk fetch ke API dan set state
+  // };
 
   const fetchProductStock = async () => {
     try {
@@ -51,6 +54,9 @@ const KartuStok = () => {
           params: {
             _limit: rowPerPage,
             _page: page,
+            filterByMonth: month || undefined,
+            filterByYear: year || undefined,
+            filterByActivity: activity || undefined,
           },
         }
       );
@@ -62,7 +68,7 @@ const KartuStok = () => {
         data.map((val, idx) => {
           return {
             nomor: idx + rowPerPage * (page - 1) + 1,
-            createdAt: val?.stock?.createdAt,
+            createdAt: val?.createdAt,
             aktivitas: val?.aktivitas,
             expDate: val?.stock?.exp_date,
             jumlahStok: val?.jumlah,
@@ -87,7 +93,7 @@ const KartuStok = () => {
     if (router.query.productId) {
       fetchProductStock();
     }
-  }, [router.query.productId, rowPerPage, page]);
+  }, [router.query.productId, rowPerPage, page, year, month, activity]);
 
   return (
     <Box
@@ -143,46 +149,92 @@ const KartuStok = () => {
             mt="30px"
             mr="24px"
           >
-            <Typography sx={{ mb: "5px" }}>Bulan</Typography>
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <DatePicker
-                views={["month"]}
-                value={month}
-                inputFormat="MMMM"
-                renderInput={(params) => (
-                  <TextField {...params} helperText={null} />
-                )}
-                onChange={(date) => {
-                  setMonth(date);
-                }}
-              />
-            </LocalizationProvider>
+            <Typography sx={{ mb: "5px", fontWeight: "bold" }}>
+              Bulan
+            </Typography>
+            <Select
+              size="small"
+              displayEmpty
+              value={month}
+              onChange={(e) => {
+                setMonth(e.target.value);
+                setPage(1);
+              }}
+            >
+              <MenuItem value="">None</MenuItem>
+              <MenuItem value={1}>January</MenuItem>
+              <MenuItem value={2}>February</MenuItem>
+              <MenuItem value={3}>March</MenuItem>
+              <MenuItem value={4}>April</MenuItem>
+              <MenuItem value={5}>May</MenuItem>
+              <MenuItem value={6}>June</MenuItem>
+              <MenuItem value={7}>July</MenuItem>
+              <MenuItem value={8}>August</MenuItem>
+              <MenuItem value={9}>September</MenuItem>
+              <MenuItem value={10}>October</MenuItem>
+              <MenuItem value={11}>November</MenuItem>
+              <MenuItem value={12}>Desember</MenuItem>
+            </Select>
           </Box>
           <Box display="flex" flexDirection="column" mt="30px" mr="24px">
-            <Typography sx={{ mb: "5px" }}>Tahun</Typography>
+            <Typography sx={{ mb: "5px", fontWeight: "bold" }}>
+              Tahun
+            </Typography>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <DatePicker
                 views={["year"]}
-                value={year}
+                value={year || null}
                 onChange={(date) => {
                   setYear(moment(date).format("YYYY"));
+                  setPage(1);
                 }}
                 renderInput={(params) => (
-                  <TextField {...params} helperText={null} placeholder="Year" />
+                  <TextField
+                    size="small"
+                    {...params}
+                    inputProps={{
+                      ...params.inputProps,
+                      placeholder: "Year",
+                    }}
+                  />
                 )}
               />
             </LocalizationProvider>
           </Box>
           <Box display="flex" flexDirection="column" mt="30px" mr="24px">
-            <Typography sx={{ mb: "5px" }}>&nbsp;</Typography>
-            <Button
-              variant="contained"
-              sx={{ width: "80px", height: "40px" }}
-              onClick={handleButtonFilter}
+            <Typography sx={{ mb: "5px", fontWeight: "bold" }}>
+              Aktivitas
+            </Typography>
+            <Select
+              size="small"
+              displayEmpty
+              value={activity}
+              onChange={(e) => {
+                setActivity(e.target.value);
+                setPage(1);
+              }}
             >
-              Filter
-            </Button>
+              <MenuItem value="">None</MenuItem>
+              <MenuItem value="Penerimaan Barang">Penerimaan Barang</MenuItem>
+              <MenuItem value="Penjualan Barang">Penjualan Barang</MenuItem>
+            </Select>
           </Box>
+          {activity || month || year ? (
+            <Box display="flex" flexDirection="column" mt="30px" mr="24px">
+              <Typography sx={{ mb: "5px" }}>&nbsp;</Typography>
+              <Button
+                size="medium"
+                variant="outlined"
+                onClick={() => {
+                  setActivity("");
+                  setMonth("");
+                  setYear("");
+                }}
+              >
+                Clear Filter
+              </Button>
+            </Box>
+          ) : null}
         </Box>
         <Divider
           sx={{
