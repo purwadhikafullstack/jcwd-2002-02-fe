@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import {
   Box,
   Button,
@@ -9,15 +10,29 @@ import {
 } from "@mui/material";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import CheckOutCard from "components/CheckOut";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ModalIsi from "components/Modal";
 import Link from "next/link";
+import axiosInstance from "config/api";
 
 const CheckOut = () => {
   const [open, setOpen] = useState(false);
+  const [alamatUtama, setAlamatUtama] = useState(null);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const feetchMainAddress = async () => {
+    try {
+      const mainAddress = await axiosInstance.get("/address/get-all-address");
+      console.log(mainAddress);
+      setAlamatUtama(mainAddress);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
+  useEffect(() => {
+    feetchMainAddress();
+  }, []);
   return (
     <Container sx={{ mt: "56px" }}>
       <Grid container spacing={2} columns={{ xs: 6, md: 12 }}>

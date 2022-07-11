@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-unneeded-ternary */
 import {
@@ -28,6 +29,7 @@ const Alamat = () => {
   const [selectedProvinsi, setSelectedProvinsi] = useState(null);
   const [kotaOption, setKotaOption] = useState(null);
   const [selectedKota, setSelectedKota] = useState(null);
+  const [mainAddress, setMainAddress] = useState(false);
   const router = useRouter();
   const formik = useFormik({
     initialValues: {
@@ -63,15 +65,17 @@ const Alamat = () => {
     }),
     validateOnChange: false,
     onSubmit: async (values) => {
+      console.log("test");
       const newAddress = {
         label_alamat: values.label,
         nama_penerima: `${values.namaDepan}  ${values.namaBelakang}`,
         no_telepon_penerima: values.nomorHp,
         alamat_lengkap: values.alamat,
         kode_pos: values.kodePos,
-        provinsi_id: selectedProvinsi,
-        kota_kabupaten_id: selectedKota,
+        provinsi_id: selectedProvinsi.provinsi_id,
+        kota_kabupaten_id: selectedKota.kota_id,
         kecamatan: values.kecamatan,
+        is_main_address: mainAddress,
       };
 
       await axiosInstance.post("/address/add-new-address", newAddress);
@@ -79,6 +83,25 @@ const Alamat = () => {
       // router.push("/checkout")
     },
   });
+
+  const handleSubmit = async () => {
+    try {
+      const newAddress = {
+        label_alamat: formik.values.label,
+        nama_penerima: `${formik.values.namaDepan}  ${formik.values.namaBelakang}`,
+        no_telepon_penerima: formik.values.nomorHp,
+        alamat_lengkap: formik.values.alamat,
+        kode_pos: formik.values.kodePos,
+        provinsi_id: selectedProvinsi.provinsi_id,
+        kota_kabupaten_id: selectedKota.kota_id,
+        kecamatan: formik.values.kecamatan,
+        is_main_address: mainAddress,
+      };
+      await axiosInstance.post("/address/add-new-address", newAddress);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const inputHandler = (event) => {
     const { value, name } = event.target;
@@ -108,6 +131,7 @@ const Alamat = () => {
   };
 
   const provinsiHandler = (event) => {
+    // console.log(selectedProvinsi);
     setSelectedProvinsi({
       provinsi_id: event.target.value,
       // provinsi: event.target.name,
@@ -115,6 +139,7 @@ const Alamat = () => {
   };
 
   const kotaHandler = (event) => {
+    // console.log(selectedKota);
     setSelectedKota({
       kota_id: event.target.value,
       // kota: event.target.name,
@@ -142,12 +167,14 @@ const Alamat = () => {
   };
 
   useEffect(() => {
+    console.log(selectedProvinsi);
+    console.log(selectedKota);
     if (selectedProvinsi) {
       fetchKota();
     } else {
       fetchProvinsi();
     }
-  }, [selectedProvinsi]);
+  }, [selectedProvinsi, selectedKota]);
   return (
     <Box
       justifyContent="center"
@@ -276,7 +303,14 @@ const Alamat = () => {
         </Box>
         <Box mt="36px">
           <FormControlLabel
-            control={<Checkbox defaultChecked color="default" />}
+            control={
+              <Checkbox
+                checked={false}
+                defaultChecked
+                color="default"
+                onChange={() => setMainAddress(!mainAddress)}
+              />
+            }
             label="Simpan sebagai alamat utama"
           />
         </Box>
@@ -293,8 +327,12 @@ const Alamat = () => {
           </Button>
           {/* <Link href="checkout"> */}
           <Button
-            onClick={formik.handleSubmit}
-            disabled={formik.isSubmitting}
+            onClick={() => {
+              // console.log(formik.isSubmitting);
+              handleSubmit();
+              // formik.handleSubmit();
+            }}
+            // disabled={formik.isSubmitting}
             variant="contained"
             sx={{
               width: "50%",
