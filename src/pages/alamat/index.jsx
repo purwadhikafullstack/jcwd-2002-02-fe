@@ -30,7 +30,12 @@ const Alamat = () => {
   const [kotaOption, setKotaOption] = useState(null);
   const [selectedKota, setSelectedKota] = useState(null);
   const [mainAddress, setMainAddress] = useState(false);
-  const router = useRouter();
+  const [checked, setChecked] = useState(false);
+
+  const handleChange = (event) => {
+    setChecked(event.target.checked);
+    setMainAddress(!mainAddress);
+  };
   const formik = useFormik({
     initialValues: {
       label: "",
@@ -65,7 +70,6 @@ const Alamat = () => {
     }),
     validateOnChange: false,
     onSubmit: async (values) => {
-      console.log("test");
       const newAddress = {
         label_alamat: values.label,
         nama_penerima: `${values.namaDepan}  ${values.namaBelakang}`,
@@ -80,7 +84,6 @@ const Alamat = () => {
 
       await axiosInstance.post("/address/add-new-address", newAddress);
       formik.setSubmitting(false);
-      // router.push("/checkout")
     },
   });
 
@@ -89,7 +92,7 @@ const Alamat = () => {
       const newAddress = {
         label_alamat: formik.values.label,
         nama_penerima: `${formik.values.namaDepan}  ${formik.values.namaBelakang}`,
-        no_telepon_penerima: formik.values.nomorHp,
+        no_telepon_penerima: `+62 ${formik.values.nomorHp}`,
         alamat_lengkap: formik.values.alamat,
         kode_pos: formik.values.kodePos,
         provinsi_id: selectedProvinsi.provinsi_id,
@@ -119,7 +122,7 @@ const Alamat = () => {
 
   const fetchKota = async () => {
     try {
-      const cityList = await axiosInstance.get("address/city", {
+      const cityList = await axiosInstance.get("/address/city", {
         params: {
           provinceTerpilih: selectedProvinsi.provinsi_id,
         },
@@ -131,18 +134,14 @@ const Alamat = () => {
   };
 
   const provinsiHandler = (event) => {
-    // console.log(selectedProvinsi);
     setSelectedProvinsi({
       provinsi_id: event.target.value,
-      // provinsi: event.target.name,
     });
   };
 
   const kotaHandler = (event) => {
-    // console.log(selectedKota);
     setSelectedKota({
       kota_id: event.target.value,
-      // kota: event.target.name,
     });
   };
 
@@ -167,8 +166,6 @@ const Alamat = () => {
   };
 
   useEffect(() => {
-    console.log(selectedProvinsi);
-    console.log(selectedKota);
     if (selectedProvinsi) {
       fetchKota();
     } else {
@@ -234,7 +231,6 @@ const Alamat = () => {
               <Typography fontSize="14px" color="#737A8D" mb="16px">
                 Nomor HP
               </Typography>
-              {/* input no tlpon diganti pke library */}
               <RoundedInput
                 onChange={inputHandler}
                 name="nomorHp"
@@ -251,7 +247,6 @@ const Alamat = () => {
                 <Typography fontSize="14px" color="#737A8D" mb="16px">
                   Provinsi
                 </Typography>
-                {/* ganti jadi select, tembak ke api */}
                 <Select
                   onChange={provinsiHandler}
                   fullWidth
@@ -264,7 +259,6 @@ const Alamat = () => {
                 <Typography fontSize="14px" color="#737A8D" mb="16px">
                   Kota/Kabupaten
                 </Typography>
-                {/* ganti jadi select, tembak ke api */}
                 <Select
                   onChange={kotaHandler}
                   fullWidth
@@ -305,10 +299,10 @@ const Alamat = () => {
           <FormControlLabel
             control={
               <Checkbox
-                checked={false}
+                checked={checked}
+                onChange={handleChange}
                 defaultChecked
                 color="default"
-                onChange={() => setMainAddress(!mainAddress)}
               />
             }
             label="Simpan sebagai alamat utama"
@@ -325,24 +319,21 @@ const Alamat = () => {
           >
             Batalkan
           </Button>
-          {/* <Link href="checkout"> */}
-          <Button
-            onClick={() => {
-              // console.log(formik.isSubmitting);
-              handleSubmit();
-              // formik.handleSubmit();
-            }}
-            // disabled={formik.isSubmitting}
-            variant="contained"
-            sx={{
-              width: "50%",
-              height: "52px",
-              marginLeft: "8px",
-            }}
-          >
-            Simpan Alamat
-          </Button>
-          {/* </Link> */}
+          <Link href="checkout">
+            <Button
+              onClick={() => {
+                handleSubmit();
+              }}
+              variant="contained"
+              sx={{
+                width: "50%",
+                height: "52px",
+                marginLeft: "8px",
+              }}
+            >
+              Simpan Alamat
+            </Button>
+          </Link>
         </Box>
       </Box>
     </Box>
