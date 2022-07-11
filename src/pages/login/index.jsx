@@ -34,6 +34,7 @@ import { useSnackbar } from "notistack";
 import { login } from "redux/reducer/auth";
 import axiosInstance from "config/api";
 import jsCookie from "js-cookie";
+import { signInWithGoogle } from "config/firebase/firebase";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState("false");
@@ -341,6 +342,7 @@ const LoginPage = () => {
                 boxShadow: "none",
                 ":hover": { backgroundColor: "#c7bfaf", border: "unset" },
               }}
+              onClick={signInWithGoogle}
             >
               Masuk dengan Google
             </Button>
