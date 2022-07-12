@@ -125,8 +125,6 @@ const DashboardPage = () => {
     fetchTodayStok();
   }, []);
 
-  console.log(todayStok);
-
   return (
     <Grid container>
       {/* Container 1 */}

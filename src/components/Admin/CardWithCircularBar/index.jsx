@@ -11,7 +11,6 @@ const CardWithCircularBar = ({
   percentage,
   notation,
 }) => {
-  console.log(percentage);
   return (
     <Grid
       item
