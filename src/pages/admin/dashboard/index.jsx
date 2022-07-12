@@ -13,6 +13,7 @@ const DashboardPage = () => {
   const [lastUpdated, setLastUpdated] = useState(moment());
   const [expStok, setExpStok] = useState({});
   const [todayTransaction, setTodayTransaction] = useState({});
+  const [todayStok, setTodayStok] = useState({});
 
   const penjualanObatOption = {
     stroke: { width: 2, curve: "smooth" },
@@ -102,12 +103,29 @@ const DashboardPage = () => {
     }
   };
 
+  const fetchTodayStok = async () => {
+    try {
+      const res = await axiosInstance.get("/report/get-today-stok");
+      const stokInfo = {
+        todayStok: res.data.result.todayStok.sum,
+        yesterdayStok: res.data.result.yesterdayStok.sum,
+      };
+      setTodayStok(stokInfo);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
     fetchPemesananDataCount();
     setLastUpdated(moment());
     fetchExpStok();
     fetchTodayTransaction();
+    fetchTodayStok();
   }, []);
+
+  console.log(todayStok);
 
   return (
     <Grid container>
@@ -131,7 +149,7 @@ const DashboardPage = () => {
             <CardWithCircularBar
               title="Profit Hari Ini"
               amount="Rp 10.000.000"
-              value="+5.700.000"
+              value="5.700.000"
               percentage={25}
               notation="+"
             />
@@ -141,11 +159,11 @@ const DashboardPage = () => {
               value={
                 todayTransaction.todayOrder - todayTransaction.yesterdayOrder
               }
-              percentage={(
-                (1 -
-                  todayTransaction.todayOrder /
-                    todayTransaction.yesterdayOrder) *
-                100
+              percentage={Math.abs(
+                ((todayTransaction.todayOrder -
+                  todayTransaction.yesterdayOrder) /
+                  todayTransaction.yesterdayOrder) *
+                  100
               ).toFixed(1)}
               notation={
                 todayTransaction.todayOrder - todayTransaction.yesterdayOrder <
@@ -156,10 +174,16 @@ const DashboardPage = () => {
             />
             <CardWithCircularBar
               title="Sisa Stok Hari Ini"
-              amount="110"
-              value="+30"
-              percentage={30}
-              notation="+"
+              amount={todayStok.todayStok}
+              value={Math.abs(todayStok.todayStok - todayStok.yesterdayStok)}
+              percentage={Math.abs(
+                ((todayStok.todayStok - todayStok.yesterdayStok) /
+                  todayStok.yesterdayStok) *
+                  100
+              ).toFixed(1)}
+              notation={
+                todayStok.todayStok - todayStok.yesterdayStok < 0 ? "-" : "+"
+              }
             />
           </Grid>
         </Grid>

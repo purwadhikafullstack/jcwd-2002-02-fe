@@ -11,6 +11,7 @@ const CardWithCircularBar = ({
   percentage,
   notation,
 }) => {
+  console.log(percentage);
   return (
     <Grid
       item
@@ -61,6 +62,7 @@ const CardWithCircularBar = ({
               <BsFillArrowDownRightCircleFill fontSize="10px" />
             )}
             <Typography sx={{ fontSize: "10px", marginLeft: "4px" }}>
+              {notation}
               {value.toLocaleString()}
             </Typography>
           </Box>
