@@ -8,9 +8,11 @@ import {
 } from "@mui/material";
 import CardCategory from "components/Admin/CardCategory";
 import CardStatistik from "components/Admin/CardStatistik";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import requiresAdmin from "config/requireAdmin";
+import axiosInstance from "config/api";
+import moment from "moment";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 const RingkasanStatistikPage = () => {
@@ -18,6 +20,8 @@ const RingkasanStatistikPage = () => {
   const [sort, setSort] = useState("");
   const [sortPendapatan, setSortPendapatan] = useState("");
   const [sortPembatalan, setSortPembatalan] = useState("");
+  const [pemesanan, setPemesanan] = useState([]);
+  const [lastUpdated, setLastUpdated] = useState(moment());
 
   const penjualanObatOption = {
     stroke: { width: 2, curve: "smooth" },
@@ -121,6 +125,21 @@ const RingkasanStatistikPage = () => {
     setSortPembatalan(event.target.value);
   };
 
+  const fetchPemesananDataCount = async () => {
+    try {
+      const res = await axiosInstance.get("/report/get-transaction-count");
+      setPemesanan(res.data.result);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchPemesananDataCount();
+    setLastUpdated(moment());
+  }, []);
+
   return (
     <Grid container>
       {/* Container 1 */}
@@ -137,7 +156,7 @@ const RingkasanStatistikPage = () => {
                   component="span"
                   sx={{ fontSize: "14px", fontWeight: "bold" }}
                 >
-                  20 Januari 2022, 14.30 WIB
+                  {moment(lastUpdated).format("LLL")}
                 </Typography>
               </Typography>
             </Box>
@@ -161,11 +180,61 @@ const RingkasanStatistikPage = () => {
               justifyContent: "space-between",
             }}
           >
-            <CardCategory title="Pesanan Baru" value={7} column={1.8} />
-            <CardCategory title="Siap Dikirim" value={3} column={1.8} />
-            <CardCategory title="Sedang Dikirim" value={0} column={1.8} />
-            <CardCategory title="Selesai" value={7} column={1.8} />
-            <CardCategory title="Dibatalkan" value={3} column={1.8} />
+            <CardCategory
+              title="Menunggu Pembayaran"
+              value={pemesanan.reduce((init, val) => {
+                if (val.paymentStatusId === 1) {
+                  return init + val.count;
+                }
+
+                return init;
+              }, 0)}
+              column={1.8}
+            />
+            <CardCategory
+              title="Pesanan Baru"
+              value={pemesanan.reduce((init, val) => {
+                if (val.paymentStatusId === 2) {
+                  return init + val.count;
+                }
+
+                return init;
+              }, 0)}
+              column={1.8}
+            />
+            <CardCategory
+              title="Dikirim"
+              value={pemesanan.reduce((init, val) => {
+                if (val.paymentStatusId === 3) {
+                  return init + val.count;
+                }
+
+                return init;
+              }, 0)}
+              column={1.8}
+            />
+            <CardCategory
+              title="Selesai"
+              value={pemesanan.reduce((init, val) => {
+                if (val.paymentStatusId === 4) {
+                  return init + val.count;
+                }
+
+                return init;
+              }, 0)}
+              column={1.8}
+            />
+            <CardCategory
+              title="Dibatalkan"
+              value={pemesanan.reduce((init, val) => {
+                if (val.paymentStatusId === 5) {
+                  return init + val.count;
+                }
+
+                return init;
+              }, 0)}
+              column={1.8}
+            />
             <CardCategory title="Chat Baru" value={0} column={1.8} />
           </Grid>
         </Grid>

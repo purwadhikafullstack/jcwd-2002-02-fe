@@ -2,11 +2,17 @@
 import { Box, Typography, Grid } from "@mui/material";
 import CardCategory from "components/Admin/CardCategory";
 import CardWithCircularBar from "components/Admin/CardWithCircularBar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CardStatistik from "components/Admin/CardStatistik";
 import requiresAdmin from "config/requireAdmin";
+import axiosInstance from "config/api";
+import moment from "moment";
 
 const DashboardPage = () => {
+  const [pemesanan, setPemesanan] = useState([]);
+  const [lastUpdated, setLastUpdated] = useState(moment());
+  const [expStok, setExpStok] = useState({});
+
   const penjualanObatOption = {
     stroke: { width: 2, curve: "smooth" },
     xaxis: {
@@ -65,6 +71,32 @@ const DashboardPage = () => {
     setSort(event.target.value);
   };
 
+  const fetchPemesananDataCount = async () => {
+    try {
+      const res = await axiosInstance.get("/report/get-transaction-count");
+      setPemesanan(res.data.result);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
+    }
+  };
+
+  const fetchExpStok = async () => {
+    try {
+      const res = await axiosInstance.get("/report/get-exp-product");
+      setExpStok(res.data.result);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchPemesananDataCount();
+    setLastUpdated(moment());
+    fetchExpStok();
+  }, []);
+
   return (
     <Grid container>
       {/* Container 1 */}
@@ -79,7 +111,7 @@ const DashboardPage = () => {
               component="span"
               sx={{ fontSize: "14px", fontWeight: "bold" }}
             >
-              20 Januari 2022, 14.30 WIB
+              {moment(lastUpdated).format("LLL")}
             </Typography>
           </Typography>
 
@@ -99,7 +131,7 @@ const DashboardPage = () => {
               notation="-"
             />
             <CardWithCircularBar
-              title="Sisa Hari Ini"
+              title="Sisa Stok Hari Ini"
               amount="110"
               value="+30"
               percentage={30}
@@ -125,12 +157,62 @@ const DashboardPage = () => {
               flexDirection: "row",
             }}
           >
-            <CardCategory title="Pesanan Baru" value={7} column={4} />
-            <CardCategory title="Siap Dikirim" value={3} column={4} />
-            <CardCategory title="Sedang Dikirim" value={0} column={4} />
-            <CardCategory title="Selesai" value={7} column={4} />
-            <CardCategory title="Dibatalkan" value={3} column={4} />
-            <CardCategory title="Chat Baru" value={0} column={4} />
+            <CardCategory
+              title="Menunggu Pembayaran"
+              value={pemesanan.reduce((init, val) => {
+                if (val.paymentStatusId === 1) {
+                  return init + val.count;
+                }
+
+                return init;
+              }, 0)}
+              column={4}
+            />
+            <CardCategory
+              title="Pesanan Baru"
+              value={pemesanan.reduce((init, val) => {
+                if (val.paymentStatusId === 2) {
+                  return init + val.count;
+                }
+
+                return init;
+              }, 0)}
+              column={4}
+            />
+            <CardCategory
+              title="Dikirim"
+              value={pemesanan.reduce((init, val) => {
+                if (val.paymentStatusId === 3) {
+                  return init + val.count;
+                }
+
+                return init;
+              }, 0)}
+              column={4}
+            />
+            <CardCategory
+              title="Selesai"
+              value={pemesanan.reduce((init, val) => {
+                if (val.paymentStatusId === 4) {
+                  return init + val.count;
+                }
+
+                return init;
+              }, 0)}
+              column={4}
+            />
+            <CardCategory
+              title="Dibatalkan"
+              value={pemesanan.reduce((init, val) => {
+                if (val.paymentStatusId === 5) {
+                  return init + val.count;
+                }
+
+                return init;
+              }, 0)}
+              column={4}
+            />
+            {/* <CardCategory title="Chat Baru" value={0} column={4} /> */}
           </Grid>
         </Grid>
         <Grid item xs={6}>
@@ -173,7 +255,7 @@ const DashboardPage = () => {
                 <Typography
                   sx={{ fontWeight: "bold", fontSize: "24px", color: "red" }}
                 >
-                  17
+                  {expStok?.expStok?.sum}
                 </Typography>
               </Box>
               <Box
@@ -192,9 +274,13 @@ const DashboardPage = () => {
                   Kadaluwarse Bulan Ini
                 </Typography>
                 <Typography
-                  sx={{ fontWeight: "bold", fontSize: "24px", color: "yellow" }}
+                  sx={{
+                    fontWeight: "bold",
+                    fontSize: "24px",
+                    color: "#F4BB44",
+                  }}
                 >
-                  0
+                  {expStok?.expSoon?.sum}
                 </Typography>
               </Box>
               <Box
@@ -219,7 +305,7 @@ const DashboardPage = () => {
                     color: "#21CDC0",
                   }}
                 >
-                  3
+                  {expStok?.expIn3Months?.sum}
                 </Typography>
               </Box>
             </Box>
