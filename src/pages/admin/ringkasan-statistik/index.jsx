@@ -16,7 +16,7 @@ import moment from "moment";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 const RingkasanStatistikPage = () => {
-  const [ringkasanSort, setRingkasanSort] = useState("");
+  const [ringkasanSort, setRingkasanSort] = useState(undefined);
   const [sort, setSort] = useState("");
   const [sortPendapatan, setSortPendapatan] = useState("");
   const [sortPembatalan, setSortPembatalan] = useState("");
@@ -127,7 +127,10 @@ const RingkasanStatistikPage = () => {
 
   const fetchPemesananDataCount = async () => {
     try {
-      const res = await axiosInstance.get("/report/get-transaction-count");
+      console.log(ringkasanSort);
+      const res = await axiosInstance.post("/report/get-transaction-count", {
+        stateOfDate: ringkasanSort,
+      });
       setPemesanan(res.data.result);
     } catch (err) {
       // eslint-disable-next-line no-console
@@ -138,7 +141,7 @@ const RingkasanStatistikPage = () => {
   useEffect(() => {
     fetchPemesananDataCount();
     setLastUpdated(moment());
-  }, []);
+  }, [ringkasanSort]);
 
   return (
     <Grid container>
@@ -162,13 +165,13 @@ const RingkasanStatistikPage = () => {
             </Box>
             <FormControl>
               <Select
-                sx={{ width: "141px", height: "24px" }}
+                sx={{ width: "161px", height: "24px" }}
                 onChange={handleChange}
                 value={ringkasanSort}
               >
-                <MenuItem value="Mingguan">Mingguan</MenuItem>
-                <MenuItem value="Bulanan">Bulanan</MenuItem>
-                <MenuItem value="Tahunan">Tahunan</MenuItem>
+                <MenuItem value="Harian">1 Hari Terakhir</MenuItem>
+                <MenuItem value="Mingguan">1 Minggu Terakhir</MenuItem>
+                <MenuItem value="Bulanan">1 Bulan Terakhir</MenuItem>
               </Select>
             </FormControl>
           </Box>

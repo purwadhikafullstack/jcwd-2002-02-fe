@@ -75,7 +75,7 @@ const DashboardPage = () => {
 
   const fetchPemesananDataCount = async () => {
     try {
-      const res = await axiosInstance.get("/report/get-transaction-count");
+      const res = await axiosInstance.post("/report/get-transaction-count");
       setPemesanan(res.data.result);
     } catch (err) {
       // eslint-disable-next-line no-console
