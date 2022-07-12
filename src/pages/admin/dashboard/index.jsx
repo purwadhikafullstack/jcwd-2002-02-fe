@@ -12,6 +12,7 @@ const DashboardPage = () => {
   const [pemesanan, setPemesanan] = useState([]);
   const [lastUpdated, setLastUpdated] = useState(moment());
   const [expStok, setExpStok] = useState({});
+  const [todayTransaction, setTodayTransaction] = useState({});
 
   const penjualanObatOption = {
     stroke: { width: 2, curve: "smooth" },
@@ -91,10 +92,21 @@ const DashboardPage = () => {
     }
   };
 
+  const fetchTodayTransaction = async () => {
+    try {
+      const res = await axiosInstance.get("/report/get-today-transaction");
+      setTodayTransaction(res.data.result);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
     fetchPemesananDataCount();
     setLastUpdated(moment());
     fetchExpStok();
+    fetchTodayTransaction();
   }, []);
 
   return (
@@ -125,10 +137,22 @@ const DashboardPage = () => {
             />
             <CardWithCircularBar
               title="Total Pemesanan Hari Ini"
-              amount="110"
-              value="-60"
-              percentage={62}
-              notation="-"
+              amount={todayTransaction.todayOrder}
+              value={
+                todayTransaction.todayOrder - todayTransaction.yesterdayOrder
+              }
+              percentage={(
+                (1 -
+                  todayTransaction.todayOrder /
+                    todayTransaction.yesterdayOrder) *
+                100
+              ).toFixed(1)}
+              notation={
+                todayTransaction.todayOrder - todayTransaction.yesterdayOrder <
+                0
+                  ? "-"
+                  : "+"
+              }
             />
             <CardWithCircularBar
               title="Sisa Stok Hari Ini"
