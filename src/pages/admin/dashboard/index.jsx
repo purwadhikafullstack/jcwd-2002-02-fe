@@ -14,37 +14,45 @@ const DashboardPage = () => {
   const [expStok, setExpStok] = useState({});
   const [todayTransaction, setTodayTransaction] = useState({});
   const [todayStok, setTodayStok] = useState({});
+  const [penjualan, setPenjualan] = useState([]);
+  const [categoryPenjualan, setCategoryPenjualan] = useState([]);
+  const [dataPenjualan, setDataPenjualan] = useState([]);
 
   const penjualanObatOption = {
     stroke: { width: 2, curve: "smooth" },
     xaxis: {
-      categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sept",
-        "Oct",
-        "Nov",
-        "Des",
-      ],
+      categories: categoryPenjualan,
     },
   };
 
-  const penjualanObatSeries = [
-    {
-      name: "Obat Bebas",
-      data: [750, 800, 850, 500, 300, 400, 100, 700, 550, 1200, 850, 300],
-    },
-    {
-      name: "Obat Racikan",
-      data: [300, 200, 450, 500, 600, 550, 700, 770, 600, 800, 1250, 100],
-    },
-  ];
+  const penjualanObatSeries = dataPenjualan;
+
+  const convertDataPenjualan = () => {
+    const category = [];
+    const data = [];
+    penjualan.forEach((val) => {
+      if (val.week) {
+        category.push(moment(val.week).format("DD MMM"));
+      }
+      if (val.month) {
+        category.push(moment(val.month).format("MMMM"));
+      }
+      if (val.year) {
+        category.push(moment(val.year).format("YYYY"));
+      }
+      data.push(val.sum);
+    });
+
+    const arrayOfData = [
+      {
+        name: "Obat Bebas",
+        data,
+      },
+    ];
+
+    setCategoryPenjualan(category);
+    setDataPenjualan(arrayOfData);
+  };
 
   const profitOption = {
     xaxis: {
@@ -67,10 +75,16 @@ const DashboardPage = () => {
     },
   ];
 
-  const [sort, setSort] = useState("");
+  const [sortPenjualan, setSortPenjualan] = useState("");
 
-  const handleChange = (event) => {
-    setSort(event.target.value);
+  const handleChangePenjualan = (event) => {
+    setSortPenjualan(event.target.value);
+  };
+
+  const [sortProfit, setSortProfit] = useState("");
+
+  const handleChangeProfit = (event) => {
+    setSortProfit(event.target.value);
   };
 
   const fetchPemesananDataCount = async () => {
@@ -117,6 +131,18 @@ const DashboardPage = () => {
     }
   };
 
+  const fetchPenjualan = async () => {
+    try {
+      const res = await axiosInstance.post("/report/get-penjualan", {
+        stateOfDate: sortPenjualan || "Bulanan",
+      });
+      setPenjualan(res.data.result);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
     fetchPemesananDataCount();
     setLastUpdated(moment());
@@ -124,6 +150,17 @@ const DashboardPage = () => {
     fetchTodayTransaction();
     fetchTodayStok();
   }, []);
+
+  useEffect(() => {
+    fetchPenjualan();
+    setLastUpdated(moment());
+  }, [sortPenjualan]);
+
+  useEffect(() => {
+    if (penjualan.length) {
+      convertDataPenjualan();
+    }
+  }, [penjualan]);
 
   return (
     <Grid container>
@@ -368,8 +405,8 @@ const DashboardPage = () => {
           column={6}
           chartOption={profitOption}
           chartSeries={profitSeries}
-          selectHandle={handleChange}
-          selectValue={sort}
+          selectHandle={handleChangeProfit}
+          selectValue={sortProfit}
           chartSort={[
             { sortValue: "Mingguan", sortTitle: "Mingguan" },
             { sortValue: "Bulanan", sortTitle: "Bulanan" },
@@ -383,8 +420,8 @@ const DashboardPage = () => {
           column={6}
           chartOption={penjualanObatOption}
           chartSeries={penjualanObatSeries}
-          selectHandle={handleChange}
-          selectValue={sort}
+          selectHandle={handleChangePenjualan}
+          selectValue={sortPenjualan}
           chartSort={[
             { sortValue: "Mingguan", sortTitle: "Mingguan" },
             { sortValue: "Bulanan", sortTitle: "Bulanan" },
