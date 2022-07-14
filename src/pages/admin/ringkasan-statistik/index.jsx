@@ -36,20 +36,36 @@ const RingkasanStatistikPage = () => {
 
   const penjualanObatSeries = dataPenjualan;
 
+  const Month = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
   const convertDataPenjualan = () => {
+    if (sort === "Bulanan" || !sort) {
+      return;
+    }
     const category = [];
     const data = [];
     penjualan.forEach((val) => {
       if (val.week) {
         category.push(moment(val.week).format("DD MMM"));
-      }
-      if (val.month) {
-        category.push(moment(val.month).format("MMMM"));
+        data.push(val.sum);
       }
       if (val.year) {
         category.push(moment(val.year).format("YYYY"));
+        data.push(val.sum);
       }
-      data.push(val.sum);
     });
 
     const arrayOfData = [
@@ -61,6 +77,25 @@ const RingkasanStatistikPage = () => {
 
     setCategoryPenjualan(category);
     setDataPenjualan(arrayOfData);
+  };
+
+  const covertDataPenjualanByMonth = () => {
+    if (sort === "Bulanan" || sort === "") {
+      const arr = new Array(parseInt(moment().format("MM"))).fill(0);
+      penjualan.forEach((val) => {
+        arr[parseInt(moment(val.month).format("MM")) - 1] = val.sum;
+      });
+
+      const arrayOfData = [
+        {
+          name: "Obat Bebas",
+          data: arr,
+        },
+      ];
+
+      setCategoryPenjualan(Month);
+      setDataPenjualan(arrayOfData);
+    }
   };
 
   const pendapatanOption = {
@@ -171,6 +206,7 @@ const RingkasanStatistikPage = () => {
   useEffect(() => {
     if (penjualan.length) {
       convertDataPenjualan();
+      covertDataPenjualanByMonth();
     }
   }, [penjualan]);
 

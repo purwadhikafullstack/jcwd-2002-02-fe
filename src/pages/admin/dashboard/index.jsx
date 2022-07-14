@@ -1,3 +1,4 @@
+/* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable react/jsx-no-useless-fragment */
 import { Box, Typography, Grid } from "@mui/material";
 import CardCategory from "components/Admin/CardCategory";
@@ -17,6 +18,9 @@ const DashboardPage = () => {
   const [penjualan, setPenjualan] = useState([]);
   const [categoryPenjualan, setCategoryPenjualan] = useState([]);
   const [dataPenjualan, setDataPenjualan] = useState([]);
+  const [sortPenjualan, setSortPenjualan] = useState("");
+  const [sortProfit, setSortProfit] = useState("");
+  const [todayRevenue, setTodayRevenue] = useState({});
 
   const penjualanObatOption = {
     stroke: { width: 2, curve: "smooth" },
@@ -27,20 +31,36 @@ const DashboardPage = () => {
 
   const penjualanObatSeries = dataPenjualan;
 
+  const Month = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
   const convertDataPenjualan = () => {
+    if (sortPenjualan === "Bulanan" || !sortPenjualan) {
+      return;
+    }
     const category = [];
     const data = [];
     penjualan.forEach((val) => {
       if (val.week) {
         category.push(moment(val.week).format("DD MMM"));
-      }
-      if (val.month) {
-        category.push(moment(val.month).format("MMMM"));
+        data.push(val.sum);
       }
       if (val.year) {
         category.push(moment(val.year).format("YYYY"));
+        data.push(val.sum);
       }
-      data.push(val.sum);
     });
 
     const arrayOfData = [
@@ -52,6 +72,25 @@ const DashboardPage = () => {
 
     setCategoryPenjualan(category);
     setDataPenjualan(arrayOfData);
+  };
+
+  const covertDataPenjualanByMonth = () => {
+    if (sortPenjualan === "Bulanan" || sortPenjualan === "") {
+      const arr = new Array(parseInt(moment().format("MM"))).fill(0);
+      penjualan.forEach((val) => {
+        arr[parseInt(moment(val.month).format("MM")) - 1] = val.sum;
+      });
+
+      const arrayOfData = [
+        {
+          name: "Obat Bebas",
+          data: arr,
+        },
+      ];
+
+      setCategoryPenjualan(Month);
+      setDataPenjualan(arrayOfData);
+    }
   };
 
   const profitOption = {
@@ -75,13 +114,9 @@ const DashboardPage = () => {
     },
   ];
 
-  const [sortPenjualan, setSortPenjualan] = useState("");
-
   const handleChangePenjualan = (event) => {
     setSortPenjualan(event.target.value);
   };
-
-  const [sortProfit, setSortProfit] = useState("");
 
   const handleChangeProfit = (event) => {
     setSortProfit(event.target.value);
@@ -143,12 +178,23 @@ const DashboardPage = () => {
     }
   };
 
+  const fetchRevenue = async () => {
+    try {
+      const res = await axiosInstance.get("/report/get-today-revenue");
+      setTodayRevenue(res.data.result);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
     fetchPemesananDataCount();
     setLastUpdated(moment());
     fetchExpStok();
     fetchTodayTransaction();
     fetchTodayStok();
+    fetchRevenue();
   }, []);
 
   useEffect(() => {
@@ -159,6 +205,7 @@ const DashboardPage = () => {
   useEffect(() => {
     if (penjualan.length) {
       convertDataPenjualan();
+      covertDataPenjualanByMonth();
     }
   }, [penjualan]);
 
@@ -183,23 +230,39 @@ const DashboardPage = () => {
           <Grid container spacing={2}>
             <CardWithCircularBar
               title="Profit Hari Ini"
-              amount="Rp 10.000.000"
-              value="5.700.000"
-              percentage={25}
-              notation="+"
+              amount={`Rp. ${todayRevenue?.todayRevenue?.result || 0}`}
+              value={Math.abs(
+                todayRevenue?.todayRevenue?.result -
+                  todayRevenue?.yesterdayRevenue?.result
+              ).toLocaleString()}
+              percentage={Math.abs(
+                ((todayRevenue?.todayRevenue?.result -
+                  todayRevenue?.yesterdayRevenue?.result) /
+                  todayRevenue?.yesterdayRevenue?.result) *
+                  100
+              ).toFixed(1)}
+              notation={
+                todayRevenue?.todayRevenue?.result -
+                  todayRevenue?.yesterdayRevenue?.result <
+                0
+                  ? "-"
+                  : "+"
+              }
             />
             <CardWithCircularBar
               title="Total Pemesanan Hari Ini"
               amount={todayTransaction.todayOrder}
-              value={
+              value={Math.abs(
                 todayTransaction.todayOrder - todayTransaction.yesterdayOrder
+              )}
+              percentage={
+                Math.abs(
+                  ((todayTransaction.todayOrder -
+                    todayTransaction.yesterdayOrder) /
+                    todayTransaction.yesterdayOrder) *
+                    100
+                ).toFixed(1) && 0
               }
-              percentage={Math.abs(
-                ((todayTransaction.todayOrder -
-                  todayTransaction.yesterdayOrder) /
-                  todayTransaction.yesterdayOrder) *
-                  100
-              ).toFixed(1)}
               notation={
                 todayTransaction.todayOrder - todayTransaction.yesterdayOrder <
                 0
@@ -211,11 +274,13 @@ const DashboardPage = () => {
               title="Sisa Stok Hari Ini"
               amount={todayStok.todayStok}
               value={Math.abs(todayStok.todayStok - todayStok.yesterdayStok)}
-              percentage={Math.abs(
-                ((todayStok.todayStok - todayStok.yesterdayStok) /
-                  todayStok.yesterdayStok) *
-                  100
-              ).toFixed(1)}
+              percentage={
+                Math.abs(
+                  ((todayStok.todayStok - todayStok.yesterdayStok) /
+                    todayStok.yesterdayStok) *
+                    100
+                ).toFixed(1) && 0
+              }
               notation={
                 todayStok.todayStok - todayStok.yesterdayStok < 0 ? "-" : "+"
               }
@@ -338,7 +403,7 @@ const DashboardPage = () => {
                 <Typography
                   sx={{ fontWeight: "bold", fontSize: "24px", color: "red" }}
                 >
-                  {expStok?.expStok?.sum}
+                  {expStok?.expStok?.sum || "-"}
                 </Typography>
               </Box>
               <Box
@@ -363,7 +428,7 @@ const DashboardPage = () => {
                     color: "#F4BB44",
                   }}
                 >
-                  {expStok?.expSoon?.sum}
+                  {expStok?.expSoon?.sum || "-"}
                 </Typography>
               </Box>
               <Box
@@ -388,7 +453,7 @@ const DashboardPage = () => {
                     color: "#21CDC0",
                   }}
                 >
-                  {expStok?.expIn3Months?.sum}
+                  {expStok?.expIn3Months?.sum || "-"}
                 </Typography>
               </Box>
             </Box>
