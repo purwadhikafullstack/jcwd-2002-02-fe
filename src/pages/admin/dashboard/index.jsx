@@ -21,6 +21,9 @@ const DashboardPage = () => {
   const [sortPenjualan, setSortPenjualan] = useState("");
   const [sortProfit, setSortProfit] = useState("");
   const [todayRevenue, setTodayRevenue] = useState({});
+  const [profitData, setProfitData] = useState({});
+  const [categoryProfit, setCategoryProfit] = useState([]);
+  const [profit, setProfit] = useState([]);
 
   const penjualanObatOption = {
     stroke: { width: 2, curve: "smooth" },
@@ -95,24 +98,33 @@ const DashboardPage = () => {
 
   const profitOption = {
     xaxis: {
-      categories: [
-        "Senin",
-        "Selasa",
-        "Rabu",
-        "Kamis",
-        "Jumat",
-        "Sabtu",
-        "Minggu",
-      ],
+      categories: categoryProfit,
     },
   };
 
-  const profitSeries = [
-    {
-      name: "series-1",
-      data: [3, 5, 6, 4, 8, 7, 9],
-    },
-  ];
+  const profitSeries = profit;
+
+  const converProfitDataByMonth = () => {
+    const { revenue, capital } = profitData;
+    const dataArr = new Array(parseInt(moment().format("MM"))).fill(0);
+    revenue?.forEach((val) => {
+      dataArr[parseInt(moment(val.month).format("MM")) - 1] = val.sum;
+    });
+
+    capital?.forEach((val) => {
+      dataArr[parseInt(moment(val.month).format("MM")) - 1] -= val.sum;
+    });
+
+    const data = [
+      {
+        name: "profit",
+        data: dataArr,
+      },
+    ];
+
+    setCategoryProfit(Month);
+    setProfit(data);
+  };
 
   const handleChangePenjualan = (event) => {
     setSortPenjualan(event.target.value);
@@ -188,6 +200,16 @@ const DashboardPage = () => {
     }
   };
 
+  const fetchProfit = async () => {
+    try {
+      const res = await axiosInstance.post("/report/get-profit");
+      setProfitData(res.data.result);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
     fetchPemesananDataCount();
     setLastUpdated(moment());
@@ -195,6 +217,7 @@ const DashboardPage = () => {
     fetchTodayTransaction();
     fetchTodayStok();
     fetchRevenue();
+    fetchProfit();
   }, []);
 
   useEffect(() => {
@@ -208,6 +231,12 @@ const DashboardPage = () => {
       covertDataPenjualanByMonth();
     }
   }, [penjualan]);
+
+  useEffect(() => {
+    if (Object.keys(profitData).length) {
+      converProfitDataByMonth();
+    }
+  }, [profitData]);
 
   return (
     <Grid container>
@@ -466,7 +495,6 @@ const DashboardPage = () => {
 
         <CardStatistik
           cardTitle="Profit"
-          cardCaption="Data dinyatakan dalam jutaan rupiah"
           column={6}
           chartOption={profitOption}
           chartSeries={profitSeries}
