@@ -170,7 +170,6 @@ const RingkasanStatistikPage = () => {
 
   const fetchPemesananDataCount = async () => {
     try {
-      console.log(ringkasanSort);
       const res = await axiosInstance.post("/report/get-transaction-count", {
         stateOfDate: ringkasanSort,
       });
