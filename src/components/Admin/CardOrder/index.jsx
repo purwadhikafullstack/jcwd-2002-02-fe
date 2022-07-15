@@ -1,24 +1,12 @@
 /* eslint-disable no-nested-ternary */
-import {
-  Grid,
-  Box,
-  Typography,
-  Button,
-  FormControlLabel,
-  Checkbox,
-  Stack,
-  Divider,
-} from "@mui/material";
+import { Grid, Box, Typography, Button, Stack, Divider } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import ChatIcon from "@mui/icons-material/Chat";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import { useState } from "react";
-<<<<<<< Updated upstream
 import moment from "moment";
-=======
 import { styled } from "@mui/material/styles";
->>>>>>> Stashed changes
 import ModalTerimaPesanan from "../ModalTerimaPesanan";
 import ModalSalinanResep from "../ModalSalinanResep";
 
@@ -29,8 +17,6 @@ const Image = styled("img")({
 });
 
 const CardOrder = ({
-  checked = false,
-  setCartChecked,
   status,
   orderCode,
   orderTime,
@@ -81,22 +67,6 @@ const CardOrder = ({
         >
           {/* Check Box */}
           <Box display="flex" alignItems="center" flexDirection="row">
-<<<<<<< Updated upstream
-            <FormControlLabel
-              sx={{ marginRight: 0 }}
-              control={
-                <Checkbox
-                  onClick={setCartChecked}
-                  checked={checked}
-                  sx={{
-                    color: "Brand.500",
-                    "&.Mui-checked": {
-                      color: "Brand.500",
-                    },
-                  }}
-                />
-              }
-            />
             <Typography sx={{ fontWeight: "bold" }}>
               {status === 1
                 ? "Pesanan Baru"
@@ -111,10 +81,8 @@ const CardOrder = ({
             <Typography sx={{ color: "Sidebar.700", marginLeft: "10px" }}>
               /
             </Typography>
-=======
->>>>>>> Stashed changes
             <Typography sx={{ fontWeight: "bold", marginLeft: "10px" }}>
-              {orderCode()}
+              {orderCode}
             </Typography>
             <Typography sx={{ color: "Sidebar.700", marginLeft: "10px" }}>
               /
@@ -335,29 +303,10 @@ const CardOrder = ({
                 marginRight: "8px",
               }}
             >
-<<<<<<< Updated upstream
-              Rp {totalPrice},-
+              Rp {totalPrice.toLocaleString()},-
             </Typography>
           </Box>
         )}
-=======
-              Total Harga
-            </Typography>
-            {/* <Typography sx={{ fontSize: "12px", fontWeight: "bold" }}>
-              ({productQty} Obat)
-            </Typography> */}
-          </Box>
-          <Typography
-            sx={{
-              fontSize: "16px",
-              fontWeight: "bold",
-              marginRight: "8px",
-            }}
-          >
-            Rp {totalPrice?.toLocaleString()},-
-          </Typography>
-        </Box>
->>>>>>> Stashed changes
 
         {/* Kategori Footer */}
         <Box

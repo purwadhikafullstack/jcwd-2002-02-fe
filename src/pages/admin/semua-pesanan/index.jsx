@@ -8,8 +8,6 @@ import {
   FormControl,
   Select,
   MenuItem,
-  FormControlLabel,
-  Checkbox,
   Stack,
   Pagination,
   Divider,
@@ -31,7 +29,6 @@ const SemuaPesananPage = () => {
   const [sortFilter, setSortFilter] = useState("");
   const [urutkan, setUrutkan] = useState("");
   const [cardPerPage, setCardPerPage] = useState("5");
-  const [checkedItems, setCheckedItems] = useState([]);
   const [transaksi, setTransaksi] = useState(null);
 
   const filterHandle = (event) => {
@@ -80,6 +77,8 @@ const SemuaPesananPage = () => {
           productPrice={val?.transaction_details[0]?.price_when_sold}
           courier="JNE-REG"
           orderCode={randomizer()}
+          status={1}
+          transaksiId={val?.id}
         />
       );
     });
@@ -209,25 +208,6 @@ const SemuaPesananPage = () => {
                 </Stack>
               </Box>
             </Box>
-
-            {/* Product Component */}
-            {/* {order.map((val, idx) => {
-              return (
-                <CardOrder
-                  setCartChecked={() => {
-                    let dupItems = [...checkedItems];
-
-                    if (dupItems.includes(idx)) {
-                      dupItems = dupItems.filter((oldItem) => oldItem !== idx);
-                    } else {
-                      dupItems.push(idx);
-                    }
-                    setCheckedItems(dupItems);
-                  }}
-                  checked={checkedItems.includes(idx)}
-                />
-              );
-            })} */}
             {renderTransaksi()}
 
             {/* <CardOrder
