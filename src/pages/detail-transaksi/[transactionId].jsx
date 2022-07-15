@@ -42,7 +42,6 @@ const DetailTransaksiPage = () => {
     try {
       const { transactionId } = router.query;
       const cartData = await axiosInstance.get(`/transaction/${transactionId}`);
-      console.log(cartData);
       setCart(cartData.data.result.detailTransaksi);
       setMethod(cartData.data.result.transaksi.payment_method);
       setTransaction(cartData.data.result.transaksi);
@@ -87,9 +86,6 @@ const DetailTransaksiPage = () => {
     }
   }, [router.query.transactionId]);
 
-  console.log(cart);
-  console.log(method);
-  console.log(router.query.transactionId);
   return (
     <Container
       sx={{
