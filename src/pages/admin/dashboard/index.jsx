@@ -448,7 +448,7 @@ const DashboardPage = () => {
                     fontSize: "16px",
                   }}
                 >
-                  Kadaluwarse Bulan Ini
+                  Kadaluwarsa Bulan Ini
                 </Typography>
                 <Typography
                   sx={{
@@ -506,6 +506,7 @@ const DashboardPage = () => {
             { sortValue: "Tahunan", sortTitle: "Tahunan" },
           ]}
           chartType="bar"
+          showSelectOption={false}
         />
 
         <CardStatistik

@@ -25,6 +25,12 @@ const RingkasanStatistikPage = () => {
   const [penjualan, setPenjualan] = useState([]);
   const [categoryPenjualan, setCategoryPenjualan] = useState([]);
   const [dataPenjualan, setDataPenjualan] = useState([]);
+  const [earningData, setEarningData] = useState({});
+  const [earningCategory, setEarningCategory] = useState([]);
+  const [earning, setEarnings] = useState([]);
+  const [cancelationData, setCancelationData] = useState([]);
+  const [cancelationCategory, setCancelationCategory] = useState([]);
+  const [cancelation, setCancelation] = useState([]);
 
   const penjualanObatOption = {
     stroke: { width: 2, curve: "smooth" },
@@ -101,20 +107,7 @@ const RingkasanStatistikPage = () => {
   const pendapatanOption = {
     stroke: { width: 2, curve: "smooth" },
     xaxis: {
-      categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sept",
-        "Oct",
-        "Nov",
-        "Des",
-      ],
+      categories: earningCategory,
     },
     chart: { type: "area", height: "200px" },
     fill: {
@@ -122,35 +115,82 @@ const RingkasanStatistikPage = () => {
     },
   };
 
-  const pendapatanSeries = [
-    {
-      name: "Obat Bebas",
-      data: [750, 800, 850, 500, 300, 400, 100, 700, 550, 1200, 850, 300],
-    },
-  ];
+  const pendapatanSeries = earning;
+
+  const converProfitDataByMonth = () => {
+    const { revenue } = earningData;
+    const dataArr = new Array(parseInt(moment().format("MM"))).fill(0);
+    revenue?.forEach((val) => {
+      dataArr[parseInt(moment(val.month).format("MM")) - 1] = val.sum;
+    });
+
+    const data = [
+      {
+        name: "profit",
+        data: dataArr,
+      },
+    ];
+
+    setEarningCategory(Month);
+    setEarnings(data);
+  };
 
   const pembatalanOption = {
     stroke: { width: 2, curve: "stepline" },
     xaxis: {
-      categories: [
-        "Dibatalkan Otomatis",
-        "Ditolak Apotik",
-        "Permintaan Pembeli",
-      ],
+      categories: cancelationCategory,
     },
     chart: { type: "line" },
   };
 
-  const pembatalanSeries = [
-    {
-      name: "Obat Racikan",
-      data: [300, 200, 450, 500, 600, 550, 700, 770, 600, 800, 1250, 100],
-    },
-    {
-      name: "Obat Resep",
-      data: [500, 600, 550],
-    },
-  ];
+  const pembatalanSeries = cancelation;
+
+  const convertDataPembatalan = () => {
+    if (sortPembatalan === "Bulanan" || !sortPembatalan) {
+      return;
+    }
+    const category = [];
+    const data = [];
+    cancelationData.forEach((val) => {
+      if (val.week) {
+        category.push(moment(val.week).format("DD MMM"));
+        data.push(val.count);
+      }
+      if (val.year) {
+        category.push(moment(val.year).format("YYYY"));
+        data.push(val.count);
+      }
+    });
+
+    const arrayOfData = [
+      {
+        name: "Obat Bebas",
+        data,
+      },
+    ];
+
+    setCancelationCategory(category);
+    setCancelation(arrayOfData);
+  };
+
+  const covertDataPembatalanByMonth = () => {
+    if (sortPembatalan === "Bulanan" || sortPembatalan === "") {
+      const arr = new Array(parseInt(moment().format("MM"))).fill(0);
+      cancelationData.forEach((val) => {
+        arr[parseInt(moment(val.month).format("MM")) - 1] = val.count;
+      });
+
+      const arrayOfData = [
+        {
+          name: "Obat Bebas",
+          data: arr,
+        },
+      ];
+
+      setCancelationCategory(Month);
+      setCancelation(arrayOfData);
+    }
+  };
 
   const handleChange = (event) => {
     setRingkasanSort(event.target.value);
@@ -192,6 +232,28 @@ const RingkasanStatistikPage = () => {
     }
   };
 
+  const fetchEarnings = async () => {
+    try {
+      const res = await axiosInstance.post("/report/get-profit");
+      setEarningData(res.data.result);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
+    }
+  };
+
+  const fetchCancelation = async () => {
+    try {
+      const res = await axiosInstance.post("/report/get-pembatalan", {
+        stateOfDate: sortPembatalan || "Bulanan",
+      });
+      setCancelationData(res.data.result);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
     fetchPemesananDataCount();
     setLastUpdated(moment());
@@ -208,6 +270,29 @@ const RingkasanStatistikPage = () => {
       covertDataPenjualanByMonth();
     }
   }, [penjualan]);
+
+  useEffect(() => {
+    fetchEarnings();
+    setLastUpdated(moment());
+  }, []);
+
+  useEffect(() => {
+    fetchCancelation();
+    setLastUpdated(moment());
+  }, [sortPembatalan]);
+
+  useEffect(() => {
+    if (Object.keys(earningData).length) {
+      converProfitDataByMonth();
+    }
+  }, [earningData]);
+
+  useEffect(() => {
+    if (cancelationData?.length) {
+      convertDataPembatalan();
+      covertDataPembatalanByMonth();
+    }
+  }, [cancelationData]);
 
   return (
     <Grid container>
@@ -362,6 +447,7 @@ const RingkasanStatistikPage = () => {
             { sortValue: "Bulanan", sortTitle: "Bulanan" },
             { sortValue: "Tahunan", sortTitle: "Tahunan" },
           ]}
+          showSelectOption={false}
         />
         <CardStatistik
           cardTitle="Tren Pembatalan"
@@ -371,18 +457,9 @@ const RingkasanStatistikPage = () => {
           selectHandle={pembatalanHandle}
           selectValue={sortPembatalan}
           chartSort={[
-            { sortValue: "Jan", sortTitle: "Jan" },
-            { sortValue: "Feb", sortTitle: "Feb" },
-            { sortValue: "Mar", sortTitle: "Mar" },
-            { sortValue: "Apr", sortTitle: "Apr" },
-            { sortValue: "May", sortTitle: "May" },
-            { sortValue: "Jun", sortTitle: "Jun" },
-            { sortValue: "Jul", sortTitle: "Jul" },
-            { sortValue: "Aug", sortTitle: "Aug" },
-            { sortValue: "Sep", sortTitle: "Sep" },
-            { sortValue: "Oct", sortTitle: "Oct" },
-            { sortValue: "Nov", sortTitle: "Nov" },
-            { sortValue: "Des", sortTitle: "Des" },
+            { sortValue: "Mingguan", sortTitle: "Mingguan" },
+            { sortValue: "Bulanan", sortTitle: "Bulanan" },
+            { sortValue: "Tahunan", sortTitle: "Tahunan" },
           ]}
         />
       </Grid>
