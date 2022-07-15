@@ -10,15 +10,23 @@ import {
   Divider,
 } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import Kursiplastik from "public/Images/kursiplastik.png";
-import Image from "next/image";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import ChatIcon from "@mui/icons-material/Chat";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import { useState } from "react";
+<<<<<<< Updated upstream
 import moment from "moment";
+=======
+import { styled } from "@mui/material/styles";
+>>>>>>> Stashed changes
 import ModalTerimaPesanan from "../ModalTerimaPesanan";
 import ModalSalinanResep from "../ModalSalinanResep";
+
+const Image = styled("img")({
+  width: "73px",
+  height: "100%",
+  objectFit: "scale-down",
+});
 
 const CardOrder = ({
   checked = false,
@@ -73,6 +81,7 @@ const CardOrder = ({
         >
           {/* Check Box */}
           <Box display="flex" alignItems="center" flexDirection="row">
+<<<<<<< Updated upstream
             <FormControlLabel
               sx={{ marginRight: 0 }}
               control={
@@ -102,8 +111,10 @@ const CardOrder = ({
             <Typography sx={{ color: "Sidebar.700", marginLeft: "10px" }}>
               /
             </Typography>
+=======
+>>>>>>> Stashed changes
             <Typography sx={{ fontWeight: "bold", marginLeft: "10px" }}>
-              {orderCode}
+              {orderCode()}
             </Typography>
             <Typography sx={{ color: "Sidebar.700", marginLeft: "10px" }}>
               /
@@ -169,7 +180,7 @@ const CardOrder = ({
                   border: "1px solid #B4B9C7",
                 }}
               >
-                <Image src={productImage || Kursiplastik} layout="responsive" />
+                <Image src={productImage} />
               </Box>
 
               {/* Box Product Title, Qty, etc */}
@@ -211,7 +222,7 @@ const CardOrder = ({
                       {productName}
                     </Typography>
                     <Typography sx={{ fontSize: "14px", color: "gray" }}>
-                      {productQty} x {productPrice}
+                      {productQty} x Rp {productPrice?.toLocaleString()}
                     </Typography>
                     <Box
                       sx={{
@@ -324,10 +335,29 @@ const CardOrder = ({
                 marginRight: "8px",
               }}
             >
+<<<<<<< Updated upstream
               Rp {totalPrice},-
             </Typography>
           </Box>
         )}
+=======
+              Total Harga
+            </Typography>
+            {/* <Typography sx={{ fontSize: "12px", fontWeight: "bold" }}>
+              ({productQty} Obat)
+            </Typography> */}
+          </Box>
+          <Typography
+            sx={{
+              fontSize: "16px",
+              fontWeight: "bold",
+              marginRight: "8px",
+            }}
+          >
+            Rp {totalPrice?.toLocaleString()},-
+          </Typography>
+        </Box>
+>>>>>>> Stashed changes
 
         {/* Kategori Footer */}
         <Box

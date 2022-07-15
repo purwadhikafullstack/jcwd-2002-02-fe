@@ -17,11 +17,13 @@ import {
 import DownloadIcon from "@mui/icons-material/Download";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import SearchIcon from "@mui/icons-material/Search";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import CardOrder from "components/Admin/CardOrder";
 import Group from "public/Images/Group.png";
 import requiresAdmin from "config/requireAdmin";
+import axiosInstance from "config/api";
+import { nanoid } from "nanoid";
 
 const SemuaPesananPage = () => {
   // eslint-disable-next-line no-unused-vars
@@ -30,6 +32,7 @@ const SemuaPesananPage = () => {
   const [urutkan, setUrutkan] = useState("");
   const [cardPerPage, setCardPerPage] = useState("5");
   const [checkedItems, setCheckedItems] = useState([]);
+  const [transaksi, setTransaksi] = useState(null);
 
   const filterHandle = (event) => {
     setSortFilter(event.target.value);
@@ -42,6 +45,48 @@ const SemuaPesananPage = () => {
   const cardHandle = (event) => {
     setCardPerPage(event.target.value);
   };
+
+  const fetchTransaksi = async () => {
+    try {
+      const dataTransaksi = await axiosInstance.get("/transaction");
+      setTransaksi(dataTransaksi.data.result.rows);
+      console.log(dataTransaksi.data.result.rows);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const randomizer = () => {
+    const randomId = nanoid(5);
+    return `HTMED-${randomId}`;
+  };
+  const renderTransaksi = () => {
+    return transaksi?.map((val) => {
+      return (
+        <CardOrder
+          buyersName={val?.user?.username}
+          buyersAddress={val?.address?.alamat_lengkap}
+          totalPrice={val?.total_price}
+          productImage={
+            val?.resep_image_url ||
+            val?.transaction_details[0]?.product?.produk_image_url[0]
+          }
+          productName={
+            val?.nomor_resep ||
+            val?.transaction_details[0]?.product?.nama_produk
+          }
+          product={val?.transaction_details}
+          productQty={val?.transaction_details[0]?.quantity}
+          productPrice={val?.transaction_details[0]?.price_when_sold}
+          courier="JNE-REG"
+          orderCode={randomizer()}
+        />
+      );
+    });
+  };
+  useEffect(() => {
+    fetchTransaksi();
+  }, []);
 
   return (
     <>
@@ -135,36 +180,7 @@ const SemuaPesananPage = () => {
 
           {/* Body Box */}
           <Grid item xs={12}>
-            <Box
-              display="flex"
-              flexDirection="row"
-              justifyContent="space-between"
-            >
-              <Box>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      onChange={({ target: { checked } }) => {
-                        let dupItems = [...checkedItems];
-                        if (checked) {
-                          order.forEach((val, idx) => dupItems.push(idx));
-                        } else {
-                          dupItems = [];
-                        }
-
-                        setCheckedItems(dupItems);
-                      }}
-                      sx={{
-                        color: "Brand.500",
-                        "&.Mui-checked": {
-                          color: "Brand.500",
-                        },
-                      }}
-                    />
-                  }
-                  label="Pilih Semua"
-                />
-              </Box>
+            <Box display="flex" flexDirection="row" justifyContent="flex-end">
               <Box display="flex" flexDirection="row" alignContent="center">
                 <Typography sx={{ marginRight: "5px" }}>
                   Kartu per halaman
@@ -195,7 +211,7 @@ const SemuaPesananPage = () => {
             </Box>
 
             {/* Product Component */}
-            {order.map((val, idx) => {
+            {/* {order.map((val, idx) => {
               return (
                 <CardOrder
                   setCartChecked={() => {
@@ -211,9 +227,10 @@ const SemuaPesananPage = () => {
                   checked={checkedItems.includes(idx)}
                 />
               );
-            })}
+            })} */}
+            {renderTransaksi()}
 
-            <CardOrder
+            {/* <CardOrder
               status="Pesanan Baru"
               orderCode="HTMED129X"
               orderTime="10 Jan 2022, 10:45 WIB"
@@ -226,8 +243,8 @@ const SemuaPesananPage = () => {
               buyersAddress="Jl. Erlangga XII No.25, RT.5/RW.3, Selong, Kec. Kby. Baru, Kota Jakarta Selatan"
               courier="Grab-Sameday"
               totalPrice={3 * 55000}
-            />
-            <CardOrder
+            /> */}
+            {/* <CardOrder
               status="Siap Dikirim"
               orderCode="HTMED129X"
               orderTime="10 Jan 2022, 10:45 WIB"
@@ -240,8 +257,8 @@ const SemuaPesananPage = () => {
               buyersAddress="Jl. Erlangga XII No.25, RT.5/RW.3, Selong, Kec. Kby. Baru, Kota Jakarta Selatan"
               courier="Grab-Sameday"
               totalPrice={3 * 55000}
-            />
-            <CardOrder
+            /> */}
+            {/* <CardOrder
               status="Dalam Pengiriman"
               orderCode="HTMED129X"
               orderTime="10 Jan 2022, 10:45 WIB"
@@ -268,7 +285,7 @@ const SemuaPesananPage = () => {
               buyersAddress="Jl. Erlangga XII No.25, RT.5/RW.3, Selong, Kec. Kby. Baru, Kota Jakarta Selatan"
               courier="Grab-Sameday"
               totalPrice={3 * 55000}
-            />
+            />  */}
           </Grid>
         </Grid>
       ) : (
