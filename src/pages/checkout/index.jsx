@@ -55,10 +55,17 @@ const CheckOut = () => {
       const newData = {
         total_price: totalHarga,
         cartId: priceSelector.checkedItems,
+        paymentMethodId: method,
       };
-      await axiosInstance.post("/transaction/add-new-transaction", newData);
+      const res = await axiosInstance.post(
+        "/transaction/add-new-transaction",
+        newData
+      );
+      console.log(res);
       dispatch(cumulatedPrice(totalHarga));
-      router.push(`/konfirmasi?paymentMethod=${method}`);
+      router.push(
+        `/konfirmasi?paymentMethod=${method}&transaksiId=${res.data.data.id}&createdAt=${res.data.data.createdAt}`
+      );
     } catch (err) {
       console.log(err);
     }
@@ -115,6 +122,7 @@ const CheckOut = () => {
   useEffect(() => {
     setTotalHarga(total());
   }, [total]);
+
   return (
     <Container sx={{ mt: "56px" }}>
       <Grid container spacing={2} columns={{ xs: 6, md: 12 }}>

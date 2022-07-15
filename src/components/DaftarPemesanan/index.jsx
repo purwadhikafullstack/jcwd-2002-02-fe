@@ -2,9 +2,15 @@
 /* eslint-disable camelcase */
 import { Box, Button, Stack, Typography } from "@mui/material";
 import CheckOutCard from "components/CheckOut";
+import ModalUploadPembayaran from "components/ModalUploadPembayaran";
+import moment from "moment";
+import { useRouter } from "next/router";
+import { useState } from "react";
 import { BsFillChatDotsFill } from "react-icons/bs";
 
 const DaftarPemesanan = ({ status, total_harga, produk, detail }) => {
+  const router = useRouter();
+  const [uploadPembayaran, setUploadPembayaran] = useState(false);
   const renderProduk = () => {
     if (detail.is_resep) {
       return (
@@ -23,10 +29,13 @@ const DaftarPemesanan = ({ status, total_harga, produk, detail }) => {
           produk_name={valo?.product?.nama_produk}
           produk_price={valo?.product?.harga_jual}
           produk_qty={valo?.quantity}
+          product_diskon={valo?.product?.diskon}
         />
       );
     });
   };
+
+  console.log(detail);
   return (
     <Stack>
       <Stack
@@ -47,7 +56,9 @@ const DaftarPemesanan = ({ status, total_harga, produk, detail }) => {
             borderBottom: "2px solid white",
           }}
         >
-          <Typography>Jumat, 5 April 2022, 15:45</Typography>
+          <Typography>
+            {moment(detail?.createdAt).format("dddd, DD MMMM YYYY, hh:mm")}
+          </Typography>
           {status === "Dikirim" ||
           status === "Selesai" ||
           status === "Menunggu" ||
@@ -149,10 +160,15 @@ const DaftarPemesanan = ({ status, total_harga, produk, detail }) => {
                 Bayar Sebelum
               </Typography>
               <Typography sx={{ color: "#4F618E", fontSize: "12px" }}>
-                6 April 2022, 15:45
+                {moment(detail?.createdAt)
+                  .add(1, "day")
+                  .format("dddd, DD MMMM YYYY, hh:mm")}
               </Typography>
             </Stack>
             <Button
+              onClick={() =>
+                router.push(`/konfirmasi?paymentMethod=${detail.id}`)
+              }
               variant="contained"
               sx={{
                 ml: "16px",
@@ -163,6 +179,10 @@ const DaftarPemesanan = ({ status, total_harga, produk, detail }) => {
             >
               Bayar Sekarang
             </Button>
+            <ModalUploadPembayaran
+              openModal={uploadPembayaran}
+              handleCloseModal={() => setUploadPembayaran(false)}
+            />
           </Box>
         </Box>
       </Stack>

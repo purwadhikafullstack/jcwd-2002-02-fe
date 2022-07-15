@@ -18,6 +18,8 @@ import { useSelector } from "react-redux";
 import axiosInstance from "config/api";
 import { useRouter } from "next/router";
 import { styled } from "@mui/material/styles";
+import ModalUploadPembayaran from "components/ModalUploadPembayaran";
+import moment from "moment";
 
 const Image = styled("img")({
   maxWidth: "120px",
@@ -26,6 +28,7 @@ const Image = styled("img")({
 });
 
 const Konfirmasi = () => {
+  const [uploadPembayaran, setUploadPembayaran] = useState(false);
   const priceSelector = useSelector((state) => state.price);
   const [bca, setBca] = useState(false);
   const openBca = () => setBca(true);
@@ -43,6 +46,7 @@ const Konfirmasi = () => {
       });
       setCart(cartData.data.data.rows);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
     }
   };
@@ -71,6 +75,7 @@ const Konfirmasi = () => {
       );
       setMethod(methodData.data.result);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
     }
   };
@@ -85,6 +90,7 @@ const Konfirmasi = () => {
       setMethodId(router.query.paymentMethod);
     }
   }, [router.isReady]);
+
   return (
     <Container
       sx={{
@@ -120,7 +126,9 @@ const Konfirmasi = () => {
               Batas Akhir Pembayaran
             </Typography>
             <Typography sx={{ fontWeight: 700, fontSize: "16px", mt: "8px" }}>
-              Jumat, 17 Juni 2022, 20:45 PM
+              {moment(router.query.createdAt)
+                .add(1, "day")
+                .format("dddd, DD MMMM YYYY, hh:mm A")}
             </Typography>
           </Stack>
           <Box
@@ -246,7 +254,6 @@ const Konfirmasi = () => {
           </Stack>
           <Box
             sx={{
-              display: "flex",
               justifyContent: "center",
               alignItems: "center",
               mt: "40px",
@@ -254,34 +261,56 @@ const Konfirmasi = () => {
               paddingBottom: "84px",
             }}
           >
-            <Link href="/">
-              <Button
-                variant="outlined"
-                sx={{
-                  height: "50px",
-                  width: "100%",
-                  mr: "8px",
-                  fontWeight: 700,
-                  fontSize: "14px",
-                }}
-              >
-                Kembali Ke Beranda
-              </Button>
-            </Link>
-            <Link href="/proses-pemesanan">
-              <Button
-                variant="contained"
-                sx={{
-                  height: "50px",
-                  width: "100%",
-                  fontWeight: 700,
-                  fontSize: "14px",
-                  "&:hover": { border: 0 },
-                }}
-              >
-                Check Status Pembayaran
-              </Button>
-            </Link>
+            <Button
+              onClick={() => setUploadPembayaran(true)}
+              sx={{
+                height: "50px",
+                width: "100%",
+                mr: "8px",
+                fontWeight: 700,
+                fontSize: "14px",
+              }}
+              variant="contained"
+            >
+              Upload Bukti Pembayaran
+            </Button>
+            <ModalUploadPembayaran
+              openModal={uploadPembayaran}
+              handleCloseModal={() => setUploadPembayaran(false)}
+              metodePembayaranId={router.query.paymentMethod}
+              totalPembayaran={priceSelector?.totalPrice}
+              transaksiId={router.query.transaksiId}
+            />
+            <Box sx={{ display: "flex", marginTop: "10px" }}>
+              <Link href="/">
+                <Button
+                  variant="outlined"
+                  sx={{
+                    height: "50px",
+                    width: "100%",
+                    mr: "8px",
+                    fontWeight: 700,
+                    fontSize: "14px",
+                  }}
+                >
+                  Kembali Ke Beranda
+                </Button>
+              </Link>
+              <Link href="/proses-pemesanan">
+                <Button
+                  variant="contained"
+                  sx={{
+                    height: "50px",
+                    width: "100%",
+                    fontWeight: 700,
+                    fontSize: "14px",
+                    "&:hover": { border: 0 },
+                  }}
+                >
+                  Check Status Pembayaran
+                </Button>
+              </Link>
+            </Box>
           </Box>
         </Box>
         <Typography
