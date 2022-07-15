@@ -36,15 +36,18 @@ const DetailTransaksiPage = () => {
   const [cart, setCart] = useState([]);
   const [method, setMethod] = useState([]);
   const [transaction, setTransaction] = useState([]);
+  const [proofPayment, setProofPayment] = useState();
   const router = useRouter();
 
   const fetchCart = async () => {
     try {
       const { transactionId } = router.query;
       const cartData = await axiosInstance.get(`/transaction/${transactionId}`);
+
       setCart(cartData.data.result.detailTransaksi);
       setMethod(cartData.data.result.transaksi.payment_method);
       setTransaction(cartData.data.result.transaksi);
+      setProofPayment(cartData.data.result.transaksi.proof_of_payment);
     } catch (err) {
       // eslint-disable-next-line no-console
       console.log(err);
@@ -65,26 +68,14 @@ const DetailTransaksiPage = () => {
     });
   };
 
-  const fetchPaymentMethod = async () => {
-    try {
-      const methodData = await axiosInstance.post(
-        "/transaction/get-payment-method-id",
-        {
-          id: router.query.paymentMethod,
-        }
-      );
-      setMethod(methodData.data.result);
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.log(err);
-    }
-  };
-
   useEffect(() => {
+    if (proofPayment) {
+      router.push("/proses-pemesanan");
+    }
     if (router.query.transactionId) {
       fetchCart();
     }
-  }, [router.query.transactionId]);
+  }, [router.query.transactionId, proofPayment]);
 
   return (
     <Container
@@ -174,7 +165,7 @@ const DetailTransaksiPage = () => {
                   Sub Total
                 </Typography>
                 <Typography sx={{ fontWeight: 700, mt: 2 }}>
-                  Rp {transaction.total_price?.toLocaleString()}
+                  Rp {transaction.total_price?.toLocaleString()},-
                 </Typography>
               </Box>
             </Box>
@@ -243,7 +234,7 @@ const DetailTransaksiPage = () => {
                 Total Pembayaran
               </Typography>
               <Typography sx={{ fontWeight: 700, fontSize: "24px" }}>
-                Rp {priceSelector?.totalPrice.toLocaleString()}
+                Rp {transaction.total_price?.toLocaleString()},-
               </Typography>
             </Stack>
           </Stack>

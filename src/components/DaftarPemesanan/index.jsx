@@ -35,7 +35,6 @@ const DaftarPemesanan = ({ status, total_harga, produk, detail }) => {
     });
   };
 
-  console.log(detail);
   return (
     <Stack>
       <Stack
