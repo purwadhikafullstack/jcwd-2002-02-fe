@@ -154,36 +154,36 @@ const DaftarPemesanan = ({ status, total_harga, produk, detail }) => {
           >
             Chat Customer Service
           </Button>
-          <Box sx={{ display: "flex" }}>
-            <Stack sx={{ textAlign: "end" }}>
-              <Typography sx={{ color: "#4F618E", fontSize: "12px" }}>
-                Bayar Sebelum
-              </Typography>
-              <Typography sx={{ color: "#4F618E", fontSize: "12px" }}>
-                {moment(detail?.createdAt)
-                  .add(1, "day")
-                  .format("dddd, DD MMMM YYYY, hh:mm")}
-              </Typography>
-            </Stack>
-            <Button
-              onClick={() =>
-                router.push(`/konfirmasi?paymentMethod=${detail.id}`)
-              }
-              variant="contained"
-              sx={{
-                ml: "16px",
-                "&:hover": { border: 0 },
-                width: "157px",
-                height: "30px",
-              }}
-            >
-              Bayar Sekarang
-            </Button>
-            <ModalUploadPembayaran
-              openModal={uploadPembayaran}
-              handleCloseModal={() => setUploadPembayaran(false)}
-            />
-          </Box>
+          {detail.proof_of_payment ? null : (
+            <Box sx={{ display: "flex" }}>
+              <Stack sx={{ textAlign: "end" }}>
+                <Typography sx={{ color: "#4F618E", fontSize: "12px" }}>
+                  Bayar Sebelum
+                </Typography>
+                <Typography sx={{ color: "#4F618E", fontSize: "12px" }}>
+                  {moment(detail?.createdAt)
+                    .add(1, "day")
+                    .format("dddd, DD MMMM YYYY, hh:mm")}
+                </Typography>
+              </Stack>
+              <Button
+                onClick={() => router.push(`/detail-transaksi/${detail.id}`)}
+                variant="contained"
+                sx={{
+                  ml: "16px",
+                  "&:hover": { border: 0 },
+                  width: "157px",
+                  height: "30px",
+                }}
+              >
+                Bayar Sekarang
+              </Button>
+              <ModalUploadPembayaran
+                openModal={uploadPembayaran}
+                handleCloseModal={() => setUploadPembayaran(false)}
+              />
+            </Box>
+          )}
         </Box>
       </Stack>
     </Stack>

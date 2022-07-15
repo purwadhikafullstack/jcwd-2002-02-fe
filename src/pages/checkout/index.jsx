@@ -35,6 +35,7 @@ const CheckOut = () => {
 
       setAlamatUtama(mainAddress.data.result);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
     }
   };
@@ -46,6 +47,7 @@ const CheckOut = () => {
       });
       setCart(cartData.data.data.rows);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
     }
   };
@@ -61,12 +63,12 @@ const CheckOut = () => {
         "/transaction/add-new-transaction",
         newData
       );
-      console.log(res);
       dispatch(cumulatedPrice(totalHarga));
       router.push(
         `/konfirmasi?paymentMethod=${method}&transaksiId=${res.data.data.id}&createdAt=${res.data.data.createdAt}`
       );
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
     }
   };
@@ -103,6 +105,7 @@ const CheckOut = () => {
       });
       setOngkir(dataOngkir.data.result[0].costs[0].cost[0].value);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
     }
   };
