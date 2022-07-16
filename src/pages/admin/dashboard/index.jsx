@@ -258,18 +258,20 @@ const DashboardPage = () => {
 
           <Grid container spacing={2}>
             <CardWithCircularBar
-              title="Profit Hari Ini"
+              title="Revenue Hari Ini"
               amount={`Rp. ${todayRevenue?.todayRevenue?.result || 0}`}
               value={Math.abs(
                 todayRevenue?.todayRevenue?.result -
                   todayRevenue?.yesterdayRevenue?.result
               ).toLocaleString()}
-              percentage={Math.abs(
-                ((todayRevenue?.todayRevenue?.result -
-                  todayRevenue?.yesterdayRevenue?.result) /
-                  todayRevenue?.yesterdayRevenue?.result) *
-                  100
-              ).toFixed(1)}
+              percentage={
+                Math.abs(
+                  ((todayRevenue?.todayRevenue?.result -
+                    todayRevenue?.yesterdayRevenue?.result) /
+                    todayRevenue?.yesterdayRevenue?.result) *
+                    100
+                ).toFixed(1) && 0
+              }
               notation={
                 todayRevenue?.todayRevenue?.result -
                   todayRevenue?.yesterdayRevenue?.result <

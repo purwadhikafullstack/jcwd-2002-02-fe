@@ -1,144 +1,195 @@
-import { Autocomplete, Box, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  Box,
+  FormControl,
+  Grid,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+} from "@mui/material";
+import axiosInstance from "config/api";
 import requiresAdmin from "config/requireAdmin";
+import { useEffect, useState } from "react";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import CardStatistik from "components/Admin/CardStatistik";
+
+const ReportCart = ({
+  title,
+  data = 0,
+  percentange = "0%",
+  notation = "+",
+}) => {
+  return (
+    <Box
+      sx={{ backgroundColor: "white" }}
+      padding={2}
+      height="120px"
+      display="flex"
+      justifyContent="space-between"
+    >
+      <Box width="50%">
+        <Typography>{title}</Typography>
+        <Typography variant="h3" marginTop={1}>
+          {data}
+        </Typography>
+      </Box>
+      <Box
+        width="50%"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
+        {notation === "+" ? (
+          <ArrowUpwardIcon sx={{ fontSize: "50px" }} color="success" />
+        ) : (
+          <ArrowDownwardIcon sx={{ fontSize: "50px" }} color="error" />
+        )}
+        <Typography variant="h4" marginLeft={1}>
+          {percentange}
+        </Typography>
+      </Box>
+    </Box>
+  );
+};
 
 const ProductDetails = () => {
-  const productOption = [
-    { label: "The Shawshank Redemption", year: 1994 },
-    { label: "The Godfather", year: 1972 },
-    { label: "The Godfather: Part II", year: 1974 },
-    { label: "The Dark Knight", year: 2008 },
-    { label: "12 Angry Men", year: 1957 },
-    { label: "Schindler's List", year: 1993 },
-    { label: "Pulp Fiction", year: 1994 },
-    {
-      label: "The Lord of the Rings: The Return of the King",
-      year: 2003,
+  const [allProduct, setAllProduct] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const fetchAllProduct = async () => {
+    try {
+      const res = await axiosInstance.get("/product/product-name");
+      const products = res.data.result;
+
+      const modifiedProduct = products.map((val) => {
+        return { label: val.nama_produk, id: val.id };
+      });
+      setAllProduct(modifiedProduct);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllProduct();
+  }, []);
+
+  const penjualanObatOption = {
+    stroke: { width: 2, curve: "smooth" },
+    xaxis: {
+      categories: [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sept",
+        "Oct",
+        "Nov",
+        "Des",
+      ],
     },
-    { label: "The Good, the Bad and the Ugly", year: 1966 },
-    { label: "Fight Club", year: 1999 },
+  };
+
+  const penjualanObatSeries = [
     {
-      label: "The Lord of the Rings: The Fellowship of the Ring",
-      year: 2001,
+      name: "Obat Bebas",
+      data: [750, 800, 850, 500, 300, 400, 100, 700, 550, 1200, 850, 300],
     },
     {
-      label: "Star Wars: Episode V - The Empire Strikes Back",
-      year: 1980,
+      name: "Obat Racikan",
+      data: [300, 200, 450, 500, 600, 550, 700, 770, 600, 800, 1250, 100],
     },
-    { label: "Forrest Gump", year: 1994 },
-    { label: "Inception", year: 2010 },
-    {
-      label: "The Lord of the Rings: The Two Towers",
-      year: 2002,
-    },
-    { label: "One Flew Over the Cuckoo's Nest", year: 1975 },
-    { label: "Goodfellas", year: 1990 },
-    { label: "The Matrix", year: 1999 },
-    { label: "Seven Samurai", year: 1954 },
-    {
-      label: "Star Wars: Episode IV - A New Hope",
-      year: 1977,
-    },
-    { label: "City of God", year: 2002 },
-    { label: "Se7en", year: 1995 },
-    { label: "The Silence of the Lambs", year: 1991 },
-    { label: "It's a Wonderful Life", year: 1946 },
-    { label: "Life Is Beautiful", year: 1997 },
-    { label: "The Usual Suspects", year: 1995 },
-    { label: "Léon: The Professional", year: 1994 },
-    { label: "Spirited Away", year: 2001 },
-    { label: "Saving Private Ryan", year: 1998 },
-    { label: "Once Upon a Time in the West", year: 1968 },
-    { label: "American History X", year: 1998 },
-    { label: "Interstellar", year: 2014 },
-    { label: "Casablanca", year: 1942 },
-    { label: "City Lights", year: 1931 },
-    { label: "Psycho", year: 1960 },
-    { label: "The Green Mile", year: 1999 },
-    { label: "The Intouchables", year: 2011 },
-    { label: "Modern Times", year: 1936 },
-    { label: "Raiders of the Lost Ark", year: 1981 },
-    { label: "Rear Window", year: 1954 },
-    { label: "The Pianist", year: 2002 },
-    { label: "The Departed", year: 2006 },
-    { label: "Terminator 2: Judgment Day", year: 1991 },
-    { label: "Back to the Future", year: 1985 },
-    { label: "Whiplash", year: 2014 },
-    { label: "Gladiator", year: 2000 },
-    { label: "Memento", year: 2000 },
-    { label: "The Prestige", year: 2006 },
-    { label: "The Lion King", year: 1994 },
-    { label: "Apocalypse Now", year: 1979 },
-    { label: "Alien", year: 1979 },
-    { label: "Sunset Boulevard", year: 1950 },
-    {
-      label:
-        "Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb",
-      year: 1964,
-    },
-    { label: "The Great Dictator", year: 1940 },
-    { label: "Cinema Paradiso", year: 1988 },
-    { label: "The Lives of Others", year: 2006 },
-    { label: "Grave of the Fireflies", year: 1988 },
-    { label: "Paths of Glory", year: 1957 },
-    { label: "Django Unchained", year: 2012 },
-    { label: "The Shining", year: 1980 },
-    { label: "WALL·E", year: 2008 },
-    { label: "American Beauty", year: 1999 },
-    { label: "The Dark Knight Rises", year: 2012 },
-    { label: "Princess Mononoke", year: 1997 },
-    { label: "Aliens", year: 1986 },
-    { label: "Oldboy", year: 2003 },
-    { label: "Once Upon a Time in America", year: 1984 },
-    { label: "Witness for the Prosecution", year: 1957 },
-    { label: "Das Boot", year: 1981 },
-    { label: "Citizen Kane", year: 1941 },
-    { label: "North by Northwest", year: 1959 },
-    { label: "Vertigo", year: 1958 },
-    {
-      label: "Star Wars: Episode VI - Return of the Jedi",
-      year: 1983,
-    },
-    { label: "Reservoir Dogs", year: 1992 },
-    { label: "Braveheart", year: 1995 },
-    { label: "M", year: 1931 },
-    { label: "Requiem for a Dream", year: 2000 },
-    { label: "Amélie", year: 2001 },
-    { label: "A Clockwork Orange", year: 1971 },
-    { label: "Like Stars on Earth", year: 2007 },
-    { label: "Taxi Driver", year: 1976 },
-    { label: "Lawrence of Arabia", year: 1962 },
-    { label: "Double Indemnity", year: 1944 },
-    {
-      label: "Eternal Sunshine of the Spotless Mind",
-      year: 2004,
-    },
-    { label: "Amadeus", year: 1984 },
-    { label: "To Kill a Mockingbird", year: 1962 },
-    { label: "Toy Story 3", year: 2010 },
-    { label: "Logan", year: 2017 },
-    { label: "Full Metal Jacket", year: 1987 },
-    { label: "Dangal", year: 2016 },
-    { label: "The Sting", year: 1973 },
-    { label: "2001: A Space Odyssey", year: 1968 },
-    { label: "Singin' in the Rain", year: 1952 },
-    { label: "Toy Story", year: 1995 },
-    { label: "Bicycle Thieves", year: 1948 },
-    { label: "The Kid", year: 1921 },
-    { label: "Inglourious Basterds", year: 2009 },
-    { label: "Snatch", year: 2000 },
-    { label: "3 Idiots", year: 2009 },
-    { label: "Monty Python and the Holy Grail", year: 1975 },
   ];
+
+  const [sort, setSort] = useState("");
+
+  const handleChange = (event) => {
+    setSort(event.target.value);
+  };
+
   return (
     <Box>
-      <Autocomplete
-        disablePortal
-        options={productOption}
-        sx={{ width: 300 }}
-        renderInput={(params) => (
-          <TextField {...params} label="Select Product" />
-        )}
-      />
+      <Typography variant="h4" marginBottom={4}>
+        Product Performance Report
+      </Typography>
+      <Box display="flex" justifyContent="space-between">
+        <Autocomplete
+          disablePortal
+          options={allProduct}
+          getOptionLabel={(val) => val.label}
+          sx={{ width: 300 }}
+          onChange={(event, value) => setSelectedProduct(value.id)}
+          renderInput={(params) => (
+            <TextField {...params} label="Select Product" />
+          )}
+        />
+        <Box>
+          <FormControl sx={{ width: "125px" }}>
+            <Select sx={{ height: "25px" }}>
+              <MenuItem value="Mingguan">Mingguan</MenuItem>
+              <MenuItem value="Bulanan">Bulanan</MenuItem>
+              <MenuItem value="Tahunan">Tahunan</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+      </Box>
+      <Box marginY={4}>
+        <Grid container spacing={4}>
+          <Grid item xs={4}>
+            <ReportCart
+              title="Quantity Sold"
+              data={0}
+              percentange="10%"
+              notation="+"
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <ReportCart
+              title="Item Viewed"
+              data={0}
+              percentange="10%"
+              notation="+"
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <ReportCart
+              title="Conversion Rate"
+              data={0}
+              percentange="10%"
+              notation="+"
+            />
+          </Grid>
+        </Grid>
+      </Box>
+      <Grid container spacing={2}>
+        {/* Statistik Profit */}
+
+        <CardStatistik
+          cardTitle="Revenue"
+          column={12}
+          chartOption={penjualanObatOption}
+          chartSeries={penjualanObatSeries}
+          selectHandle={handleChange}
+          selectValue={sort}
+          chartSort={[
+            { sortValue: "Mingguan", sortTitle: "Mingguan" },
+            { sortValue: "Bulanan", sortTitle: "Bulanan" },
+            { sortValue: "Tahunan", sortTitle: "Tahunan" },
+          ]}
+          chartType="line"
+          showSelectOption={false}
+          chartHeight="258px"
+        />
+      </Grid>
+      {/* <Typography variant="h5">revenue of this product</Typography>
+        <Typography variant="h5">percentage of revenue</Typography> */}
     </Box>
   );
 };

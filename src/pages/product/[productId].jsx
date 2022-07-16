@@ -28,7 +28,7 @@ const ProductPage = ({ productDetail }) => {
   const authSelector = useSelector((state) => state.auth);
   const router = useRouter();
 
-  const recordUserActifity = async () => {
+  const recordUserActivity = async () => {
     try {
       await axiosInstance.post("/product/record-user-product", {
         product_id: productDetail.id,
@@ -40,7 +40,7 @@ const ProductPage = ({ productDetail }) => {
   };
 
   useEffect(() => {
-    recordUserActifity();
+    recordUserActivity();
   }, []);
 
   const formik = useFormik({
