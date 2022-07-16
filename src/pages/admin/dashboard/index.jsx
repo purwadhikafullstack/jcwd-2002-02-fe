@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable react/jsx-no-useless-fragment */
 import { Box, Typography, Grid } from "@mui/material";
@@ -265,12 +266,21 @@ const DashboardPage = () => {
                   todayRevenue?.yesterdayRevenue?.result
               ).toLocaleString()}
               percentage={
-                Math.abs(
-                  ((todayRevenue?.todayRevenue?.result -
-                    todayRevenue?.yesterdayRevenue?.result) /
-                    todayRevenue?.yesterdayRevenue?.result) *
-                    100
-                ).toFixed(1) && 0
+                isNaN(
+                  Math.abs(
+                    ((todayRevenue?.todayRevenue?.result -
+                      todayRevenue?.yesterdayRevenue?.result) /
+                      todayRevenue?.yesterdayRevenue?.result) *
+                      100
+                  ).toFixed(1)
+                )
+                  ? 0
+                  : Math.abs(
+                      ((todayRevenue?.todayRevenue?.result -
+                        todayRevenue?.yesterdayRevenue?.result) /
+                        todayRevenue?.yesterdayRevenue?.result) *
+                        100
+                    ).toFixed(1)
               }
               notation={
                 todayRevenue?.todayRevenue?.result -
@@ -287,12 +297,21 @@ const DashboardPage = () => {
                 todayTransaction.todayOrder - todayTransaction.yesterdayOrder
               )}
               percentage={
-                Math.abs(
-                  ((todayTransaction.todayOrder -
-                    todayTransaction.yesterdayOrder) /
-                    todayTransaction.yesterdayOrder) *
-                    100
-                ).toFixed(1) && 0
+                isNaN(
+                  Math.abs(
+                    ((todayTransaction.todayOrder -
+                      todayTransaction.yesterdayOrder) /
+                      todayTransaction.yesterdayOrder) *
+                      100
+                  ).toFixed(1)
+                )
+                  ? 0
+                  : Math.abs(
+                      ((todayTransaction.todayOrder -
+                        todayTransaction.yesterdayOrder) /
+                        todayTransaction.yesterdayOrder) *
+                        100
+                    ).toFixed(1)
               }
               notation={
                 todayTransaction.todayOrder - todayTransaction.yesterdayOrder <
@@ -306,11 +325,19 @@ const DashboardPage = () => {
               amount={todayStok.todayStok}
               value={Math.abs(todayStok.todayStok - todayStok.yesterdayStok)}
               percentage={
-                Math.abs(
-                  ((todayStok.todayStok - todayStok.yesterdayStok) /
-                    todayStok.yesterdayStok) *
-                    100
-                ).toFixed(1) && 0
+                isNaN(
+                  Math.abs(
+                    ((todayStok.todayStok - todayStok.yesterdayStok) /
+                      todayStok.yesterdayStok) *
+                      100
+                  ).toFixed(1)
+                )
+                  ? 0
+                  : Math.abs(
+                      ((todayStok.todayStok - todayStok.yesterdayStok) /
+                        todayStok.yesterdayStok) *
+                        100
+                    ).toFixed(1)
               }
               notation={
                 todayStok.todayStok - todayStok.yesterdayStok < 0 ? "-" : "+"

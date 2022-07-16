@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import {
   Autocomplete,
   Box,
@@ -15,12 +16,7 @@ import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import CardStatistik from "components/Admin/CardStatistik";
 
-const ReportCart = ({
-  title,
-  data = 0,
-  percentange = "0%",
-  notation = "+",
-}) => {
+const ReportCart = ({ title, data = 0, percentange = "0", notation = "+" }) => {
   return (
     <Box
       sx={{ backgroundColor: "white" }}
@@ -47,7 +43,7 @@ const ReportCart = ({
           <ArrowDownwardIcon sx={{ fontSize: "50px" }} color="error" />
         )}
         <Typography variant="h4" marginLeft={1}>
-          {percentange}
+          {percentange}%
         </Typography>
       </Box>
     </Box>
@@ -57,6 +53,7 @@ const ReportCart = ({
 const ProductDetails = () => {
   const [allProduct, setAllProduct] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [qtySold, setQtySold] = useState({});
 
   const fetchAllProduct = async () => {
     try {
@@ -114,6 +111,28 @@ const ProductDetails = () => {
     setSort(event.target.value);
   };
 
+  const fetchQtySold = async () => {
+    try {
+      const res = await axiosInstance.post("/report/get-product-qty-sold", {
+        stateOFDate: sort || "Bulanan",
+        productId: selectedProduct,
+      });
+
+      console.log(res.data.result);
+
+      setQtySold(res.data.result);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedProduct) {
+      fetchQtySold();
+    }
+  }, [selectedProduct]);
+
   return (
     <Box>
       <Typography variant="h4" marginBottom={4}>
@@ -132,7 +151,11 @@ const ProductDetails = () => {
         />
         <Box>
           <FormControl sx={{ width: "125px" }}>
-            <Select sx={{ height: "25px" }}>
+            <Select
+              sx={{ height: "25px" }}
+              onChange={handleChange}
+              defaultValue={sort}
+            >
               <MenuItem value="Mingguan">Mingguan</MenuItem>
               <MenuItem value="Bulanan">Bulanan</MenuItem>
               <MenuItem value="Tahunan">Tahunan</MenuItem>
@@ -140,21 +163,32 @@ const ProductDetails = () => {
           </FormControl>
         </Box>
       </Box>
-      <Box marginY={4}>
+      <Box marginTop={4} marginBottom={2}>
         <Grid container spacing={4}>
           <Grid item xs={4}>
             <ReportCart
               title="Quantity Sold"
-              data={0}
-              percentange="10%"
-              notation="+"
+              data={qtySold.data}
+              percentange={
+                isNaN(
+                  Math.abs(
+                    ((qtySold.data - qtySold.prevData) / qtySold.prevData) * 100
+                  ).toFixed(1)
+                )
+                  ? 0
+                  : Math.abs(
+                      ((qtySold.data - qtySold.prevData) / qtySold.prevData) *
+                        100
+                    ).toFixed(1)
+              }
+              notation={qtySold.data - qtySold.prevData < 0 ? "-" : "+"}
             />
           </Grid>
           <Grid item xs={4}>
             <ReportCart
               title="Item Viewed"
               data={0}
-              percentange="10%"
+              percentange="10"
               notation="+"
             />
           </Grid>
@@ -162,7 +196,7 @@ const ProductDetails = () => {
             <ReportCart
               title="Conversion Rate"
               data={0}
-              percentange="10%"
+              percentange="10"
               notation="+"
             />
           </Grid>
