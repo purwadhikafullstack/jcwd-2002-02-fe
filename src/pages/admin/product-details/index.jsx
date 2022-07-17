@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import CardStatistik from "components/Admin/CardStatistik";
+import moment from "moment";
 
 const ReportCart = ({ title, data = 0, percentange = "0", notation = "+" }) => {
   return (
@@ -51,11 +52,15 @@ const ReportCart = ({ title, data = 0, percentange = "0", notation = "+" }) => {
 };
 
 const ProductDetails = () => {
+  const [sort, setSort] = useState("");
   const [allProduct, setAllProduct] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [qtySold, setQtySold] = useState({});
   const [viewCount, setViewCount] = useState({});
   const [productSoldCount, setProductSoldCount] = useState({});
+  const [revenueRawData, setRevenueRawData] = useState([]);
+  const [revenueData, setRevenueData] = useState([]);
+  const [revenueCategory, setRevenueCategory] = useState([]);
 
   // ada bug, klo di datanya ada yg null, percentagenya jadi infinity
   // count product di transaction detail trus dibagi sama viewednya buat dptin conversion rate
@@ -79,38 +84,78 @@ const ProductDetails = () => {
     fetchAllProduct();
   }, []);
 
+  const Month = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
   const penjualanObatOption = {
     stroke: { width: 2, curve: "smooth" },
     xaxis: {
-      categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sept",
-        "Oct",
-        "Nov",
-        "Des",
-      ],
+      categories: revenueCategory,
     },
   };
 
-  const penjualanObatSeries = [
-    {
-      name: "Obat Bebas",
-      data: [750, 800, 850, 500, 300, 400, 100, 700, 550, 1200, 850, 300],
-    },
-    {
-      name: "Obat Racikan",
-      data: [300, 200, 450, 500, 600, 550, 700, 770, 600, 800, 1250, 100],
-    },
-  ];
+  const penjualanObatSeries = revenueData;
 
-  const [sort, setSort] = useState("");
+  const convertRevenueDataByMonth = () => {
+    if (sort === "Bulanan" || sort === "") {
+      const arr = new Array(parseInt(moment().format("MM"))).fill(0);
+      revenueRawData.forEach((val) => {
+        arr[parseInt(moment(val.month).format("MM")) - 1] = val.sum;
+      });
+
+      const arrayOfData = [
+        {
+          name: "Obat Bebas",
+          data: arr,
+        },
+      ];
+
+      setRevenueCategory(Month);
+      setRevenueData(arrayOfData);
+    }
+  };
+
+  const convertRevenueNotByMonth = () => {
+    if (sort === "Bulanan" || sort === "") {
+      return;
+    }
+
+    const category = [];
+    const data = [];
+
+    revenueRawData.forEach((val) => {
+      if (val.week) {
+        category.push(moment(val.week).format("DD MMM"));
+        data.push(val.sum);
+      }
+      if (val.year) {
+        category.push(moment(val.year).format("YYYY"));
+        data.push(val.sum);
+      }
+    });
+
+    const arrayOfData = [
+      {
+        name: "Obat Bebas",
+        data,
+      },
+    ];
+
+    setRevenueCategory(category);
+    setRevenueData(arrayOfData);
+  };
 
   const handleChange = (event) => {
     setSort(event.target.value);
@@ -144,6 +189,20 @@ const ProductDetails = () => {
     }
   };
 
+  const fetchRevenuePerProduct = async () => {
+    try {
+      const res = await axiosInstance.post("/report/get-product-revenue", {
+        stateOfDate: sort || "Bulanan",
+        productId: selectedProduct,
+      });
+
+      setRevenueRawData(res.data.result);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
+    }
+  };
+
   const fetchItemsSoldCount = async () => {
     try {
       const res = await axiosInstance.post("/report/get-product-sold-count", {
@@ -163,8 +222,16 @@ const ProductDetails = () => {
       fetchQtySold();
       fetchItemViewedCount();
       fetchItemsSoldCount();
+      fetchRevenuePerProduct();
     }
   }, [selectedProduct, sort]);
+
+  useEffect(() => {
+    if (revenueRawData.length) {
+      convertRevenueDataByMonth();
+      convertRevenueNotByMonth();
+    }
+  }, [revenueRawData]);
 
   return (
     <Box>
@@ -245,7 +312,9 @@ const ProductDetails = () => {
               data={
                 isNaN((productSoldCount.data / viewCount.data) * 100)
                   ? "0%"
-                  : `${(productSoldCount.data / viewCount.data) * 100}%`
+                  : `${Math.round(
+                      (productSoldCount.data / viewCount.data) * 100
+                    )}%`
               }
               percentange={
                 isNaN(
