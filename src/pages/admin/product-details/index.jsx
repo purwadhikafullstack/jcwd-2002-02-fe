@@ -54,6 +54,11 @@ const ProductDetails = () => {
   const [allProduct, setAllProduct] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [qtySold, setQtySold] = useState({});
+  const [viewCount, setViewCount] = useState({});
+  const [productSoldCount, setProductSoldCount] = useState({});
+
+  // ada bug, klo di datanya ada yg null, percentagenya jadi infinity
+  // count product di transaction detail trus dibagi sama viewednya buat dptin conversion rate
 
   const fetchAllProduct = async () => {
     try {
@@ -114,13 +119,39 @@ const ProductDetails = () => {
   const fetchQtySold = async () => {
     try {
       const res = await axiosInstance.post("/report/get-product-qty-sold", {
-        stateOFDate: sort || "Bulanan",
+        stateOfDate: sort || "Bulanan",
         productId: selectedProduct,
       });
 
-      console.log(res.data.result);
-
       setQtySold(res.data.result);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
+    }
+  };
+
+  const fetchItemViewedCount = async () => {
+    try {
+      const res = await axiosInstance.post("/report/get-product-viewed-count", {
+        stateOfDate: sort || "Bulanan",
+        productId: selectedProduct,
+      });
+
+      setViewCount(res.data.result);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
+    }
+  };
+
+  const fetchItemsSoldCount = async () => {
+    try {
+      const res = await axiosInstance.post("/report/get-product-sold-count", {
+        stateOfDate: sort || "Bulanan",
+        productId: selectedProduct,
+      });
+
+      setProductSoldCount(res.data.result);
     } catch (err) {
       // eslint-disable-next-line no-console
       console.log(err);
@@ -130,8 +161,10 @@ const ProductDetails = () => {
   useEffect(() => {
     if (selectedProduct) {
       fetchQtySold();
+      fetchItemViewedCount();
+      fetchItemsSoldCount();
     }
-  }, [selectedProduct]);
+  }, [selectedProduct, sort]);
 
   return (
     <Box>
@@ -187,17 +220,56 @@ const ProductDetails = () => {
           <Grid item xs={4}>
             <ReportCart
               title="Item Viewed"
-              data={0}
-              percentange="10"
-              notation="+"
+              data={viewCount.data}
+              percentange={
+                isNaN(
+                  Math.abs(
+                    ((viewCount.data - viewCount.prevData) /
+                      viewCount.prevData) *
+                      100
+                  ).toFixed(1)
+                )
+                  ? 0
+                  : Math.abs(
+                      ((viewCount.data - viewCount.prevData) /
+                        viewCount.prevData) *
+                        100
+                    ).toFixed(1)
+              }
+              notation={viewCount.data - viewCount.prevData < 0 ? "-" : "+"}
             />
           </Grid>
           <Grid item xs={4}>
             <ReportCart
               title="Conversion Rate"
-              data={0}
-              percentange="10"
-              notation="+"
+              data={
+                isNaN((productSoldCount.data / viewCount.data) * 100)
+                  ? "0%"
+                  : `${(productSoldCount.data / viewCount.data) * 100}%`
+              }
+              percentange={
+                isNaN(
+                  Math.abs(
+                    ((productSoldCount.data / viewCount.data -
+                      productSoldCount.prevData / viewCount.prevData) /
+                      (productSoldCount.prevData / viewCount.prevData)) *
+                      100
+                  ).toFixed(1)
+                )
+                  ? 0
+                  : Math.abs(
+                      ((viewCount.data - viewCount.prevData) /
+                        viewCount.prevData) *
+                        100
+                    ).toFixed(1)
+              }
+              notation={
+                productSoldCount.data / viewCount.data -
+                  productSoldCount.prevData / viewCount.prevData <
+                0
+                  ? "-"
+                  : "+"
+              }
             />
           </Grid>
         </Grid>
