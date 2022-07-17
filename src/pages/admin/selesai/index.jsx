@@ -8,8 +8,6 @@ import {
   FormControl,
   Select,
   MenuItem,
-  FormControlLabel,
-  Checkbox,
   Stack,
   Pagination,
   Divider,
@@ -17,11 +15,12 @@ import {
 import DownloadIcon from "@mui/icons-material/Download";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import SearchIcon from "@mui/icons-material/Search";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import CardOrder from "components/Admin/CardOrder";
 import Group from "public/Images/Group.png";
 import requiresAdmin from "config/requireAdmin";
+import axiosInstance from "config/api";
 
 const SelesaiPage = () => {
   // eslint-disable-next-line no-unused-vars
@@ -29,7 +28,7 @@ const SelesaiPage = () => {
   const [sortFilter, setSortFilter] = useState("");
   const [urutkan, setUrutkan] = useState("");
   const [cardPerPage, setCardPerPage] = useState("5");
-  const [checkedItems, setCheckedItems] = useState([]);
+  const [transaksi, setTransaksi] = useState(null);
 
   const filterHandle = (event) => {
     setSortFilter(event.target.value);
@@ -42,6 +41,52 @@ const SelesaiPage = () => {
   const cardHandle = (event) => {
     setCardPerPage(event.target.value);
   };
+
+  const fetchTransaksi = async () => {
+    try {
+      const dataTransaksi = await axiosInstance.get("/transaction", {
+        params: {
+          statusTerpilih: 4,
+        },
+      });
+      setTransaksi(dataTransaksi.data.result.rows);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const renderTransaksi = () => {
+    return transaksi?.map((val) => {
+      return (
+        <CardOrder
+          buyersName={val?.user?.username}
+          buyersAddress={val?.address?.alamat_lengkap}
+          totalPrice={val?.total_price}
+          productImage={
+            val?.resep_image_url ||
+            val?.transaction_details[0]?.product?.produk_image_url[0]
+          }
+          productName={
+            val?.nomor_resep ||
+            val?.transaction_details[0]?.product?.nama_produk
+          }
+          product={val?.transaction_details}
+          productQty={val?.transaction_details[0]?.quantity}
+          productPrice={val?.transaction_details[0]?.price_when_sold}
+          courier="JNE-REG"
+          orderCode={`HTMED-${val.id}`}
+          status={val?.paymentStatusId}
+          transaksiId={val?.id}
+          isObatResep={val?.is_resep}
+        />
+      );
+    });
+  };
+
+  useEffect(() => {
+    fetchTransaksi();
+  }, []);
+
   return (
     <>
       {order.length ? (
@@ -139,31 +184,6 @@ const SelesaiPage = () => {
               flexDirection="row"
               justifyContent="space-between"
             >
-              <Box>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      onChange={({ target: { checked } }) => {
-                        let dupItems = [...checkedItems];
-                        if (checked) {
-                          order.forEach((val, idx) => dupItems.push(idx));
-                        } else {
-                          dupItems = [];
-                        }
-
-                        setCheckedItems(dupItems);
-                      }}
-                      sx={{
-                        color: "Brand.500",
-                        "&.Mui-checked": {
-                          color: "Brand.500",
-                        },
-                      }}
-                    />
-                  }
-                  label="Pilih Semua"
-                />
-              </Box>
               <Box display="flex" flexDirection="row" alignContent="center">
                 <Typography sx={{ marginRight: "5px" }}>
                   Kartu per halaman
@@ -193,39 +213,8 @@ const SelesaiPage = () => {
               </Box>
             </Box>
 
+            {renderTransaksi()}
             {/* Product Component */}
-            {order.map((val, idx) => {
-              return (
-                <CardOrder
-                  setCartChecked={() => {
-                    let dupItems = [...checkedItems];
-
-                    if (dupItems.includes(idx)) {
-                      dupItems = dupItems.filter((oldItem) => oldItem !== idx);
-                    } else {
-                      dupItems.push(idx);
-                    }
-                    setCheckedItems(dupItems);
-                  }}
-                  checked={checkedItems.includes(idx)}
-                />
-              );
-            })}
-
-            <CardOrder
-              status={4}
-              orderCode="HTMED129X"
-              orderTime="10 Jan 2022, 10:45 WIB"
-              expiredResponse="12 Jan 2022, 10:45 WIB"
-              productName="Kursi"
-              productQty={3}
-              productPrice={55000}
-              productOrderQty={2}
-              buyersName="Panji"
-              buyersAddress="Jl. Erlangga XII No.25, RT.5/RW.3, Selong, Kec. Kby. Baru, Kota Jakarta Selatan"
-              courier="Grab-Sameday"
-              totalPrice={3 * 55000}
-            />
           </Grid>
         </Grid>
       ) : (

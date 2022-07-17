@@ -1,3 +1,7 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-unneeded-ternary */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable eqeqeq */
 /* eslint-disable react/jsx-no-useless-fragment */
 import {
   Grid,
@@ -12,24 +16,31 @@ import {
   Pagination,
   Divider,
 } from "@mui/material";
+import _ from "lodash";
 import DownloadIcon from "@mui/icons-material/Download";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import SearchIcon from "@mui/icons-material/Search";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import CardOrder from "components/Admin/CardOrder";
 import Group from "public/Images/Group.png";
 import requiresAdmin from "config/requireAdmin";
 import axiosInstance from "config/api";
-import { nanoid } from "nanoid";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { useRouter } from "next/router";
 
 const SemuaPesananPage = () => {
-  // eslint-disable-next-line no-unused-vars
+  const router = useRouter();
   const [order, setOrder] = useState([1]);
   const [sortFilter, setSortFilter] = useState("");
   const [urutkan, setUrutkan] = useState("");
   const [cardPerPage, setCardPerPage] = useState("5");
-  const [transaksi, setTransaksi] = useState(null);
+  const [transaksi, setTransaksi] = useState([]);
+  const [page, setPage] = useState(1);
+  const [maxPage, setMaxPage] = useState(1);
+  const [sortBy, setSortBy] = useState(router.query._sortBy);
+  const [sortDir, setSortDir] = useState(router.query._sortDir);
+  const [namaUser, setNamaUser] = useState(router.query.username);
 
   const filterHandle = (event) => {
     setSortFilter(event.target.value);
@@ -44,19 +55,67 @@ const SemuaPesananPage = () => {
   };
 
   const fetchTransaksi = async () => {
+    const limit = 5;
     try {
-      const dataTransaksi = await axiosInstance.get("/transaction");
-      setTransaksi(dataTransaksi.data.result.rows);
-      console.log(dataTransaksi.data.result.rows);
+      const dataTransaksi = await axiosInstance.get("/transaction", {
+        params: {
+          _page: page,
+          _sortBy: sortBy ? sortBy : undefined,
+          _sortDir: sortDir ? sortDir : undefined,
+          username: namaUser,
+          _limit: limit,
+        },
+      });
+      if (page == 1) {
+        setTransaksi(dataTransaksi.data.result.rows);
+      } else {
+        setTransaksi((prevTransaction) => [
+          ...prevTransaction,
+          ...dataTransaksi.data.result.rows,
+        ]);
+      }
+      setMaxPage(Math.ceil(dataTransaksi.data.result.count / limit));
     } catch (err) {
       console.log(err);
     }
   };
 
-  const randomizer = () => {
-    const randomId = nanoid(5);
-    return `HTMED-${randomId}`;
+  useEffect(() => {
+    if (router.isReady) {
+      if (router.query._sortBy) {
+        setSortBy(router.query._sortBy);
+      }
+      if (router.query._sortDir) {
+        setSortDir(router.query.sortDir);
+      }
+      if (router.query.username) {
+        setNamaUser(router.query.username);
+      }
+    }
+  }, [router.isReady]);
+
+  const namaUserDebounce = useCallback(
+    _.debounce((values) => {
+      setNamaUser(values);
+      setPage(1);
+    }, 2000)
+  );
+
+  const sortButton = () => {
+    if (urutkan == "Terbaru") {
+      setSortBy("createdAt");
+      setSortDir("DESC");
+    } else if (urutkan == "Terlama") {
+      setSortBy("createdAt");
+      setSortDir("ASC");
+    }
+    setPage(1);
   };
+
+  const fetchNextPage = () => {
+    setPage(page + 1);
+  };
+
   const renderTransaksi = () => {
     return transaksi?.map((val) => {
       return (
@@ -76,16 +135,46 @@ const SemuaPesananPage = () => {
           productQty={val?.transaction_details[0]?.quantity}
           productPrice={val?.transaction_details[0]?.price_when_sold}
           courier="JNE-REG"
-          orderCode={randomizer()}
-          status={1}
+          orderCode={`HTMED-${val.id}`}
+          status={val?.paymentStatusId}
           transaksiId={val?.id}
+          isObatResep={val?.is_resep}
+          productOrderQty={val?.transaction_details.length}
+          detail={val}
         />
       );
     });
   };
   useEffect(() => {
     fetchTransaksi();
-  }, []);
+    if (typeof sortDir === "string" || typeof namaUser === "string") {
+      router.push({
+        query: {
+          _sortBy: sortBy,
+          _sortDir: sortDir,
+          username: namaUser,
+        },
+      });
+    }
+  }, [page, sortBy, sortDir, namaUser]);
+
+  const sortDefaultValue = () => {
+    if (router.isReady && router.query._sortDir && router.query._sortBy) {
+      if (
+        router.query._sortDir === "DESC" &&
+        router.query._sortBy === "createdAt"
+      ) {
+        return "Terbaru";
+      }
+      if (
+        router.query._sortDir === "ASC" &&
+        router.query._sortBy === "createdAt"
+      ) {
+        return "Terlama";
+      }
+    }
+    return "";
+  };
 
   return (
     <>
@@ -120,6 +209,7 @@ const SemuaPesananPage = () => {
             {/* Box Filter */}
             <Box display="flex" flexDirection="row">
               <OutlinedInput
+                onChange={(e) => namaUserDebounce(e.target.value)}
                 sx={{
                   borderRadius: "10px",
                   width: "328px",
@@ -127,7 +217,7 @@ const SemuaPesananPage = () => {
                   backgroundColor: "white",
                   marginRight: "16px",
                 }}
-                placeholder="Cari nama obat"
+                placeholder="Cari user"
                 endAdornment={<SearchIcon htmlColor="gray" />}
               />
               {/* Filter Obat */}
@@ -165,19 +255,27 @@ const SemuaPesananPage = () => {
                   value={urutkan}
                   autoWidth
                   displayEmpty
+                  defaultValue={sortDefaultValue()}
                 >
                   <MenuItem value="" disabled>
                     Urutkan
                   </MenuItem>
                   <MenuItem value="Terbaru">Terbaru</MenuItem>
-                  <MenuItem value="Harga Tertinggi">Harga Tertinggi</MenuItem>
-                  <MenuItem value="Harga Terendah">Harga Terendah</MenuItem>
+                  <MenuItem value="Terlama">Terlama</MenuItem>
                 </Select>
               </FormControl>
+              <Button
+                variant="contained"
+                onClick={sortButton}
+                sx={{ ml: 3, "&:hover": { border: 0 } }}
+              >
+                Urutkan
+              </Button>
             </Box>
           </Grid>
 
           {/* Body Box */}
+
           <Grid item xs={12}>
             <Box display="flex" flexDirection="row" justifyContent="flex-end">
               <Box display="flex" flexDirection="row" alignContent="center">
@@ -208,64 +306,14 @@ const SemuaPesananPage = () => {
                 </Stack>
               </Box>
             </Box>
-            {renderTransaksi()}
-
-            {/* <CardOrder
-              status="Pesanan Baru"
-              orderCode="HTMED129X"
-              orderTime="10 Jan 2022, 10:45 WIB"
-              expiredResponse="12 Jan 2022, 10:45 WIB"
-              productName="Kursi"
-              productQty={3}
-              productPrice={55000}
-              productOrderQty={2}
-              buyersName="Panji"
-              buyersAddress="Jl. Erlangga XII No.25, RT.5/RW.3, Selong, Kec. Kby. Baru, Kota Jakarta Selatan"
-              courier="Grab-Sameday"
-              totalPrice={3 * 55000}
-            /> */}
-            {/* <CardOrder
-              status="Siap Dikirim"
-              orderCode="HTMED129X"
-              orderTime="10 Jan 2022, 10:45 WIB"
-              expiredResponse="12 Jan 2022, 10:45 WIB"
-              productName="Kursi"
-              productQty={3}
-              productPrice={55000}
-              productOrderQty={2}
-              buyersName="Panji"
-              buyersAddress="Jl. Erlangga XII No.25, RT.5/RW.3, Selong, Kec. Kby. Baru, Kota Jakarta Selatan"
-              courier="Grab-Sameday"
-              totalPrice={3 * 55000}
-            /> */}
-            {/* <CardOrder
-              status="Dalam Pengiriman"
-              orderCode="HTMED129X"
-              orderTime="10 Jan 2022, 10:45 WIB"
-              expiredResponse="12 Jan 2022, 10:45 WIB"
-              productName="Kursi"
-              productQty={3}
-              productPrice={55000}
-              productOrderQty={2}
-              buyersName="Panji"
-              buyersAddress="Jl. Erlangga XII No.25, RT.5/RW.3, Selong, Kec. Kby. Baru, Kota Jakarta Selatan"
-              courier="Grab-Sameday"
-              totalPrice={3 * 55000}
-            />
-            <CardOrder
-              status="Pesanan Selesai"
-              orderCode="HTMED129X"
-              orderTime="10 Jan 2022, 10:45 WIB"
-              expiredResponse="12 Jan 2022, 10:45 WIB"
-              productName="Kursi"
-              productQty={3}
-              productPrice={55000}
-              productOrderQty={2}
-              buyersName="Panji"
-              buyersAddress="Jl. Erlangga XII No.25, RT.5/RW.3, Selong, Kec. Kby. Baru, Kota Jakarta Selatan"
-              courier="Grab-Sameday"
-              totalPrice={3 * 55000}
-            />  */}
+            <InfiniteScroll
+              dataLength={transaksi.length}
+              next={fetchNextPage}
+              hasMore={page < maxPage}
+              loader={<Typography>Loading...</Typography>}
+            >
+              {renderTransaksi()}
+            </InfiniteScroll>
           </Grid>
         </Grid>
       ) : (
