@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import {
   Grid,
   Box,
@@ -24,8 +25,8 @@ import axiosInstance from "config/api";
 
 const LabaDanRugiPage = () => {
   const [periode, setPeriode] = useState("Bulanan");
-  const [bulan, setBulan] = useState(1);
-  const [tahun, setTahun] = useState("2022");
+  const [bulan, setBulan] = useState();
+  const [tahun, setTahun] = useState();
   const [income, setIncome] = useState();
   const [outcome, setOutcome] = useState();
   const { enqueueSnackbar } = useSnackbar();
@@ -115,8 +116,24 @@ const LabaDanRugiPage = () => {
               displayEmpty
               autoWidth
             >
-              <MenuItem value="Bulanan">Bulanan</MenuItem>
-              <MenuItem value="Tahunan">Tahunan</MenuItem>
+              <MenuItem value="">None</MenuItem>
+              <MenuItem
+                value="Bulanan"
+                onClick={() => {
+                  setTahun();
+                }}
+              >
+                Bulanan
+              </MenuItem>
+              <MenuItem
+                value="Tahunan"
+                onClick={() => {
+                  setBulan();
+                  setTahun("2022");
+                }}
+              >
+                Tahunan
+              </MenuItem>
             </Select>
           </FormControl>
           {/* Filter Obat */}
@@ -166,7 +183,10 @@ const LabaDanRugiPage = () => {
                       width: "auto",
                     }}
                     {...params}
-                    helperText={null}
+                    inputProps={{
+                      ...params.inputProps,
+                      placeholder: "Year",
+                    }}
                   />
                 )}
               />
@@ -187,8 +207,37 @@ const LabaDanRugiPage = () => {
           Laporan Laba & Rugi
         </Typography>
         <Typography textAlign="center">
-          Periode Bulan {moment(bulan).format("MMMM")} Tahun{" "}
-          {moment(tahun).format("YYYY")}
+          Periode{" "}
+          {bulan
+            ? `Bulan ${
+                bulan === 1
+                  ? "Januari"
+                  : bulan === 2
+                  ? "Februari"
+                  : bulan === 3
+                  ? "Maret"
+                  : bulan === 4
+                  ? "April"
+                  : bulan === 5
+                  ? "Mei"
+                  : bulan === 6
+                  ? "Juni"
+                  : bulan === 7
+                  ? "Juli"
+                  : bulan === 8
+                  ? "Agustus"
+                  : bulan === 9
+                  ? "September"
+                  : bulan === 10
+                  ? "Oktober"
+                  : bulan === 11
+                  ? "November"
+                  : bulan === 12
+                  ? "Desember"
+                  : null
+              }`
+            : null}{" "}
+          Tahun {moment(tahun).format("YYYY")}
         </Typography>
         <Typography textAlign="center">
           Terbit: Minggu 13 Februari, 2022 pukul 18.14 (GMT +07.00)
@@ -198,7 +247,10 @@ const LabaDanRugiPage = () => {
             title1="Penjualan"
             title2="dalam rupiah"
             kategori={[
-              { kategoriName: "Penjualan Barang", value: income },
+              {
+                kategoriName: "Penjualan Barang",
+                value: income?.toLocaleString(),
+              },
               { kategoriName: "Total Service", value: 0 },
               { kategoriName: "Total Embalance", value: 0 },
               { kategoriName: "Ongkos Kirim", value: 0 },
@@ -206,12 +258,15 @@ const LabaDanRugiPage = () => {
               { kategoriName: "Retur Penjualan", value: 0 },
             ]}
             footer="Penjualan Bersih"
-            footerValue={0}
+            footerValue={income?.toLocaleString()}
           />
           <IncomeStatement
             title1="Harga Pokok Penjualan"
             kategori={[
-              { kategoriName: "Persediaan Awal", value: outcome },
+              {
+                kategoriName: "Persediaan Awal",
+                value: outcome?.toLocaleString(),
+              },
               { kategoriName: "Pembelian Kotor", value: 0 },
               { kategoriName: "Retur Pembelian Kotor", value: 0 },
               { kategoriName: "Mutasi Barang Masuk", value: 0 },
@@ -219,7 +274,7 @@ const LabaDanRugiPage = () => {
               { kategoriName: "Persediaan Akhir", value: 0 },
             ]}
             footer="Harga Pokok Penjualan"
-            footerValue={0}
+            footerValue={outcome?.toLocaleString()}
           />
           <IncomeStatement
             title1="Pengeluaran Operasional"
@@ -254,7 +309,7 @@ const LabaDanRugiPage = () => {
               { kategoriName: "Pendapatan Lainnya", value: 0 },
             ]}
             footer="Laba Bersih"
-            footerValue={0}
+            footerValue={(income - outcome).toLocaleString()}
           />
         </Box>
       </Box>
