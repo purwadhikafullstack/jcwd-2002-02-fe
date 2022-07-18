@@ -12,18 +12,23 @@ import {
 } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import requiresAdmin from "config/requireAdmin";
 import moment from "moment";
 import IncomeStatement from "components/Admin/IncomeStatement";
+import { useSnackbar } from "notistack";
+import axiosInstance from "config/api";
 
 const LabaDanRugiPage = () => {
   const [periode, setPeriode] = useState("Bulanan");
   const [bulan, setBulan] = useState(1);
   const [tahun, setTahun] = useState("2022");
+  const [income, setIncome] = useState();
+  const [outcome, setOutcome] = useState();
+  const { enqueueSnackbar } = useSnackbar();
 
   const periodeHandle = (event) => {
     setPeriode(event.target.value);
@@ -32,10 +37,31 @@ const LabaDanRugiPage = () => {
     setBulan(event.target.value);
   };
   const tahunHandle = (event) => {
-    setTahun(event);
+    setTahun(moment(event).format("YYYY"));
   };
 
-  console.log(bulan);
+  const fetchRevenue = async () => {
+    try {
+      const res = await axiosInstance.get("/admin/revenue", {
+        params: {
+          filterByMonth: bulan || undefined,
+          filterByYear: tahun || undefined,
+        },
+      });
+
+      setIncome(res.data.result.income);
+      setOutcome(res.data.result.outcome);
+    } catch (err) {
+      enqueueSnackbar(err?.response?.data?.message, { variant: "error" });
+    }
+  };
+
+  useEffect(() => {
+    if (income || !income || outcome || !outcome) {
+      fetchRevenue();
+    }
+  }, [bulan, tahun, income, outcome]);
+
   return (
     <Grid container>
       {/* Heading Box */}
@@ -129,7 +155,7 @@ const LabaDanRugiPage = () => {
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <DatePicker
                 views={["year"]}
-                value={tahun}
+                value={tahun || null}
                 onChange={tahunHandle}
                 renderInput={(params) => (
                   <TextField
@@ -172,28 +198,28 @@ const LabaDanRugiPage = () => {
             title1="Penjualan"
             title2="dalam rupiah"
             kategori={[
-              { kategoriName: "Penjualan Barang", value: 25000000 },
-              { kategoriName: "Total Service", value: 15000 },
+              { kategoriName: "Penjualan Barang", value: income },
+              { kategoriName: "Total Service", value: 0 },
               { kategoriName: "Total Embalance", value: 0 },
-              { kategoriName: "Ongkos Kirim", value: 23000 },
-              { kategoriName: "Diskon Penjualan", value: 3000000 },
-              { kategoriName: "Retur Penjualan", value: 25000 },
+              { kategoriName: "Ongkos Kirim", value: 0 },
+              { kategoriName: "Diskon Penjualan", value: 0 },
+              { kategoriName: "Retur Penjualan", value: 0 },
             ]}
             footer="Penjualan Bersih"
-            footerValue="70.000.000"
+            footerValue={0}
           />
           <IncomeStatement
             title1="Harga Pokok Penjualan"
             kategori={[
-              { kategoriName: "Persediaan Awal", value: "68.000.000" },
-              { kategoriName: "Pembelian Kotor", value: "61.000.000" },
+              { kategoriName: "Persediaan Awal", value: outcome },
+              { kategoriName: "Pembelian Kotor", value: 0 },
               { kategoriName: "Retur Pembelian Kotor", value: 0 },
               { kategoriName: "Mutasi Barang Masuk", value: 0 },
               { kategoriName: "Mutasi Barang Keluar", value: 0 },
-              { kategoriName: "Persediaan Akhir", value: "70.000.000" },
+              { kategoriName: "Persediaan Akhir", value: 0 },
             ]}
             footer="Harga Pokok Penjualan"
-            footerValue="59.000.000"
+            footerValue={0}
           />
           <IncomeStatement
             title1="Pengeluaran Operasional"
@@ -206,29 +232,29 @@ const LabaDanRugiPage = () => {
               { kategoriName: "Sewa Tempat", value: 0 },
               { kategoriName: "Peralatan Kantor", value: 0 },
               { kategoriName: "Biaya Pengadaan", value: 0 },
-              { kategoriName: "Biaya Operasional Lainnya", value: "96.173" },
+              { kategoriName: "Biaya Operasional Lainnya", value: 0 },
             ]}
             footer="Pengeluaran Operasional"
-            footerValue="96.173"
+            footerValue={0}
           />
           <IncomeStatement
             title1="Pendapatan Lainnya"
             kategori={[
-              { kategoriName: "Cashback Pembelian", value: "177.939" },
+              { kategoriName: "Cashback Pembelian", value: 0 },
               { kategoriName: "Keuntungan Konsiyasi", value: 0 },
             ]}
             footer="Pendapatan Lainnya"
-            footerValue="177.939"
+            footerValue={0}
           />
           <IncomeStatement
             title1="Laba Bersih"
             kategori={[
-              { kategoriName: "Laba Kotor", value: "20.007.753" },
-              { kategoriName: "Pengeluaran Operasional", value: "96.173" },
-              { kategoriName: "Pendapatan Lainnya", value: "177.939" },
+              { kategoriName: "Laba Kotor", value: 0 },
+              { kategoriName: "Pengeluaran Operasional", value: 0 },
+              { kategoriName: "Pendapatan Lainnya", value: 0 },
             ]}
             footer="Laba Bersih"
-            footerValue="20.089.519"
+            footerValue={0}
           />
         </Box>
       </Box>
