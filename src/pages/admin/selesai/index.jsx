@@ -1,3 +1,6 @@
+/* eslint-disable no-unneeded-ternary */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable eqeqeq */
 /* eslint-disable react/jsx-no-useless-fragment */
 import {
   Grid,
@@ -12,23 +15,31 @@ import {
   Pagination,
   Divider,
 } from "@mui/material";
+import _, { ceil } from "lodash";
 import DownloadIcon from "@mui/icons-material/Download";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import SearchIcon from "@mui/icons-material/Search";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import CardOrder from "components/Admin/CardOrder";
 import Group from "public/Images/Group.png";
 import requiresAdmin from "config/requireAdmin";
 import axiosInstance from "config/api";
+import { useRouter } from "next/router";
 
 const SelesaiPage = () => {
+  const router = useRouter();
   // eslint-disable-next-line no-unused-vars
   const [order, setOrder] = useState([1]);
   const [sortFilter, setSortFilter] = useState("");
   const [urutkan, setUrutkan] = useState("");
-  const [cardPerPage, setCardPerPage] = useState("5");
-  const [transaksi, setTransaksi] = useState(null);
+  const [transaksi, setTransaksi] = useState([]);
+  const [page, setPage] = useState(1);
+  const [sortBy, setSortBy] = useState(router.query._sortBy);
+  const [sortDir, setSortDir] = useState(router.query._sortDir);
+  const [namaUser, setNamaUser] = useState(router.query.username);
+  const [dataCount, setDataCount] = useState([]);
+  const [rowPerPage, setRowPerPage] = useState(5);
 
   const filterHandle = (event) => {
     setSortFilter(event.target.value);
@@ -38,21 +49,55 @@ const SelesaiPage = () => {
     setUrutkan(event.target.value);
   };
 
-  const cardHandle = (event) => {
-    setCardPerPage(event.target.value);
-  };
-
   const fetchTransaksi = async () => {
     try {
       const dataTransaksi = await axiosInstance.get("/transaction", {
         params: {
           statusTerpilih: 4,
+          _page: page,
+          _sortBy: sortBy ? sortBy : undefined,
+          _sortDir: sortDir ? sortDir : undefined,
+          username: namaUser,
+          _limit: rowPerPage,
         },
       });
       setTransaksi(dataTransaksi.data.result.rows);
+      setDataCount(dataTransaksi.data.result.count);
     } catch (err) {
       console.log(err);
     }
+  };
+
+  useEffect(() => {
+    if (router.isReady) {
+      if (router.query._sortBy) {
+        setSortBy(router.query._sortBy);
+      }
+      if (router.query._sortDir) {
+        setSortDir(router.query.sortDir);
+      }
+      if (router.query.username) {
+        setNamaUser(router.query.username);
+      }
+    }
+  }, [router.isReady]);
+
+  const namaUserDebounce = useCallback(
+    _.debounce((values) => {
+      setNamaUser(values);
+      setPage(1);
+    }, 2000)
+  );
+
+  const sortButton = () => {
+    if (urutkan == "Terbaru") {
+      setSortBy("createdAt");
+      setSortDir("DESC");
+    } else if (urutkan == "Terlama") {
+      setSortBy("createdAt");
+      setSortDir("ASC");
+    }
+    setPage(1);
   };
 
   const renderTransaksi = () => {
@@ -78,6 +123,8 @@ const SelesaiPage = () => {
           status={val?.paymentStatusId}
           transaksiId={val?.id}
           isObatResep={val?.is_resep}
+          productOrderQty={val?.transaction_details.length}
+          detail={val}
         />
       );
     });
@@ -85,7 +132,43 @@ const SelesaiPage = () => {
 
   useEffect(() => {
     fetchTransaksi();
-  }, []);
+    if (typeof sortDir === "string" || typeof namaUser === "string") {
+      router.push({
+        query: {
+          _sortBy: sortBy,
+          _sortDir: sortDir,
+          username: namaUser,
+        },
+      });
+    }
+  }, [page, sortBy, sortDir, namaUser, rowPerPage]);
+
+  const sortDefaultValue = () => {
+    if (router.isReady && router.query._sortDir && router.query._sortBy) {
+      if (
+        router.query._sortDir === "DESC" &&
+        router.query._sortBy === "createdAt"
+      ) {
+        return "Terbaru";
+      }
+      if (
+        router.query._sortDir === "ASC" &&
+        router.query._sortBy === "createdAt"
+      ) {
+        return "Terlama";
+      }
+    }
+    return "";
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowPerPage(event.target.value);
+    setPage(1);
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
 
   return (
     <>
@@ -120,6 +203,7 @@ const SelesaiPage = () => {
             {/* Box Filter */}
             <Box display="flex" flexDirection="row">
               <OutlinedInput
+                onChange={(e) => namaUserDebounce(e.target.value)}
                 sx={{
                   borderRadius: "10px",
                   width: "328px",
@@ -127,7 +211,7 @@ const SelesaiPage = () => {
                   backgroundColor: "white",
                   marginRight: "16px",
                 }}
-                placeholder="Cari nama obat"
+                placeholder="Cari user"
                 endAdornment={<SearchIcon htmlColor="gray" />}
               />
               {/* Filter Obat */}
@@ -165,6 +249,7 @@ const SelesaiPage = () => {
                   value={urutkan}
                   autoWidth
                   displayEmpty
+                  defaultValue={sortDefaultValue()}
                 >
                   <MenuItem value="" disabled>
                     Urutkan
@@ -174,19 +259,22 @@ const SelesaiPage = () => {
                   <MenuItem value="Harga Terendah">Harga Terendah</MenuItem>
                 </Select>
               </FormControl>
+              <Button
+                variant="contained"
+                onClick={sortButton}
+                sx={{ ml: 3, "&:hover": { border: 0 } }}
+              >
+                Urutkan
+              </Button>
             </Box>
           </Grid>
 
           {/* Body Box */}
           <Grid item xs={12}>
-            <Box
-              display="flex"
-              flexDirection="row"
-              justifyContent="space-between"
-            >
+            <Box display="flex" flexDirection="row" justifyContent="flex-end">
               <Box display="flex" flexDirection="row" alignContent="center">
                 <Typography sx={{ marginRight: "5px" }}>
-                  Kartu per halaman
+                  Transaksi per halaman
                 </Typography>
                 <FormControl sx={{ marginRight: "30px" }}>
                   <Select
@@ -197,10 +285,9 @@ const SelesaiPage = () => {
                       backgroundColor: "white",
                       borderColor: "Brand.500",
                     }}
-                    onChange={cardHandle}
-                    value={cardPerPage}
-                    autoWidth
-                    displayEmpty
+                    onChange={handleChangeRowsPerPage}
+                    defaultValue={5}
+                    size="small"
                   >
                     <MenuItem value={2}>2</MenuItem>
                     <MenuItem value={3}>3</MenuItem>
@@ -208,13 +295,18 @@ const SelesaiPage = () => {
                   </Select>
                 </FormControl>
                 <Stack spacing={2}>
-                  <Pagination count={10} color="primary" siblingCount={0} />
+                  <Pagination
+                    defaultPage={1}
+                    siblingCount={0}
+                    count={ceil(dataCount / rowPerPage)}
+                    page={page}
+                    onChange={handleChangePage}
+                    color="primary"
+                  />
                 </Stack>
               </Box>
             </Box>
-
             {renderTransaksi()}
-            {/* Product Component */}
           </Grid>
         </Grid>
       ) : (

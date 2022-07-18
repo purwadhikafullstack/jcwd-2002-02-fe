@@ -16,16 +16,16 @@ import {
   Pagination,
   Divider,
 } from "@mui/material";
+import _, { ceil } from "lodash";
 import DownloadIcon from "@mui/icons-material/Download";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import SearchIcon from "@mui/icons-material/Search";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import CardOrder from "components/Admin/CardOrder";
 import Group from "public/Images/Group.png";
 import requiresAdmin from "config/requireAdmin";
 import axiosInstance from "config/api";
-import InfiniteScroll from "react-infinite-scroll-component";
 import { useRouter } from "next/router";
 
 const PesananBaruPage = () => {
@@ -33,12 +33,13 @@ const PesananBaruPage = () => {
   const [order, setOrder] = useState([1]);
   const [sortFilter, setSortFilter] = useState("");
   const [urutkan, setUrutkan] = useState("");
-  const [cardPerPage, setCardPerPage] = useState("5");
   const [transaksi, setTransaksi] = useState([]);
   const [page, setPage] = useState(1);
-  const [maxPage, setMaxPage] = useState(1);
   const [sortBy, setSortBy] = useState(router.query._sortBy);
   const [sortDir, setSortDir] = useState(router.query._sortDir);
+  const [namaUser, setNamaUser] = useState(router.query.username);
+  const [dataCount, setDataCount] = useState([]);
+  const [rowPerPage, setRowPerPage] = useState(5);
 
   const filterHandle = (event) => {
     setSortFilter(event.target.value);
@@ -48,12 +49,7 @@ const PesananBaruPage = () => {
     setUrutkan(event.target.value);
   };
 
-  const cardHandle = (event) => {
-    setCardPerPage(event.target.value);
-  };
-
   const fetchTransaksi = async () => {
-    const limit = 5;
     try {
       const dataTransaksi = await axiosInstance.get("/transaction", {
         params: {
@@ -61,18 +57,12 @@ const PesananBaruPage = () => {
           _page: page,
           _sortBy: sortBy ? sortBy : undefined,
           _sortDir: sortDir ? sortDir : undefined,
-          _limit: limit,
+          username: namaUser,
+          _limit: rowPerPage,
         },
       });
-      if (page == 1) {
-        setTransaksi(dataTransaksi.data.result.rows);
-      } else {
-        setTransaksi((prevTransaction) => [
-          ...prevTransaction,
-          ...dataTransaksi.data.result.rows,
-        ]);
-      }
-      setMaxPage(Math.ceil(dataTransaksi.data.result.count / limit));
+      setTransaksi(dataTransaksi.data.result.rows);
+      setDataCount(dataTransaksi.data.result.count);
     } catch (err) {
       console.log(err);
     }
@@ -85,6 +75,9 @@ const PesananBaruPage = () => {
       }
       if (router.query._sortDir) {
         setSortDir(router.query.sortDir);
+      }
+      if (router.query.username) {
+        setNamaUser(router.query.username);
       }
     }
   }, [router.isReady]);
@@ -100,9 +93,12 @@ const PesananBaruPage = () => {
     setPage(1);
   };
 
-  const fetchNextPage = () => {
-    setPage(page + 1);
-  };
+  const namaUserDebounce = useCallback(
+    _.debounce((values) => {
+      setNamaUser(values);
+      setPage(1);
+    }, 2000)
+  );
 
   const renderTransaksi = () => {
     return transaksi?.map((val) => {
@@ -127,6 +123,8 @@ const PesananBaruPage = () => {
           status={val?.paymentStatusId}
           transaksiId={val?.id}
           isObatResep={val?.is_resep}
+          productOrderQty={val?.transaction_details.length}
+          detail={val}
         />
       );
     });
@@ -134,15 +132,16 @@ const PesananBaruPage = () => {
 
   useEffect(() => {
     fetchTransaksi();
-    if (typeof sortDir === "string") {
+    if (typeof sortDir === "string" || typeof namaUser === "string") {
       router.push({
         query: {
           _sortBy: sortBy,
           _sortDir: sortDir,
+          username: namaUser,
         },
       });
     }
-  }, [page, sortBy, sortDir]);
+  }, [page, sortBy, sortDir, namaUser, rowPerPage]);
 
   const sortDefaultValue = () => {
     if (router.isReady && router.query._sortDir && router.query._sortBy) {
@@ -160,6 +159,15 @@ const PesananBaruPage = () => {
       }
     }
     return "";
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowPerPage(event.target.value);
+    setPage(1);
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
   };
 
   return (
@@ -195,6 +203,7 @@ const PesananBaruPage = () => {
             {/* Box Filter */}
             <Box display="flex" flexDirection="row">
               <OutlinedInput
+                onChange={(e) => namaUserDebounce(e.target.value)}
                 sx={{
                   borderRadius: "10px",
                   width: "328px",
@@ -202,7 +211,7 @@ const PesananBaruPage = () => {
                   backgroundColor: "white",
                   marginRight: "16px",
                 }}
-                placeholder="Cari nama obat"
+                placeholder="Cari user"
                 endAdornment={<SearchIcon htmlColor="gray" />}
               />
               {/* Filter Obat */}
@@ -249,20 +258,22 @@ const PesananBaruPage = () => {
                   <MenuItem value="Terlama">Terlama</MenuItem>
                 </Select>
               </FormControl>
-              <Button onClick={sortButton}>Urutkan</Button>
+              <Button
+                variant="contained"
+                onClick={sortButton}
+                sx={{ ml: 3, "&:hover": { border: 0 } }}
+              >
+                Urutkan
+              </Button>
             </Box>
           </Grid>
 
           {/* Body Box */}
           <Grid item xs={12}>
-            <Box
-              display="flex"
-              flexDirection="row"
-              justifyContent="space-between"
-            >
+            <Box display="flex" flexDirection="row" justifyContent="flex-end">
               <Box display="flex" flexDirection="row" alignContent="center">
                 <Typography sx={{ marginRight: "5px" }}>
-                  Kartu per halaman
+                  Transaksi per halaman
                 </Typography>
                 <FormControl sx={{ marginRight: "30px" }}>
                   <Select
@@ -273,10 +284,9 @@ const PesananBaruPage = () => {
                       backgroundColor: "white",
                       borderColor: "Brand.500",
                     }}
-                    onChange={cardHandle}
-                    value={cardPerPage}
-                    autoWidth
-                    displayEmpty
+                    onChange={handleChangeRowsPerPage}
+                    defaultValue={5}
+                    size="small"
                   >
                     <MenuItem value={2}>2</MenuItem>
                     <MenuItem value={3}>3</MenuItem>
@@ -284,18 +294,18 @@ const PesananBaruPage = () => {
                   </Select>
                 </FormControl>
                 <Stack spacing={2}>
-                  <Pagination count={10} color="primary" siblingCount={0} />
+                  <Pagination
+                    defaultPage={1}
+                    siblingCount={0}
+                    count={ceil(dataCount / rowPerPage)}
+                    page={page}
+                    onChange={handleChangePage}
+                    color="primary"
+                  />
                 </Stack>
               </Box>
             </Box>
-            <InfiniteScroll
-              dataLength={transaksi.length}
-              next={fetchNextPage}
-              hasMore={page < maxPage}
-              loader={<Typography>Loading...</Typography>}
-            >
-              {renderTransaksi()}
-            </InfiniteScroll>
+            {renderTransaksi()}
           </Grid>
         </Grid>
       ) : (

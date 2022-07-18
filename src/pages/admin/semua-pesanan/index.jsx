@@ -16,7 +16,7 @@ import {
   Pagination,
   Divider,
 } from "@mui/material";
-import _ from "lodash";
+import _, { ceil } from "lodash";
 import DownloadIcon from "@mui/icons-material/Download";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import SearchIcon from "@mui/icons-material/Search";
@@ -26,7 +26,6 @@ import CardOrder from "components/Admin/CardOrder";
 import Group from "public/Images/Group.png";
 import requiresAdmin from "config/requireAdmin";
 import axiosInstance from "config/api";
-import InfiniteScroll from "react-infinite-scroll-component";
 import { useRouter } from "next/router";
 
 const SemuaPesananPage = () => {
@@ -34,13 +33,13 @@ const SemuaPesananPage = () => {
   const [order, setOrder] = useState([1]);
   const [sortFilter, setSortFilter] = useState("");
   const [urutkan, setUrutkan] = useState("");
-  const [cardPerPage, setCardPerPage] = useState("5");
   const [transaksi, setTransaksi] = useState([]);
   const [page, setPage] = useState(1);
-  const [maxPage, setMaxPage] = useState(1);
   const [sortBy, setSortBy] = useState(router.query._sortBy);
   const [sortDir, setSortDir] = useState(router.query._sortDir);
   const [namaUser, setNamaUser] = useState(router.query.username);
+  const [dataCount, setDataCount] = useState([]);
+  const [rowPerPage, setRowPerPage] = useState(5);
 
   const filterHandle = (event) => {
     setSortFilter(event.target.value);
@@ -50,12 +49,7 @@ const SemuaPesananPage = () => {
     setUrutkan(event.target.value);
   };
 
-  const cardHandle = (event) => {
-    setCardPerPage(event.target.value);
-  };
-
   const fetchTransaksi = async () => {
-    const limit = 5;
     try {
       const dataTransaksi = await axiosInstance.get("/transaction", {
         params: {
@@ -63,18 +57,11 @@ const SemuaPesananPage = () => {
           _sortBy: sortBy ? sortBy : undefined,
           _sortDir: sortDir ? sortDir : undefined,
           username: namaUser,
-          _limit: limit,
+          _limit: rowPerPage,
         },
       });
-      if (page == 1) {
-        setTransaksi(dataTransaksi.data.result.rows);
-      } else {
-        setTransaksi((prevTransaction) => [
-          ...prevTransaction,
-          ...dataTransaksi.data.result.rows,
-        ]);
-      }
-      setMaxPage(Math.ceil(dataTransaksi.data.result.count / limit));
+      setTransaksi(dataTransaksi.data.result.rows);
+      setDataCount(dataTransaksi.data.result.count);
     } catch (err) {
       console.log(err);
     }
@@ -110,10 +97,6 @@ const SemuaPesananPage = () => {
       setSortDir("ASC");
     }
     setPage(1);
-  };
-
-  const fetchNextPage = () => {
-    setPage(page + 1);
   };
 
   const renderTransaksi = () => {
@@ -156,7 +139,7 @@ const SemuaPesananPage = () => {
         },
       });
     }
-  }, [page, sortBy, sortDir, namaUser]);
+  }, [page, sortBy, sortDir, namaUser, rowPerPage]);
 
   const sortDefaultValue = () => {
     if (router.isReady && router.query._sortDir && router.query._sortBy) {
@@ -174,6 +157,15 @@ const SemuaPesananPage = () => {
       }
     }
     return "";
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowPerPage(event.target.value);
+    setPage(1);
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
   };
 
   return (
@@ -280,7 +272,7 @@ const SemuaPesananPage = () => {
             <Box display="flex" flexDirection="row" justifyContent="flex-end">
               <Box display="flex" flexDirection="row" alignContent="center">
                 <Typography sx={{ marginRight: "5px" }}>
-                  Kartu per halaman
+                  Transaksi per halaman
                 </Typography>
                 <FormControl sx={{ marginRight: "30px" }}>
                   <Select
@@ -291,10 +283,9 @@ const SemuaPesananPage = () => {
                       backgroundColor: "white",
                       borderColor: "Brand.500",
                     }}
-                    onChange={cardHandle}
-                    value={cardPerPage}
-                    autoWidth
-                    displayEmpty
+                    onChange={handleChangeRowsPerPage}
+                    defaultValue={5}
+                    size="small"
                   >
                     <MenuItem value={2}>2</MenuItem>
                     <MenuItem value={3}>3</MenuItem>
@@ -302,18 +293,18 @@ const SemuaPesananPage = () => {
                   </Select>
                 </FormControl>
                 <Stack spacing={2}>
-                  <Pagination count={10} color="primary" siblingCount={0} />
+                  <Pagination
+                    defaultPage={1}
+                    siblingCount={0}
+                    count={ceil(dataCount / rowPerPage)}
+                    page={page}
+                    onChange={handleChangePage}
+                    color="primary"
+                  />
                 </Stack>
               </Box>
             </Box>
-            <InfiniteScroll
-              dataLength={transaksi.length}
-              next={fetchNextPage}
-              hasMore={page < maxPage}
-              loader={<Typography>Loading...</Typography>}
-            >
-              {renderTransaksi()}
-            </InfiniteScroll>
+            {renderTransaksi()}
           </Grid>
         </Grid>
       ) : (
