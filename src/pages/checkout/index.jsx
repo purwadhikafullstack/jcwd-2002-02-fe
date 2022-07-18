@@ -9,6 +9,7 @@ import axiosInstance from "config/api";
 import ModalAlamat from "components/ModalAlamat";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
+import { addToCart } from "redux/reducer/cart";
 import { cumulatedPrice } from "../../redux/reducer/price";
 
 const CheckOut = () => {
@@ -63,7 +64,14 @@ const CheckOut = () => {
         "/transaction/add-new-transaction",
         newData
       );
+
+      const fetchNewCart = await axiosInstance.get("/cart/get-cart");
+
+      const CartData = fetchNewCart.data;
+
+      dispatch(addToCart(CartData.data));
       dispatch(cumulatedPrice(totalHarga));
+      // hapus cart disini
       router.push(
         `/konfirmasi?paymentMethod=${method}&transaksiId=${res.data.data.id}&createdAt=${res.data.data.createdAt}`
       );
