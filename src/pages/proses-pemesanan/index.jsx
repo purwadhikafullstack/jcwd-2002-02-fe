@@ -27,6 +27,7 @@ import axiosInstance from "config/api";
 import InfiniteScroll from "react-infinite-scroll-component";
 import IsiTab from "components/IsiTab";
 import { useRouter } from "next/router";
+import { useSelector } from "react-redux";
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -48,6 +49,7 @@ const ProsesPemesanan = () => {
   const [status, setStatus] = useState(null);
   const [sortBy, setSortBy] = useState(router.query._sortyBy);
   const [sortDir, setSortDir] = useState(router.query._sortyDir);
+  const authSelector = useSelector((state) => state.auth);
 
   const fetchTransactions = async () => {
     try {
@@ -60,6 +62,7 @@ const ProsesPemesanan = () => {
           statusTerpilih: status || undefined,
           _sortBy: sortBy ? sortBy : undefined,
           _sortDir: sortDir ? sortDir : undefined,
+          userId: authSelector.id || undefined,
         },
       });
       setJumlahTransaksi(transactionList.data.result.count);
