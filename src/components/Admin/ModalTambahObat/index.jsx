@@ -23,7 +23,12 @@ import * as Yup from "yup";
 import { useSnackbar } from "notistack";
 import { useFormik } from "formik";
 
-const ModalTambahObat = ({ open, handleClose, categories = [] }) => {
+const ModalTambahObat = ({
+  open,
+  handleClose,
+  categories = [],
+  addNewProduct,
+}) => {
   const [activeStep, setActiveStep] = useState(1);
   const [files, setFiles] = useState([]);
   const [imageReview, setImageReview] = useState([]);
@@ -131,7 +136,7 @@ const ModalTambahObat = ({ open, handleClose, categories = [] }) => {
       setImageReview([]);
       enqueueSnackbar(res?.data?.message, { variant: "success" });
       setActiveStep(3);
-
+      addNewProduct(res.data.message);
       formik.setFieldValue("nama_produk", formik.initialValues.nama_produk);
       formik.setFieldValue("nomor_obat", formik.initialValues.nomor_obat);
       formik.setFieldValue("nomor_bpom", formik.initialValues.nomor_bpom);

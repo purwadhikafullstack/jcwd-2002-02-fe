@@ -153,7 +153,12 @@ const Nav = () => {
               }}
             />
             {userSelector.id ? (
-              <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+              <Menu
+                anchorEl={anchorEl}
+                open={open}
+                onClick={handleClose}
+                onClose={handleClose}
+              >
                 <MenuItem>
                   <Link href="/profile-page">Profil Saya</Link>
                 </MenuItem>
