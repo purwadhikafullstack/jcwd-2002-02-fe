@@ -276,6 +276,16 @@ const ProsesPemesanan = () => {
               next={fetchNextPage}
               hasMore={page < maxPage}
               loader={<Typography>Loading...</Typography>}
+              endMessage={
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  mt={2}
+                >
+                  <Typography>No more transaction available</Typography>
+                </Box>
+              }
             >
               <IsiTab
                 renderTransactionList={renderTransactionList}
@@ -291,6 +301,11 @@ const ProsesPemesanan = () => {
               next={fetchNextPage}
               hasMore={page < maxPage}
               loader={<Typography>Loading...</Typography>}
+              endMessage={
+                <Box display="flex" alignItems="center" justifyContent="center">
+                  <Typography>No more Product available</Typography>
+                </Box>
+              }
             >
               <IsiTab
                 renderTransactionList={renderTransactionList}
@@ -306,6 +321,11 @@ const ProsesPemesanan = () => {
               next={fetchNextPage}
               hasMore={page < maxPage}
               loader={<Typography>Loading...</Typography>}
+              endMessage={
+                <Box display="flex" alignItems="center" justifyContent="center">
+                  <Typography>No more Product available</Typography>
+                </Box>
+              }
             >
               <IsiTab
                 renderTransactionList={renderTransactionList}
@@ -321,6 +341,11 @@ const ProsesPemesanan = () => {
               next={fetchNextPage}
               hasMore={page < maxPage}
               loader={<Typography>Loading...</Typography>}
+              endMessage={
+                <Box display="flex" alignItems="center" justifyContent="center">
+                  <Typography>No more Product available</Typography>
+                </Box>
+              }
             >
               <IsiTab
                 renderTransactionList={renderTransactionList}
@@ -336,6 +361,11 @@ const ProsesPemesanan = () => {
               next={fetchNextPage}
               hasMore={page < maxPage}
               loader={<Typography>Loading...</Typography>}
+              endMessage={
+                <Box display="flex" alignItems="center" justifyContent="center">
+                  <Typography>No more Product available</Typography>
+                </Box>
+              }
             >
               <IsiTab
                 renderTransactionList={renderTransactionList}
@@ -351,6 +381,11 @@ const ProsesPemesanan = () => {
               next={fetchNextPage}
               hasMore={page < maxPage}
               loader={<Typography>Loading...</Typography>}
+              endMessage={
+                <Box display="flex" alignItems="center" justifyContent="center">
+                  <Typography>No more Product available</Typography>
+                </Box>
+              }
             >
               <IsiTab
                 renderTransactionList={renderTransactionList}
