@@ -806,6 +806,7 @@ const ProfilePage = () => {
                 {listAlamat.map((val) => {
                   return (
                     <CardAlamat
+                      id={val.id}
                       alamat={val.alamat_lengkap}
                       namaPenerima={val.nama_penerima}
                       nomorTelp={val.no_telepon_penerima}
