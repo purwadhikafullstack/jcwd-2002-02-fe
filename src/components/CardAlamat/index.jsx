@@ -6,10 +6,6 @@ const CardAlamat = ({
   namaPenerima,
   nomorTelp,
   alamat,
-  provinsi,
-  kab,
-  kec,
-  kodePos,
 }) => {
   return (
     <Box
@@ -47,9 +43,7 @@ const CardAlamat = ({
         {namaPenerima}
       </Typography>
       <Typography sx={{ fontSize: "12px" }}>{nomorTelp}</Typography>
-      <Typography sx={{ fontSize: "12px" }}>
-        {alamat}, Kec. {kec}, Kab. {kab}, Provisin {provinsi}, {kodePos}
-      </Typography>
+      <Typography sx={{ fontSize: "12px" }}>{alamat}</Typography>
       <Box display="flex" marginTop="10px">
         <Button variant="outlined" fullWidth>
           Hapus Alamat
