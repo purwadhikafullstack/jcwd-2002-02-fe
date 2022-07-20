@@ -8,6 +8,7 @@ import ChatIcon from "@mui/icons-material/Chat";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import { useState } from "react";
 import moment from "moment";
+import "moment/locale/id";
 import { styled } from "@mui/material/styles";
 import ProductCardItems from "components/Admin/ProductCardItems";
 import ModalTerimaPesanan from "components/Admin/ModalTerimaPesanan";
@@ -50,6 +51,7 @@ const CardOrder = ({
         transactionId,
       });
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
     }
   };
@@ -60,6 +62,7 @@ const CardOrder = ({
         transactionId,
       });
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
     }
   };
@@ -90,6 +93,8 @@ const CardOrder = ({
           nama={detail.nomor_resep}
           harga={detail.total_price}
           isObatResep={detail.is_resep}
+          buyersName={detail.user.username}
+          transaksiId={transaksiId}
         />
       );
     }
@@ -165,7 +170,7 @@ const CardOrder = ({
             </Typography>
             <AccessTimeIcon sx={{ marginLeft: "10px", color: "gray" }} />
             <Typography sx={{ color: "gray" }}>
-              {moment(orderTime).format("DD MMMM YYYY, hh:mm A")}
+              {moment(orderTime).format("DD MMMM YYYY, HH:mm")}
             </Typography>
           </Box>
 
@@ -191,7 +196,7 @@ const CardOrder = ({
                 <Typography>
                   {moment(orderTime)
                     .add(2, "days")
-                    .format("DD MMMM YYYY, hh:mm A")}
+                    .format("DD MMMM YYYY, HH:mm")}
                 </Typography>
               </Box>
             </Box>
@@ -369,7 +374,9 @@ const CardOrder = ({
                 <Button
                   variant="contained"
                   onClick={handleOpen}
-                  disabled={isObatResep && !productAdded}
+                  disabled={
+                    (isObatResep && !productAdded) || !detail.proof_of_payment
+                  }
                   sx={{ "&:hover": { border: 0 } }}
                 >
                   Terima Pesanan

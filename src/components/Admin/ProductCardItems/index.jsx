@@ -22,6 +22,7 @@ const ProductCardItems = ({
   orderTime,
 }) => {
   const [salinanResep, setSalinanResep] = useState(false);
+
   return (
     <>
       <Box
@@ -42,7 +43,7 @@ const ProductCardItems = ({
           <Typography sx={{ fontSize: "14px", fontWeight: "bolder" }}>
             {nama}
           </Typography>
-          {isObatResep && !productAdded ? (
+          {isObatResep && productAdded === false ? (
             <>
               <Button
                 variant="contained"

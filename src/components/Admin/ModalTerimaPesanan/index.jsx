@@ -28,6 +28,7 @@ const ModalTerimaPesanan = ({
         transactionId,
       });
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
     }
   };
@@ -36,6 +37,8 @@ const ModalTerimaPesanan = ({
     setTerimaPesanan(true);
     acceptTransaction(value);
   };
+
+  console.log(namaProduk);
   return (
     <Modal open={open} onClose={handleClose}>
       {terimaPesanan ? (
@@ -174,7 +177,7 @@ const ModalTerimaPesanan = ({
               {namaProduk}
             </Typography>
             <Typography sx={{ fontSize: "12px", color: "gray" }}>
-              {jumlahProduk} x {hargaProduk}
+              {jumlahProduk} x {hargaProduk.toLocaleString()}
             </Typography>
             <Box
               sx={{
@@ -233,7 +236,7 @@ const ModalTerimaPesanan = ({
                     marginRight: "8px",
                   }}
                 >
-                  Rp {totalHarga},-
+                  Rp {totalHarga.toLocaleString()},-
                 </Typography>
               </Box>
             </Box>

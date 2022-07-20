@@ -76,6 +76,7 @@ const ModalSalinanResep = ({
       const res = await axiosInstance.get("/admin/product");
       setProductData(res?.data?.result?.rows);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
     }
   };
@@ -147,6 +148,8 @@ const ModalSalinanResep = ({
         };
       });
 
+      console.log(dataObat);
+
       const res = await axiosInstance.post(
         "/admin/product/custom-order",
         dataObat
@@ -159,6 +162,7 @@ const ModalSalinanResep = ({
       formik.setFieldValue("namaDokter", formik.initialValues.namaDokter);
       formik.setFieldValue("nomorResep", formik.initialValues.nomorResep);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
       enqueueSnackbar(err?.response?.data?.message, { variant: "error" });
     }
@@ -274,7 +278,10 @@ const ModalSalinanResep = ({
             <Grid container spacing={3}>
               {/* Grid for Image */}
               <Grid item xs={5}>
-                <Image src={fotoResep || Kursiplastik} />
+                <Image
+                  src={fotoResep || Kursiplastik}
+                  sx={{ maxWidth: "400px" }}
+                />
               </Grid>
 
               {/* Grid for Add Product */}
@@ -303,7 +310,7 @@ const ModalSalinanResep = ({
                       Tgl. Pemesanan
                     </Typography>
                     <Typography fontSize="20px" fontWeight="100">
-                      {moment(waktuOrder).format("DD MMMM YYYY, hh:mm A")}
+                      {moment(waktuOrder).format("DD MMMM YYYY, HH:mm")}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -396,7 +403,7 @@ const ModalSalinanResep = ({
                   </Grid>
                 </Grid>
                 <Grid container spacing={1} marginBottom="16px">
-                  <Grid item xs={4}>
+                  <Grid item xs={3}>
                     <FormControl error={formik.errors.kuantitas}>
                       <FormLabel
                         sx={{
@@ -451,7 +458,7 @@ const ModalSalinanResep = ({
                       </Box>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid item xs={5}>
                     <FormControl error={formik.errors.satuan}>
                       <FormLabel
                         sx={{
