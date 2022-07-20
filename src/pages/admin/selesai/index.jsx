@@ -40,6 +40,7 @@ const SelesaiPage = () => {
   const [namaUser, setNamaUser] = useState(router.query.username);
   const [dataCount, setDataCount] = useState([]);
   const [rowPerPage, setRowPerPage] = useState(5);
+  const [dummy, setDummy] = useState(false);
 
   const filterHandle = (event) => {
     setSortFilter(event.target.value);
@@ -128,6 +129,9 @@ const SelesaiPage = () => {
           isObatResep={val?.is_resep}
           productOrderQty={val?.transaction_details.length}
           detail={val}
+          reRender={() => {
+            setDummy(!dummy);
+          }}
         />
       );
     });
@@ -144,7 +148,7 @@ const SelesaiPage = () => {
         },
       });
     }
-  }, [page, sortBy, sortDir, namaUser, rowPerPage]);
+  }, [page, sortBy, sortDir, namaUser, rowPerPage, dummy]);
 
   const sortDefaultValue = () => {
     if (router.isReady && router.query._sortDir && router.query._sortBy) {
