@@ -112,8 +112,6 @@ const CardOrder = ({
     });
   };
 
-  console.log(detail);
-
   return (
     <>
       {/* Product Component */}

@@ -142,8 +142,6 @@ const ModalSalinanResep = ({
         };
       });
 
-      console.log(dataObat);
-
       const res = await axiosInstance.post(
         "/admin/product/custom-order",
         dataObat

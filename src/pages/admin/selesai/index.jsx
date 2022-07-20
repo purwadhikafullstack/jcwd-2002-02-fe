@@ -64,6 +64,7 @@ const SelesaiPage = () => {
       setTransaksi(dataTransaksi.data.result.rows);
       setDataCount(dataTransaksi.data.result.count);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
     }
   };
