@@ -14,11 +14,12 @@ const CardAlamat = ({
 
   const changeMainAddress = async () => {
     try {
-      const res = await axiosInstance.patch("/address/change-main-address", {
+      await axiosInstance.patch("/address/change-main-address", {
         newAddressId: id,
       });
       enqueueSnackbar("Change Main Address Success!", { variant: "success" });
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
     }
   };
