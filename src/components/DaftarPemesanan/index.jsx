@@ -4,6 +4,7 @@ import { Box, Button, Stack, Typography } from "@mui/material";
 import CheckOutCard from "components/CheckOut";
 import ModalUploadPembayaran from "components/ModalUploadPembayaran";
 import moment from "moment";
+import "moment/locale/id";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { BsFillChatDotsFill } from "react-icons/bs";
@@ -56,7 +57,9 @@ const DaftarPemesanan = ({ status, total_harga, produk, detail }) => {
           }}
         >
           <Typography>
-            {moment(detail?.createdAt).format("dddd, DD MMMM YYYY, hh:mm")}
+            {moment(detail?.createdAt)
+              .locale("in")
+              .format("dddd, DD MMMM YYYY, HH:MM")}
           </Typography>
           {status === "Dikirim" ||
           status === "Selesai" ||
@@ -162,14 +165,17 @@ const DaftarPemesanan = ({ status, total_harga, produk, detail }) => {
                 <Typography sx={{ color: "#4F618E", fontSize: "12px" }}>
                   {moment(detail?.createdAt)
                     .add(1, "day")
-                    .format("dddd, DD MMMM YYYY, hh:mm")}
+                    .format("dddd, DD MMMM YYYY, HH:MM")}
                 </Typography>
               </Stack>
+              <Button variant="outlined" sx={{ height: "30px", ml: "10px" }}>
+                Batalkan
+              </Button>
               <Button
                 onClick={() => router.push(`/detail-transaksi/${detail.id}`)}
                 variant="contained"
                 sx={{
-                  ml: "16px",
+                  ml: "5px",
                   "&:hover": { border: 0 },
                   width: "157px",
                   height: "30px",

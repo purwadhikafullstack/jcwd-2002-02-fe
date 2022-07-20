@@ -114,7 +114,7 @@ const DetailTransaksiPage = () => {
             <Typography sx={{ fontWeight: 700, fontSize: "16px", mt: "8px" }}>
               {moment(router.query.createdAt)
                 .add(1, "day")
-                .format("dddd, DD MMMM YYYY, hh:mm A")}
+                .format("dddd, DD MMMM YYYY, HH:mm ")}
             </Typography>
           </Stack>
           <Box

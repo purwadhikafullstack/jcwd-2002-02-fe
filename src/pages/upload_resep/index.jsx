@@ -60,11 +60,10 @@ const UploadResep = () => {
       await axiosInstance.post("/transaction/upload-resep", formData);
 
       handleBackDrop();
-      setTimeout(async () => {
-        setResepImgFile(null);
-        setOpen(false);
-        router.push("/unggah-resep-berhasil");
-      }, 3000);
+
+      setResepImgFile(null);
+      setOpen(false);
+      router.push("/unggah-resep-berhasil");
     } catch (err) {
       console.log(err);
     }
@@ -157,9 +156,7 @@ const UploadResep = () => {
               Batal
             </Button>
             <Button
-              onClick={() => {
-                uploadFileHandler();
-              }}
+              onClick={uploadFileHandler}
               variant="contained"
               sx={{ width: "125px", height: "42px" }}
             >
