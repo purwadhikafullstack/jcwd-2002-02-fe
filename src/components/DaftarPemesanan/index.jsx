@@ -36,6 +36,7 @@ const DaftarPemesanan = ({
         <CheckOutCard
           produk_image={valo?.product?.produk_image_url[0]}
           produk_name={valo?.product?.nama_produk}
+          produk_satuan={valo?.product?.satuan}
           produk_price={valo?.product?.harga_jual}
           produk_qty={valo?.quantity}
           product_diskon={valo?.product?.diskon}
@@ -58,6 +59,7 @@ const DaftarPemesanan = ({
     finishTransaction(value);
   };
 
+  console.log(produk);
   return (
     <Stack>
       <Stack
@@ -181,7 +183,8 @@ const DaftarPemesanan = ({
           {detail.proof_of_payment ||
           detail.paymentStatusId === 4 ||
           total_harga === 0 ||
-          detail.paymentStatusId === 3 ? null : (
+          detail.paymentStatusId === 3 ||
+          detail.paymentStatusId === 5 ? null : (
             <Box sx={{ display: "flex" }}>
               <Stack sx={{ textAlign: "end" }}>
                 <Typography sx={{ color: "#4F618E", fontSize: "12px" }}>

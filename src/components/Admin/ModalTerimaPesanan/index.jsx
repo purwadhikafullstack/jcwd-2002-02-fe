@@ -1,7 +1,5 @@
-/* eslint-disable no-unused-vars */
 import { Modal, Typography, Box, Divider, Button } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { useState } from "react";
 import Image from "next/image";
 import Group8725 from "public/Images/Group8725.png";
@@ -13,12 +11,9 @@ const ModalTerimaPesanan = ({
   namaPembeli,
   kodeOrder,
   waktuOrder,
-  namaProduk,
-  jumlahProduk,
-  hargaProduk,
-  jumlahProdukOrder,
   totalHarga,
   transaksiId,
+  productsData = [],
 }) => {
   const [terimaPesanan, setTerimaPesanan] = useState(false);
 
@@ -38,7 +33,6 @@ const ModalTerimaPesanan = ({
     acceptTransaction(value);
   };
 
-  console.log(namaProduk);
   return (
     <Modal open={open} onClose={handleClose}>
       {terimaPesanan ? (
@@ -134,7 +128,6 @@ const ModalTerimaPesanan = ({
               alignItems="center"
               flexDirection="row"
               marginTop="30px"
-              marginBottom="10px"
             >
               <Typography sx={{ fontWeight: "bold", fontSize: "12px" }}>
                 {namaPembeli}
@@ -173,26 +166,18 @@ const ModalTerimaPesanan = ({
                 {waktuOrder}
               </Typography>
             </Box>
-            <Typography fontSize="14px" fontWeight="bold">
-              {namaProduk}
-            </Typography>
-            <Typography sx={{ fontSize: "12px", color: "gray" }}>
-              {jumlahProduk} x {hargaProduk.toLocaleString()}
-            </Typography>
-            <Box
-              sx={{
-                marginTop: "11px",
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                color: "Brand.500",
-              }}
-            >
-              <Typography sx={{ fontSize: "12px" }}>
-                lihat {jumlahProdukOrder} obat lainnya
-              </Typography>
-              <KeyboardArrowDownIcon sx={{ size: "12px" }} />
-            </Box>
+            {productsData.map((val) => {
+              return (
+                <Box marginTop="10px">
+                  <Typography fontSize="14px" fontWeight="bold">
+                    {val?.product?.nama_produk}
+                  </Typography>
+                  <Typography sx={{ fontSize: "12px", color: "gray" }}>
+                    {val?.quantity} x {val?.price_when_sold?.toLocaleString()}
+                  </Typography>
+                </Box>
+              );
+            })}
           </Box>
 
           {/* Box 2 */}
@@ -226,7 +211,7 @@ const ModalTerimaPesanan = ({
                     Total Harga
                   </Typography>
                   <Typography sx={{ fontSize: "10px", fontWeight: "bold" }}>
-                    ({jumlahProduk} Obat)
+                    ({productsData?.length} Obat)
                   </Typography>
                 </Box>
                 <Typography
@@ -236,7 +221,7 @@ const ModalTerimaPesanan = ({
                     marginRight: "8px",
                   }}
                 >
-                  Rp {totalHarga.toLocaleString()},-
+                  Rp {totalHarga.toLocaleString()}
                 </Typography>
               </Box>
             </Box>

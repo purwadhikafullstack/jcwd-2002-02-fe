@@ -92,6 +92,7 @@ const CheckOut = () => {
           produk_image={val?.product?.produk_image_url[0]}
           produk_name={val?.product?.nama_produk}
           produk_price={val?.product?.harga_jual}
+          produk_satuan={val?.product?.satuan}
           produk_qty={val?.quantity}
           product_diskon={val?.product?.diskon}
         />
@@ -288,7 +289,7 @@ const CheckOut = () => {
                   Sub Total
                 </Typography>
                 <Typography sx={{ fontWeight: 700, mt: 2 }}>
-                  Rp {hargaProducts}
+                  Rp {parseInt(hargaProducts).toLocaleString()}
                 </Typography>
               </Box>
             </Box>
@@ -315,7 +316,7 @@ const CheckOut = () => {
               </Grid>
               <Grid item xs={8} sx={{ textAlign: "right" }}>
                 <Typography sx={{ fontWeight: 700, fontSize: "14px" }}>
-                  Rp {hargaProducts?.toLocaleString()}
+                  Rp {parseInt(hargaProducts).toLocaleString()}
                 </Typography>
               </Grid>
               <Grid item xs={4} sx={{ mb: "24px" }}>

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import {
   Box,
   Button,
@@ -11,11 +10,10 @@ import CheckOutCard from "components/CheckOut";
 import { RiFileCopyFill } from "react-icons/ri";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
 import Link from "next/link";
 import Timer from "components/Timer";
-import { useSelector } from "react-redux";
 import axiosInstance from "config/api";
 import { useRouter } from "next/router";
 import { styled } from "@mui/material/styles";
@@ -30,7 +28,6 @@ const Image = styled("img")({
 
 const DetailTransaksiPage = () => {
   const [uploadPembayaran, setUploadPembayaran] = useState(false);
-  const priceSelector = useSelector((state) => state.price);
   const [bca, setBca] = useState(false);
   const openBca = () => setBca(true);
   const closeBca = () => setBca(false);
@@ -64,6 +61,7 @@ const DetailTransaksiPage = () => {
           produk_name={val?.product?.nama_produk}
           produk_price={val?.product?.harga_jual}
           produk_qty={val?.quantity}
+          produk_satuan={val?.product?.satuan}
           product_diskon={val?.product?.diskon}
         />
       );
@@ -179,7 +177,7 @@ const DetailTransaksiPage = () => {
                   Sub Total
                 </Typography>
                 <Typography sx={{ fontWeight: 700, mt: 2 }}>
-                  Rp {transaction.total_price?.toLocaleString()},-
+                  Rp {transaction.total_price?.toLocaleString()}
                 </Typography>
               </Box>
             </Box>
@@ -257,7 +255,7 @@ const DetailTransaksiPage = () => {
                   Total Pembayaran
                 </Typography>
                 <Typography sx={{ fontWeight: 700, fontSize: "24px" }}>
-                  Rp {transaction.total_price?.toLocaleString()},-
+                  Rp {transaction.total_price?.toLocaleString()}
                 </Typography>
               </Stack>
               <Button

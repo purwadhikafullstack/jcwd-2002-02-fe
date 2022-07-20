@@ -120,6 +120,8 @@ const SemuaPesananPage = () => {
           courier="JNE-REG"
           orderCode={`HTMED-${val.id}`}
           status={val?.paymentStatusId}
+          orderTime={val?.createdAt}
+          productAdded={val?.productAdded}
           transaksiId={val?.id}
           isObatResep={val?.is_resep}
           productOrderQty={val?.transaction_details.length}

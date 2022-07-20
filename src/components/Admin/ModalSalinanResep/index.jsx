@@ -35,13 +35,7 @@ import axiosInstance from "config/api";
 import { useFormik } from "formik";
 import DeleteIcon from "@mui/icons-material/Delete";
 import moment from "moment";
-// import { styled } from "@mui/material/styles";
-
-const Image = styled("img")({
-  width: "430px",
-  height: "100%",
-  objectFit: "scale-down",
-});
+import Image from "next/image";
 
 const ModalSalinanResep = ({
   open,
@@ -695,7 +689,7 @@ const ModalSalinanResep = ({
                       fontSize: "12px",
                     }}
                   >
-                    {moment(waktuOrder).format("DD MMMM YYYY, hh:mm A")}
+                    {moment(waktuOrder).format("DD MMMM YYYY, HH:mm")}
                   </Typography>
                 </Box>
 
@@ -714,7 +708,8 @@ const ModalSalinanResep = ({
                         </Grid>
                         <Grid item xs={2}>
                           <Typography sx={{ fontSize: "12px", color: "gray" }}>
-                            {val.kuantitasObat} x {val.harga_jual}
+                            {val.kuantitasObat} x{" "}
+                            {val.harga_jual.toLocaleString()}
                           </Typography>
                         </Grid>
                         <Grid item xs={2}>
@@ -774,7 +769,7 @@ const ModalSalinanResep = ({
                         marginRight: "8px",
                       }}
                     >
-                      Rp {totalPrice().toLocaleString()},-
+                      Rp {totalPrice().toLocaleString()}
                     </Typography>
                   </Box>
                 </Box>

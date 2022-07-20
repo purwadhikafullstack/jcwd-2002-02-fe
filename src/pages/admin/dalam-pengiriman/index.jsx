@@ -121,6 +121,8 @@ const DalamPengirimanPage = () => {
           courier="JNE-REG"
           orderCode={`HTMED-${val.id}`}
           status={val?.paymentStatusId}
+          orderTime={val?.createdAt}
+          productAdded={val?.productAdded}
           transaksiId={val?.id}
           isObatResep={val?.is_resep}
           productOrderQty={val?.transaction_details.length}
@@ -179,7 +181,7 @@ const DalamPengirimanPage = () => {
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
               <Box>
                 <Typography sx={{ fontWeight: "bold", fontSize: "20px" }}>
-                  Semua Pesanan
+                  Dalam Pengiriman
                 </Typography>
               </Box>
               <Box display="flex">

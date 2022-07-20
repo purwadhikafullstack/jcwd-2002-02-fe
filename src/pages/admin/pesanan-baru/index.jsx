@@ -122,6 +122,8 @@ const PesananBaruPage = () => {
           orderCode={`HTMED-${val.id}`}
           status={val?.paymentStatusId}
           transaksiId={val?.id}
+          orderTime={val?.createdAt}
+          productAdded={val?.productAdded}
           isObatResep={val?.is_resep}
           productOrderQty={val?.transaction_details.length}
           detail={val}

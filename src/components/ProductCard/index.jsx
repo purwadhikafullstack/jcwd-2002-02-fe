@@ -144,7 +144,7 @@ const ProductCard = ({ nama_produk, harga, diskon, produk_image, id }) => {
                   textDecoration: "line-through",
                 }}
               >
-                Rp. {parseInt(harga).toLocaleString()}
+                Rp {parseInt(harga).toLocaleString()}
               </Typography>
             </Box>
           </Box>
@@ -171,7 +171,7 @@ const ProductCard = ({ nama_produk, harga, diskon, produk_image, id }) => {
         <Box display="flex" marginTop="7px">
           <Box maxWidth="103px">
             <Typography fontWeight="bold">
-              Rp. {parseInt(harga - harga * (diskon / 100)).toLocaleString()}
+              Rp {parseInt(harga - harga * (diskon / 100)).toLocaleString()}
             </Typography>
           </Box>
           <Typography>/ Pack</Typography>
