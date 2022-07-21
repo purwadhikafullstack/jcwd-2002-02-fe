@@ -35,7 +35,13 @@ import axiosInstance from "config/api";
 import { useFormik } from "formik";
 import DeleteIcon from "@mui/icons-material/Delete";
 import moment from "moment";
-import Image from "next/image";
+// import Image from "next/image";
+
+const Image = styled("img")({
+  width: "430px",
+  height: "50%",
+  objectFit: "scale-down",
+});
 
 const ModalSalinanResep = ({
   open,
@@ -213,10 +219,10 @@ const ModalSalinanResep = ({
             justifyContent="center"
             alignItems="center"
           >
-            <Image src={Group8725} />
+            <Image src="https://cms-assets.tutsplus.com/cdn-cgi/image/width=850/uploads/users/523/posts/32694/final_image/tutorial-preview-large.png" />
             <Typography
               sx={{
-                marginTop: "20px",
+                marginTop: "10px",
                 fontSize: "16px",
                 color: "Brand.500",
                 fontWeight: "bold",
