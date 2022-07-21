@@ -102,6 +102,7 @@ const Alamat = () => {
       };
       await axiosInstance.post("/address/add-new-address", newAddress);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
     }
   };
@@ -116,6 +117,7 @@ const Alamat = () => {
       const provinsiList = await axiosInstance.get("/address/province");
       setProvinsiOption(provinsiList.data.result);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
     }
   };
@@ -129,6 +131,7 @@ const Alamat = () => {
       });
       setKotaOption(cityList.data.result);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
     }
   };
