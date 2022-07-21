@@ -26,7 +26,6 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
-import Group8725 from "public/Images/Group8725.png";
 import Kursiplastik from "public/Images/kursiplastik.png";
 import * as Yup from "yup";
 import AddIcon from "@mui/icons-material/Add";
