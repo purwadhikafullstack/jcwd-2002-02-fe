@@ -117,7 +117,7 @@ const UserCart = ({ checked = false, setCartChecked, val, indexInRedux }) => {
 
   useEffect(() => {
     fetchProductData();
-  });
+  }, []);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", mt: "28px" }}>
