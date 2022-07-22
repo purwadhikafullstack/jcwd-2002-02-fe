@@ -77,49 +77,45 @@ const Home = () => {
         <UnggahResep />
         <Kategori />
         <Divider sx={{ marginY: "30px" }} />
-        <Box>
-          <Box>
-            <Box display="flex" justifyContent="space-between">
-              <Typography variant="h5">Kejar Diskon Hari Ini</Typography>
-              <Link href="/product-list">
-                <Typography
-                  color="Brand.500"
-                  sx={{
-                    ":hover": {
-                      cursor: "pointer",
-                    },
-                  }}
-                >
-                  Lihat Semua
-                </Typography>
-              </Link>
-            </Box>
-          </Box>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Box sx={{ width: "301px", height: "395px", position: "relative" }}>
-              <Image width="301px" height="395px" src={kejardiskon} />
+        <Box maxWidth="100vw">
+          <Box display="flex" justifyContent="space-between">
+            <Typography variant="h5">Kejar Diskon Hari Ini</Typography>
+            <Link href="/product-list">
               <Typography
+                color="Brand.500"
                 sx={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  fontWeight: "700",
-                  fontSize: "20px",
-                  width: "159px",
-                  height: "50px",
-                  m: 4,
-                  textAlign: "center",
+                  ":hover": {
+                    cursor: "pointer",
+                  },
                 }}
               >
-                Yuk Buruan Ikutan!
+                Lihat Semua
               </Typography>
-            </Box>
+            </Link>
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              overflow: "auto",
+              "::-webkit-scrollbar": {
+                display: "none",
+              },
+              maxWidth: "100vw",
+            }}
+          >
+            <Image
+              width="301px"
+              height="395px"
+              position="relative"
+              src={kejardiskon}
+            />
             <Box
               sx={{
                 display: "flex",
-                position: "absolute",
-                ml: "200px",
-                justifyContent: "space-between",
+                position: "relative",
+                ml: "100px",
+                width: "100%",
               }}
             >
               {renderProductWithDiscount()}
@@ -143,7 +139,17 @@ const Home = () => {
               </Typography>
             </Link>
           </Box>
-          <Box sx={{ display: "flex" }}>{renderPopularProduct()}</Box>
+          <Box
+            sx={{
+              display: "flex",
+              overflow: "scroll",
+              "::-webkit-scrollbar": {
+                display: "none",
+              },
+            }}
+          >
+            {renderPopularProduct()}
+          </Box>
         </Box>
 
         <BannerJaminan />
