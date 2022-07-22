@@ -55,6 +55,7 @@ const MyApp = ({ Component, pageProps }) => {
                   <GoogleAnalytics />
                   <CartProvider>
                     <AuthProvider>
+                      <GoogleAnalytics />
                       <Nav />
                       <Component {...pageProps} />
                       <Footer />
