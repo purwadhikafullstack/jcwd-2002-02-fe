@@ -29,7 +29,7 @@ const ProductList = () => {
   const searchSelector = useSelector((state) => state.search);
   const router = useRouter();
   const [contentList, setContentList] = useState([]);
-  const [page, setPage] = useState(parseInt(router.query.page));
+  const [page, setPage] = useState(1);
   const [searchValue, setSearchValue] = useState(searchSelector.searchInput);
   const [sortInput, setSortInput] = useState("");
   const [sortBy, setSortBy] = useState(router.query._sortBy);
@@ -46,14 +46,16 @@ const ProductList = () => {
   const [dataCount, setDataCount] = useState([]);
   const [rowPerPage, setRowPerPage] = useState(8);
 
+  const [isLoadingQueryParams, setIsLoadingQueryParams] = useState(true);
+
   const fetchProductList = async () => {
     try {
       const productList = await axiosInstance.get("/product", {
         params: {
           _sortBy: sortBy ? sortBy : undefined,
           _sortDir: sortDir ? sortDir : undefined,
-          _limit: rowPerPage,
-          _page: page,
+          _limit: parseInt(rowPerPage),
+          _page: parseInt(page),
           hargaMinimum: hargaMinimum || undefined,
           hargaMaksimum: hargaMaksimum || undefined,
           kategoriTerpilih: kategoriTerpilih || undefined,
@@ -87,8 +89,10 @@ const ProductList = () => {
       if (router.query.page) {
         setPage(parseInt(router.query.page));
       }
+
+      setIsLoadingQueryParams(false);
     }
-    console.log(router.query.page);
+    // console.log(router.query.page);
   }, [router.isReady]);
 
   const sortInputHandler = (event) => {
@@ -134,7 +138,7 @@ const ProductList = () => {
   };
 
   useEffect(() => {
-    if (router.isReady) {
+    if (!isLoadingQueryParams) {
       if (
         typeof sortDir === "string" ||
         typeof hargaMinimum === "string" ||
@@ -144,7 +148,6 @@ const ProductList = () => {
         (typeof page === "number" && !Number.isNaN(page))
       ) {
         fetchProductList();
-        console.log(page, "PAGEEEEEE");
         router.push({
           query: {
             _sortBy: sortBy,
@@ -168,6 +171,7 @@ const ProductList = () => {
     searchValue,
     rowPerPage,
     router.isReady,
+    isLoadingQueryParams,
   ]);
 
   useEffect(() => {

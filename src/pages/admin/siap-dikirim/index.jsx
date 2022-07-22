@@ -42,6 +42,7 @@ const SiapDikirimPage = () => {
   const [dataCount, setDataCount] = useState([]);
   const [rowPerPage, setRowPerPage] = useState(5);
   const [dummy, setDummy] = useState(false);
+  const [isLoadingQueryParams, setIsLoadingQueryParams] = useState(true);
 
   const filterHandle = (event) => {
     setSortFilter(event.target.value);
@@ -57,11 +58,11 @@ const SiapDikirimPage = () => {
       const dataTransaksi = await axiosInstance.get("/transaction", {
         params: {
           statusTerpilih: 2,
-          _page: page,
+          _page: parseInt(page),
           _sortBy: sortBy ? sortBy : undefined,
-          _sortDir: sortDir ? sortDir : undefined,
+          _sortDir: sortDir ? sortDir : "ASC",
           username: namaUser,
-          _limit: limit,
+          _limit: parseInt(rowPerPage),
         },
       });
       setTransaksi(dataTransaksi.data.result.rows);
@@ -83,6 +84,10 @@ const SiapDikirimPage = () => {
       if (router.query.username) {
         setNamaUser(router.query.username);
       }
+      if (router.query.page) {
+        setPage(parseInt(router.query.page));
+      }
+      setIsLoadingQueryParams(false);
     }
   }, [router.isReady]);
 
@@ -140,17 +145,33 @@ const SiapDikirimPage = () => {
   };
 
   useEffect(() => {
-    fetchTransaksi();
-    if (typeof sortDir === "string" || typeof namaUser === "string") {
-      router.push({
-        query: {
-          _sortBy: sortBy,
-          _sortDir: sortDir,
-          username: namaUser,
-        },
-      });
+    if (!isLoadingQueryParams) {
+      if (
+        typeof sortDir === "string" ||
+        typeof namaUser === "string" ||
+        (typeof page === "number" && !Number.isNaN(page))
+      ) {
+        fetchTransaksi();
+        router.push({
+          query: {
+            _sortBy: sortBy,
+            _sortDir: sortDir,
+            username: namaUser,
+            page: page || 1,
+          },
+        });
+      }
     }
-  }, [page, sortBy, sortDir, namaUser, rowPerPage, dummy]);
+  }, [
+    page,
+    sortBy,
+    sortDir,
+    namaUser,
+    rowPerPage,
+    dummy,
+    router.isReady,
+    isLoadingQueryParams,
+  ]);
 
   const sortDefaultValue = () => {
     if (router.isReady && router.query._sortDir && router.query._sortBy) {
@@ -307,7 +328,7 @@ const SiapDikirimPage = () => {
                     defaultPage={1}
                     siblingCount={0}
                     count={ceil(dataCount / rowPerPage)}
-                    page={page}
+                    page={parseInt(router.query.page)}
                     onChange={handleChangePage}
                     color="primary"
                   />
