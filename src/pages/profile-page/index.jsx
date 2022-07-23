@@ -238,6 +238,7 @@ const ProfilePage = () => {
       const dataAlamat = await axiosInstance.get("/address/get-all-address");
       setListAlamat(dataAlamat.data.result.rows);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
     }
   };
