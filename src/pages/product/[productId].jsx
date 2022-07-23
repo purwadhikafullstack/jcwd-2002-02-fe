@@ -23,6 +23,7 @@ import { addToCart } from "redux/reducer/cart";
 import { useEffect, useState } from "react";
 import Page from "components/Page";
 import { WEB_URL } from "config/url";
+import * as gtag from "../../lib/gtag";
 
 const Image = styled("img")({
   width: "50px",
@@ -97,6 +98,13 @@ const ProductPage = ({ productDetail, stock }) => {
       const cartInfo = addProductToCart.data;
 
       dispatch(addToCart(cartInfo.data));
+
+      gtag.gaEvent({
+        action: "add_to_cart",
+        label: `atc product: ${productDetail.nama_produk}`,
+        value: `${productDetail.nama_produk}`,
+        category: "cart",
+      });
 
       enqueueSnackbar(cartInfo.message, {
         variant: "success",

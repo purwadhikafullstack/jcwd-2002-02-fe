@@ -50,9 +50,9 @@ const MyApp = ({ Component, pageProps }) => {
                 </AdminProvider>
               ) : (
                 <>
+                  <GoogleAnalytics />
                   <CartProvider>
                     <AuthProvider>
-                      <GoogleAnalytics />
                       <Nav />
                       <Component {...pageProps} />
                       <Footer />
