@@ -434,7 +434,10 @@ const ProductPage = ({ productDetail, stock }) => {
                           border: 0,
                         },
                       }}
-                      disabled={totalStock() === formik.values.quantity}
+                      disabled={
+                        totalStock() === formik.values.quantity ||
+                        formik.values.quantity === 10
+                      }
                     >
                       +
                     </Button>

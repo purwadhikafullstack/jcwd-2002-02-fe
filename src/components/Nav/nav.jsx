@@ -15,6 +15,7 @@ import {
 import Image from "next/image";
 import { BsSearch } from "react-icons/bs";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import { useSnackbar } from "notistack";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
@@ -26,6 +27,8 @@ import { search } from "../../redux/reducer/search";
 import shopee from "../../public/Images/shopee.png";
 
 const Nav = () => {
+  const { enqueueSnackbar } = useSnackbar();
+
   const userSelector = useSelector((state) => state.auth);
   const cartSelector = useSelector((state) => state.cart);
   const dispatch = useDispatch();
@@ -128,8 +131,15 @@ const Nav = () => {
       {userSelector.id ? (
         <>
           <IconButton
-            onClick={() => router.push("/keranjang")}
-            disabled={!cartSelector.items.length}
+            onClick={
+              !cartSelector.items.length
+                ? () => {
+                    enqueueSnackbar("Isi keranjang terlebih dahulu!", {
+                      variant: "info",
+                    });
+                  }
+                : () => router.push("/keranjang")
+            }
             sx={{ ml: "50px" }}
           >
             <Badge
