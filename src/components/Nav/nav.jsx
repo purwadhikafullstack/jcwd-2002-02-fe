@@ -24,7 +24,7 @@ import { logout } from "redux/reducer/auth";
 import jsCookie from "js-cookie";
 import Router, { useRouter } from "next/router";
 import { search } from "../../redux/reducer/search";
-import shopee from "../../public/Images/shopee.png";
+import healthymed from "../../public/Images/healthymed.png";
 
 const Nav = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -93,9 +93,9 @@ const Nav = () => {
         background: "rgb(255, 255, 255, 0.9)",
       }}
     >
-      <Box display={{ xs: "none", md: "block" }}>
+      <Box mr="20px" display={{ xs: "none", md: "block" }}>
         <Link href="/">
-          <Image src={shopee} height="80px" width="210px" />
+          <Image src={healthymed} height="60px" width="210px" />
         </Link>
       </Box>
       <FormControl

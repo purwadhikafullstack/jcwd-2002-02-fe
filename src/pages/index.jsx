@@ -11,6 +11,8 @@ import axiosInstance from "config/api";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Page from "components/Page";
+import programhamil from "../public/Images/programhamil.png";
+import kebutuhanidulfitri from "../public/Images/kebutuhanidulfitri.png";
 import kejardiskon from "../public/Images/kejardiskon.png";
 import programhamil from "../public/Images/programhamil.png";
 import kebutuhanidulfitri from "../public/Images/kebutuhanidulfitri.png";
