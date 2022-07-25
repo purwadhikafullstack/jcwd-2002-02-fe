@@ -122,7 +122,6 @@ const Konfirmasi = () => {
     moment().add(5, "minutes").format("MM/DD/YYYY, hh:mm:ss");
     setTimer(moment().add(5, "minutes").format("MM/DD/YYYY, hh:mm:ss"));
   };
-  console.log(timer);
 
   return (
     <Page title="Confirm Your Order">
