@@ -262,7 +262,16 @@ const ProductPage = ({ productDetail, stock }) => {
                   src={productImagePreview || productImageShown}
                 />
               </Card>
-              <Box display="flex" width="100%" overflow="scroll">
+              <Box
+                display="flex"
+                width="100%"
+                sx={{
+                  overflow: "auto",
+                  "::-webkit-scrollbar": {
+                    display: "none",
+                  },
+                }}
+              >
                 {renderProductImage()}
               </Box>
               <Box sx={{ mt: 2 }} display={{ xs: "none", md: "block" }}>
