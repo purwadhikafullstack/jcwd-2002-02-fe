@@ -336,7 +336,6 @@ const ProductPage = ({ productDetail, stock }) => {
                 {productDetail?.diskon
                   ? hargaJual.toLocaleString()
                   : productDetail?.harga?.toLocaleString()}
-                ,-
               </Typography>
               <Typography sx={{ ml: 2, fontSize: "14px" }}>
                 / {productDetail.satuan}
@@ -358,7 +357,7 @@ const ProductPage = ({ productDetail, stock }) => {
                   }}
                   display={productDetail.diskon === "0" ? "none" : "block"}
                 >
-                  Rp {productDetail.harga_jual?.toLocaleString()},-
+                  Rp {productDetail.harga_jual?.toLocaleString()}
                 </Typography>
                 <Box
                   sx={{
@@ -580,9 +579,11 @@ const ProductPage = ({ productDetail, stock }) => {
             sx={{
               // ml: 14,
               display: "flex",
-              overflow: "visible",
+              overflow: "scroll",
+              "::-webkit-scrollbar": {
+                display: "none",
+              },
               width: "calc(~'100vh - 150px')",
-              overflowX: "scroll",
             }}
           >
             {listProdukTerkait?.map((val) => {
@@ -593,6 +594,7 @@ const ProductPage = ({ productDetail, stock }) => {
                   diskon={val?.diskon}
                   produk_image={val?.produk_image_url[0]}
                   id={val?.id}
+                  stocks={val?.stocks}
                 />
               );
             })}
