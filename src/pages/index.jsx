@@ -14,8 +14,6 @@ import Page from "components/Page";
 import programhamil from "../public/Images/programhamil.png";
 import kebutuhanidulfitri from "../public/Images/kebutuhanidulfitri.png";
 import kejardiskon from "../public/Images/kejardiskon.png";
-import programhamil from "../public/Images/programhamil.png";
-import kebutuhanidulfitri from "../public/Images/kebutuhanidulfitri.png";
 
 const Home = () => {
   const [popularProduct, setPopularProduct] = useState([]);
