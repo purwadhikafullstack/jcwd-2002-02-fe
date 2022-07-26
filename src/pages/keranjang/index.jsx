@@ -65,7 +65,15 @@ const KeranjangPage = () => {
 
   return (
     <Page title="Cart">
-      <Container sx={{ mt: "56px" }}>
+      <Container
+        sx={{
+          mt: "56px",
+          mb: {
+            xs: "100px",
+            md: 0,
+          },
+        }}
+      >
         <Stack sx={{ flexGrow: 1 }}>
           <Typography fontSize="24px" fontWeight={700}>
             Keranjang Saya
@@ -166,7 +174,7 @@ const KeranjangPage = () => {
                     sx={{ color: "#737A8D", textAlign: "right" }}
                   >
                     <Typography sx={{ fontWeight: 700 }}>
-                      Rp {totalPrice().toLocaleString()}
+                      Rp {totalPrice().toLocaleString("id")}
                     </Typography>
                   </Grid>
 
@@ -175,7 +183,7 @@ const KeranjangPage = () => {
                   </Grid>
                   <Grid item xs={8} sx={{ textAlign: "right" }}>
                     <Typography sx={{ fontWeight: 700 }}>
-                      Rp {totalPrice().toLocaleString()}
+                      Rp {totalPrice().toLocaleString("id")}
                     </Typography>
                   </Grid>
                 </Grid>

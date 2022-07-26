@@ -158,7 +158,17 @@ const ProsesPemesanan = () => {
 
   return (
     <Page title="Transaction">
-      <Grid container sx={{ mt: "56px", ml: "96px" }}>
+      <Grid
+        container
+        sx={{
+          mt: "56px",
+          ml: "96px",
+          mb: {
+            xs: "100px",
+            md: 0,
+          },
+        }}
+      >
         <Grid item xs={3}>
           <Stack
             sx={{

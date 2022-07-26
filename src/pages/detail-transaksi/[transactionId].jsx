@@ -111,6 +111,10 @@ const DetailTransaksiPage = () => {
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
+          mb: {
+            xs: "100px",
+            md: 0,
+          },
         }}
       >
         <Stack sx={{ width: "800px" }}>
@@ -138,7 +142,7 @@ const DetailTransaksiPage = () => {
                 Batas Akhir Pembayaran
               </Typography>
               <Typography sx={{ fontWeight: 700, fontSize: "16px", mt: "8px" }}>
-                {moment(router.query.createdAt)
+                {moment(transaction?.createdAt)
                   .add(1, "day")
                   .format("dddd, DD MMMM YYYY, HH:mm ")}
               </Typography>
@@ -191,7 +195,7 @@ const DetailTransaksiPage = () => {
                     Sub Total
                   </Typography>
                   <Typography sx={{ fontWeight: 700, mt: 2 }}>
-                    Rp {transaction.total_price?.toLocaleString()}
+                    Rp {transaction.total_price?.toLocaleString("id")}
                   </Typography>
                 </Box>
               </Box>
@@ -269,7 +273,7 @@ const DetailTransaksiPage = () => {
                     Total Pembayaran
                   </Typography>
                   <Typography sx={{ fontWeight: 700, fontSize: "24px" }}>
-                    Rp {transaction.total_price?.toLocaleString()}
+                    Rp {transaction.total_price?.toLocaleString("id")}
                   </Typography>
                 </Stack>
                 <Button

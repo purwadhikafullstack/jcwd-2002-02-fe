@@ -164,7 +164,7 @@ const DaftarPemesanan = ({
                   Sub Total
                 </Typography>
                 <Typography sx={{ fontWeight: 700, mt: 2 }}>
-                  Rp {total_harga.toLocaleString()}
+                  Rp {total_harga.toLocaleString("id")}
                 </Typography>
               </Box>
             </Box>
