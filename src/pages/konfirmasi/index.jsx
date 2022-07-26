@@ -20,7 +20,7 @@ import axiosInstance from "config/api";
 import { useRouter } from "next/router";
 import { styled } from "@mui/material/styles";
 import moment from "moment";
-import ModalUploadPembayaran from "components/ModalUploadPembayaran";
+import ModalUploadPembayaran from "components/modalUploadPembayaran";
 import Page from "components/Page";
 
 const Image = styled("img")({

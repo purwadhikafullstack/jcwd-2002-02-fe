@@ -2,7 +2,7 @@
 /* eslint-disable camelcase */
 import { Box, Button, Stack, Typography } from "@mui/material";
 import CheckOutCard from "components/CheckOut";
-import ModalUploadPembayaran from "components/ModalUploadPembayaran";
+import ModalUploadPembayaran from "components/modalUploadPembayaran";
 import axiosInstance from "config/api";
 import moment from "moment";
 import "moment/locale/id";
