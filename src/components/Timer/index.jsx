@@ -7,8 +7,6 @@ import { CgFormatSlash } from "react-icons/cg";
 import { useSelector } from "react-redux";
 
 const Timer = ({ time, id }) => {
-  // console.log(id);
-  const timeSelector = useSelector((state) => state.price);
   const [timeOut, setTimeOut] = useState(false);
   const [days, setDays] = useState(0);
   const [hours, setHours] = useState(0);
@@ -25,7 +23,7 @@ const Timer = ({ time, id }) => {
       setDays(d);
 
       const h = Math.floor(
-        ((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)) * 2
+        (difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
       );
       setHours(h);
 

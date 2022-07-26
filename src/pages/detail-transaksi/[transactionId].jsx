@@ -74,7 +74,7 @@ const DetailTransaksiPage = () => {
       const time = new Date(valo?.createdAt);
       return (
         <Timer
-          time={moment(time).add(1, "day").format("MM/DD/YYYY, hh:mm:ss")}
+          time={moment(time).add(1, "day").format("MM/DD/YYYY, HH:mm:ss")}
           id={valo?.id}
         />
       );
