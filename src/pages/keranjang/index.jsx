@@ -10,9 +10,11 @@ import {
   Typography,
 } from "@mui/material";
 import UserCart from "components/Cart";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
+import Group from "public/Images/Group.png";
 import Page from "components/Page";
 import { price } from "../../redux/reducer/price";
 
@@ -46,10 +48,10 @@ const KeranjangPage = () => {
   };
 
   useEffect(() => {
-    if (!authSelector.id || !cartItems.length) {
+    if (!authSelector.id) {
       router.push("/");
     }
-  }, [cartItems]);
+  }, []);
 
   const buttonHandler = () => {
     localStorage.setItem("selectedItems", JSON.stringify(checkedItems));
@@ -89,63 +91,90 @@ const KeranjangPage = () => {
                   p: 2,
                 }}
               >
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    borderBottom: "2px solid #D5D7DD",
-                    paddingBottom: "20px",
-                  }}
-                >
-                  <FormGroup>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          onChange={({ target: { checked } }) => {
-                            let dupItems = [...checkedItems];
-                            if (checked) {
-                              cartItems.forEach((val) => dupItems.push(val.id));
-                            } else {
-                              dupItems = [];
-                            }
+                {cartItems.length ? (
+                  <>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        borderBottom: "2px solid #D5D7DD",
+                        paddingBottom: "20px",
+                      }}
+                    >
+                      <FormGroup>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              onChange={({ target: { checked } }) => {
+                                let dupItems = [...checkedItems];
+                                if (checked) {
+                                  cartItems.forEach((val) =>
+                                    dupItems.push(val.id)
+                                  );
+                                } else {
+                                  dupItems = [];
+                                }
 
+                                setCheckedItems(dupItems);
+                              }}
+                              sx={{
+                                color: "Brand.500",
+                                "&.Mui-checked": {
+                                  color: "Brand.500",
+                                },
+                              }}
+                            />
+                          }
+                          label="Pilih Semua"
+                        />
+                      </FormGroup>
+                      {/* <Typography>Pilih Semua</Typography> */}
+                    </Box>
+                    {cartItems.map((item, idx) => {
+                      return (
+                        <UserCart
+                          setCartChecked={() => {
+                            let dupItems = [...checkedItems];
+
+                            if (dupItems.includes(item.id)) {
+                              dupItems = dupItems.filter(
+                                (oldItem) => oldItem !== item.id
+                              );
+                            } else {
+                              dupItems.push(item.id);
+                            }
                             setCheckedItems(dupItems);
                           }}
-                          sx={{
-                            color: "Brand.500",
-                            "&.Mui-checked": {
-                              color: "Brand.500",
-                            },
-                          }}
+                          checked={checkedItems.includes(item.id)}
+                          val={item}
+                          indexInRedux={idx}
                         />
-                      }
-                      label="Pilih Semua"
-                    />
-                  </FormGroup>
-                  {/* <Typography>Pilih Semua</Typography> */}
-                </Box>
-                {cartItems.map((item, idx) => {
-                  return (
-                    <UserCart
-                      setCartChecked={() => {
-                        let dupItems = [...checkedItems];
-
-                        if (dupItems.includes(item.id)) {
-                          dupItems = dupItems.filter(
-                            (oldItem) => oldItem !== item.id
-                          );
-                        } else {
-                          dupItems.push(item.id);
-                        }
-                        setCheckedItems(dupItems);
+                      );
+                    })}
+                  </>
+                ) : (
+                  <Box
+                    width="100%"
+                    height="100%"
+                    display="flex"
+                    flexDirection="column"
+                    justifyContent="center"
+                    alignItems="center"
+                    padding={1}
+                  >
+                    <Image src={Group} width="200px" height="125px" />
+                    <Typography
+                      sx={{
+                        marginTop: "20px",
+                        fontSize: "20px",
+                        fontWeight: "bold",
                       }}
-                      checked={checkedItems.includes(item.id)}
-                      val={item}
-                      indexInRedux={idx}
-                    />
-                  );
-                })}
+                    >
+                      Keranjang Kosong
+                    </Typography>
+                  </Box>
+                )}
               </Box>
             </Grid>
             <Grid item xs={12} md={4}>
