@@ -100,7 +100,7 @@ const ProsesPemesanan = () => {
             setDummy(!dummy);
             setPage(1);
           }}
-          time={moment(time).add(1, "day").format("MM/DD/YYYY, hh:mm:ss")}
+          time={moment(time).add(1, "day").format("MM/DD/YYYY, HH:mm:ss")}
           id={val?.id}
         />
       );

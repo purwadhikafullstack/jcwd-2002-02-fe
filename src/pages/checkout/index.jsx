@@ -5,12 +5,13 @@ import { useEffect, useState } from "react";
 import ModalIsi from "components/Modal";
 import Link from "next/link";
 import axiosInstance from "config/api";
+import { useSnackbar } from "notistack";
 import ModalAlamat from "components/ModalAlamat";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import { addToCart } from "redux/reducer/cart";
 import Page from "components/Page";
-import { cumulatedPrice, price, time } from "../../redux/reducer/price";
+import { cumulatedPrice, price } from "../../redux/reducer/price";
 
 const CheckOut = () => {
   const priceSelector = useSelector((state) => state.price);
@@ -29,6 +30,7 @@ const CheckOut = () => {
   const router = useRouter();
   const [selectedCart, setSelectedCart] = useState([]);
   const [hargaProducts, setHargaProducts] = useState(null);
+  const { enqueueSnackbar } = useSnackbar();
 
   const dispatch = useDispatch();
 
@@ -58,6 +60,12 @@ const CheckOut = () => {
 
   const addNewTransaction = async () => {
     try {
+      if (!alamatUtama) {
+        enqueueSnackbar("Masukkan Alamat Terlebih Dahulu!", {
+          variant: "warning",
+        });
+        return;
+      }
       const newData = {
         total_price: totalHarga,
         cartId: selectedCart,

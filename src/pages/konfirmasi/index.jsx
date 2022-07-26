@@ -214,7 +214,7 @@ const Konfirmasi = () => {
                     Sub Total
                   </Typography>
                   <Typography sx={{ fontWeight: 700, mt: 2 }}>
-                    Rp {priceSelector?.totalPrice.toLocaleString()}
+                    Rp {priceSelector?.totalPrice.toLocaleString("id")}
                   </Typography>
                 </Box>
               </Box>
@@ -292,7 +292,7 @@ const Konfirmasi = () => {
                     Total Pembayaran
                   </Typography>
                   <Typography sx={{ fontWeight: 700, fontSize: "24px" }}>
-                    Rp {priceSelector?.totalPrice.toLocaleString()}
+                    Rp {priceSelector?.totalPrice.toLocaleString("id")}
                   </Typography>
                 </Stack>
                 <Button
