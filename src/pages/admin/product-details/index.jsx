@@ -234,6 +234,22 @@ const ProductDetails = () => {
     }
   }, [revenueRawData]);
 
+  console.log(
+    ((productSoldCount.data / viewCount.data -
+      ((productSoldCount.prevData + 1) / (viewCount.prevData + 1) - 1) +
+      1) /
+      ((productSoldCount.prevData + 1) / (viewCount.prevData + 1)) -
+      1) *
+      100
+  );
+
+  // Math.abs(
+  //   ((productSoldCount.data / viewCount.data -
+  //     productSoldCount.prevData / viewCount.prevData) /
+  //     (productSoldCount.prevData / viewCount.prevData)) *
+  //     100
+  // ).toFixed(1)
+
   return (
     <Page title="Laporan Produk">
       <Box>
