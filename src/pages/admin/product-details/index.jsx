@@ -234,6 +234,22 @@ const ProductDetails = () => {
     }
   }, [revenueRawData]);
 
+  console.log(
+    ((productSoldCount.data / viewCount.data -
+      ((productSoldCount.prevData + 1) / (viewCount.prevData + 1) - 1) +
+      1) /
+      ((productSoldCount.prevData + 1) / (viewCount.prevData + 1)) -
+      1) *
+      100
+  );
+
+  // Math.abs(
+  //   ((productSoldCount.data / viewCount.data -
+  //     productSoldCount.prevData / viewCount.prevData) /
+  //     (productSoldCount.prevData / viewCount.prevData)) *
+  //     100
+  // ).toFixed(1)
+
   return (
     <Page title="Laporan Produk">
       <Box>
@@ -286,7 +302,9 @@ const ProductDetails = () => {
                   )
                     ? 0
                     : Math.abs(
-                        ((qtySold.data - qtySold.prevData) / qtySold.prevData) *
+                        ((qtySold.data - qtySold.prevData + 1) /
+                          (qtySold.prevData + 1) -
+                          1) *
                           100
                       ).toFixed(1)
                 }
@@ -307,8 +325,9 @@ const ProductDetails = () => {
                   )
                     ? 0
                     : Math.abs(
-                        ((viewCount.data - viewCount.prevData) /
-                          viewCount.prevData) *
+                        ((viewCount.data - viewCount.prevData + 1) /
+                          (viewCount.prevData + 1) -
+                          1) *
                           100
                       ).toFixed(1)
                 }
@@ -329,15 +348,26 @@ const ProductDetails = () => {
                   isNaN(
                     Math.abs(
                       ((productSoldCount.data / viewCount.data -
-                        productSoldCount.prevData / viewCount.prevData) /
-                        (productSoldCount.prevData / viewCount.prevData)) *
+                        ((productSoldCount.prevData + 1) /
+                          (viewCount.prevData + 1) -
+                          1) +
+                        1) /
+                        ((productSoldCount.prevData + 1) /
+                          (viewCount.prevData + 1)) -
+                        1) *
                         100
                     ).toFixed(1)
                   )
                     ? 0
                     : Math.abs(
-                        ((viewCount.data - viewCount.prevData) /
-                          viewCount.prevData) *
+                        ((productSoldCount.data / viewCount.data -
+                          ((productSoldCount.prevData + 1) /
+                            (viewCount.prevData + 1) -
+                            1) +
+                          1) /
+                          ((productSoldCount.prevData + 1) /
+                            (viewCount.prevData + 1)) -
+                          1) *
                           100
                       ).toFixed(1)
                 }
