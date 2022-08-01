@@ -37,8 +37,7 @@ import moment from "moment";
 // import Image from "next/image";
 
 const Image = styled("img")({
-  width: "430px",
-  height: "50%",
+  maxHeight: "100%",
   objectFit: "scale-down",
 });
 
@@ -49,7 +48,8 @@ const ModalSalinanResep = ({
   kodeOrder,
   waktuOrder,
   fotoResep,
-  transaksiId = 1,
+  transaksiId,
+  addressDetail,
 }) => {
   const { enqueueSnackbar } = useSnackbar();
 
@@ -57,6 +57,22 @@ const ModalSalinanResep = ({
   const [selesai, setSelesai] = useState(false);
   const [productData, setProductData] = useState([]);
   const [listObat, setListObat] = useState([]);
+  const [ongkir, setOngkir] = useState(null);
+
+  const fetchOngkir = async () => {
+    try {
+      const dataOngkir = await axiosInstance.post("/address/cost", {
+        origin: "153",
+        destination: addressDetail.kota_kabupaten_id,
+        weight: 200,
+        courier: "jne",
+      });
+      setOngkir(dataOngkir.data.result[0].costs[0].cost[0].value);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
+    }
+  };
 
   const isTerima = () => {
     setTerimaPesanan(true);
@@ -143,7 +159,7 @@ const ModalSalinanResep = ({
           transactionListId: transaksiId,
           nomor_resep: formik.values.nomorResep,
           price: val.harga_jual - val.harga_jual * (val.diskon / 100),
-          total_price: totalPrice(),
+          total_price: totalPrice() + ongkir,
         };
       });
 
@@ -171,14 +187,24 @@ const ModalSalinanResep = ({
     }
   }, []);
 
+  useEffect(() => {
+    if (!ongkir) {
+      fetchOngkir();
+    }
+  }, [ongkir]);
+
+  const closeModal = () => {
+    handleClose();
+    setTerimaPesanan(false);
+    formik.setFieldValue("obat", formik.initialValues.obat);
+    formik.setFieldValue("kuantitas", 0);
+    formik.setFieldValue("satuan", "Box");
+    formik.setFieldValue("nomorResep", "");
+    formik.setFieldValue("namaDokter", "");
+  };
+
   return (
-    <Modal
-      open={open}
-      onClose={() => {
-        handleClose();
-        setTerimaPesanan(false);
-      }}
-    >
+    <Modal open={open} onClose={closeModal}>
       {terimaPesanan ? (
         <Box
           sx={{
@@ -199,10 +225,7 @@ const ModalSalinanResep = ({
         >
           <Box display="flex" justifyContent="flex-end">
             <CloseIcon
-              onClick={() => {
-                handleClose();
-                setTerimaPesanan(false);
-              }}
+              onClick={closeModal}
               sx={{
                 "&:hover": {
                   cursor: "pointer",
@@ -218,7 +241,11 @@ const ModalSalinanResep = ({
             justifyContent="center"
             alignItems="center"
           >
-            <Image src="https://cms-assets.tutsplus.com/cdn-cgi/image/width=850/uploads/users/523/posts/32694/final_image/tutorial-preview-large.png" />
+            <Image
+              height="50%"
+              width="430px"
+              src="https://cms-assets.tutsplus.com/cdn-cgi/image/width=850/uploads/users/523/posts/32694/final_image/tutorial-preview-large.png"
+            />
             <Typography
               sx={{
                 marginTop: "10px",
@@ -262,7 +289,7 @@ const ModalSalinanResep = ({
               Buat Salinan Resep
             </Typography>
             <CloseIcon
-              onClick={handleClose}
+              onClick={closeModal}
               sx={{
                 "&:hover": {
                   cursor: "pointer",
@@ -508,7 +535,13 @@ const ModalSalinanResep = ({
                   <Button
                     onClick={tambahObatHandleBtn}
                     variant="contained"
-                    disabled={!(formik.isValid && formik.dirty)}
+                    // disabled={!(formik.isValid && formik.dirty)}
+                    disabled={
+                      formik.values.kuantitas === 0 ||
+                      formik.values.obat === "" ||
+                      !formik.values.namaDokter ||
+                      !formik.values.nomorResep
+                    }
                   >
                     Tambahkan Obat
                   </Button>
@@ -712,7 +745,10 @@ const ModalSalinanResep = ({
                         <Grid item xs={2}>
                           <Typography sx={{ fontSize: "12px", color: "gray" }}>
                             {val.kuantitasObat} x{" "}
-                            {val.harga_jual.toLocaleString("id")}
+                            {(
+                              val.harga_jual -
+                              (val.harga_jual * val.diskon) / 100
+                            )?.toLocaleString("id")}
                           </Typography>
                         </Grid>
                         <Grid item xs={2}>
