@@ -25,7 +25,6 @@ import { useSnackbar } from "notistack";
 import axiosInstance from "config/api";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import KeyboardArrowUpRoundedIcon from "@mui/icons-material/KeyboardArrowUpRounded";
-import { nanoid } from "nanoid";
 import ModalBuktiPembayaran from "../ModalBuktiPembayaran";
 
 const CardOrder = ({
@@ -466,7 +465,7 @@ const CardOrder = ({
                 variant="contained"
                 onClick={async () => {
                   await deliveryHandler(transaksiId);
-                  reRender(nanoid(64));
+                  reRender();
                 }}
               >
                 Minta Penjemputan
@@ -499,7 +498,7 @@ const CardOrder = ({
                       variant="contained"
                       onClick={async () => {
                         await declineHandler(transaksiId);
-                        reRender(nanoid(64));
+                        reRender();
                         setDecline(false);
                       }}
                       autoFocus
